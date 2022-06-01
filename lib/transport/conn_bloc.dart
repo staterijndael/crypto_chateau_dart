@@ -1,24 +1,42 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:bloc/bloc.dart';
 import 'package:crypto_chateau_dart/aes_256/aes_256.dart';
+import 'package:crypto_chateau_dart/dh/params.dart';
+import 'package:crypto_chateau_dart/transport/handshake.dart';
 import 'package:flutter/foundation.dart';
 import 'package:crypto/crypto.dart';
 
 part 'conn_event.dart';
 part 'conn_state.dart';
 
+enum EncryptionState{
+  Disabled,
+  Enabling,
+  Enabled,
+}
+
 class TcpBloc extends Bloc<TcpEvent, TcpState> {
   Socket? _socket;
   StreamSubscription? _socketStreamSub;
   ConnectionTask<Socket>? _socketConnectionTask;
-  Function(Iterable<int>)? _readFunc;
+  void Function(Uint8List)? _readFunc;
 
-  TcpBloc({required Function(Iterable<int>) readFunc})
-      : super(TcpState.initial());
+  EncryptionState _encryptionState = EncryptionState.Disabled;
+  Uint8List? _secretKey;
+  TcpBlocHandshake? tcpBlocHandshake;
+
+
+  TcpBloc({required void Function(Uint8List) readFunc, bool? encryptionEnabled})
+      : super(TcpState.initial()){
+        if (encryptionEnabled != null && encryptionEnabled){
+          _encryptionState = EncryptionState.Enabling;
+          tcpBlocHandshake = TcpBlocHandshake(tcpBloc: this);
+          tcpBlocHandshake!.handshake(Uint8List(0));
+        }
+      }
 
   @override
   Stream<TcpState> mapEventToState(
@@ -31,7 +49,7 @@ class TcpBloc extends Bloc<TcpEvent, TcpState> {
     } else if (event is ErrorOccured) {
       yield* _mapErrorToState();
     } else if (event is MessageReceived) {
-      yield* _readFunc!(event.message);
+      yield* _mapReceivedToState(event);
     } else if (event is SendMessage) {
       yield* _mapSendMessageToState(event);
     } else if (event is EnableEncryption) {
@@ -46,15 +64,8 @@ class TcpBloc extends Bloc<TcpEvent, TcpState> {
       _socket = await _socketConnectionTask!.socket;
 
       _socketStreamSub = _socket!.asBroadcastStream().listen((event) {
-        Uint8List message;
-        if (state.encryptionEnabled) {
-          message = Decrypt(event, state.sharedHash);
-        } else {
-          message = event;
-        }
-
         add(MessageReceived(
-          message: message,
+          message: event,
         ));
       });
       _socket!.handleError(() {
@@ -86,11 +97,25 @@ class TcpBloc extends Bloc<TcpEvent, TcpState> {
     await _socket?.close();
   }
 
+  Stream<TcpState> _mapReceivedToState(MessageReceived event) async* {
+    if (_encryptionState == EncryptionState.Enabling){
+      tcpBlocHandshake!.handshake(event.message);
+      if (tcpBlocHandshake!.getCurrentStep() == HandshakeSteps.Finished){
+        yield* _mapEnableEncryptionToState(EnableEncryption(sharedKey: tcpBlocHandshake!.keyStore!.sharedKey));
+      }
+    }else if (_encryptionState == EncryptionState.Enabled){
+        Uint8List decryptedData = Decrypt(event.message, _secretKey!);
+        _readFunc!(decryptedData);
+    }else{
+      _readFunc!(event.message);
+    }
+  }
+
   Stream<TcpState> _mapSendMessageToState(SendMessage event) async* {
     if (_socket != null) {
       Uint8List message;
-      if (state.encryptionEnabled) {
-        message = Encrypt(event.message, state.sharedHash);
+      if (_encryptionState == EncryptionState.Enabled) {
+        message = Encrypt(event.message, _secretKey!);
       } else {
         message = event.message;
       }
@@ -100,17 +125,11 @@ class TcpBloc extends Bloc<TcpEvent, TcpState> {
   }
 
   Stream<TcpState> _mapEnableEncryptionToState(EnableEncryption event) async* {
-    if (event.shared.isEmpty) {
-      throw "incorrect shared key";
-    }
+    Uint8List sharedKeyBytes = bigIntToByteArray(event.sharedKey);
+    List<int> hash = sha256.convert(sharedKeyBytes).bytes;
 
-    List<int> hash = sha256.convert(event.shared).bytes;
-    yield state.enableEncryption(sharedHash: Uint8List.fromList(hash));
-
-    Function(Iterable<int>)? funcBefore = _readFunc;
-    HandshakeSteps currentStep = HandshakeSteps.ReadInitMsg;
-
-  
+    _secretKey = Uint8List.fromList(hash);
+    _encryptionState = EncryptionState.Enabled;
   }
 
   @override

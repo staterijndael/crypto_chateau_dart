@@ -24,7 +24,7 @@ class ErrorOccured extends TcpEvent {}
 
 /// Represents the event of an incoming message from the TCP server.
 class MessageReceived extends TcpEvent {
-  final Iterable<int> message;
+  final Uint8List message;
 
   MessageReceived({required this.message});
 }
@@ -38,6 +38,9 @@ class SendMessage extends TcpEvent {
 }
 
 class EnableEncryption extends TcpEvent {
+  final BigInt sharedKey;
+
+  EnableEncryption({required this.sharedKey});
 }
 
 

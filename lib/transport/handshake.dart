@@ -5,6 +5,8 @@ import 'dart:typed_data';
 import 'package:crypto_chateau_dart/dh/dh.dart';
 import 'package:crypto_chateau_dart/dh/params.dart';
 
+import 'conn_bloc.dart';
+
 enum HandshakeSteps {
   Ready,
   ReadInitMsg,
@@ -14,14 +16,14 @@ enum HandshakeSteps {
   Finished,
 }
 
-class ClientHandshake {
+class TcpBlocHandshake {
   HandshakeSteps? _currentStep;
-  Socket? _socket;
+  TcpBloc? _tcpBloc;
   KeyStore? keyStore;
 
-  ClientHandshake({required Socket socket}) {
+  TcpBlocHandshake({required TcpBloc tcpBloc}) {
     _currentStep = HandshakeSteps.Ready;
-    _socket = socket;
+    tcpBloc = tcpBloc;
     keyStore = KeyStore();
   }
 
@@ -31,7 +33,7 @@ class ClientHandshake {
         _currentStep = HandshakeSteps.ReadInitMsg;
         return;
       case HandshakeSteps.ReadInitMsg:
-        _socket!.writeln("handshake");
+        _tcpBloc!.add(SendMessage(message: Uint8List.fromList("handshake".codeUnits)));
         return;
       case HandshakeSteps.GetDhParams:
         List<Uint8List> dhParams = parseMsg(message, 2);
@@ -54,7 +56,7 @@ class ClientHandshake {
         return;
       case HandshakeSteps.SendClientPublicKey:
         Uint8List publicKeyBytes = bigIntToByteArray(keyStore!.publicKey);
-        _socket!.writeln(publicKeyBytes);
+        _tcpBloc!.add(SendMessage(message: publicKeyBytes));
         return;
       case HandshakeSteps.GetServerPublicKey:
         List<Uint8List> serverPublicKeyBytes = parseMsg(message, 1);
@@ -66,6 +68,10 @@ class ClientHandshake {
       case HandshakeSteps.Finished:
         throw "handshake already finished";
     }
+  }
+
+  HandshakeSteps getCurrentStep() {
+    return _currentStep!;
   }
 }
 

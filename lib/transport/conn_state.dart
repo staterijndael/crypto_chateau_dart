@@ -13,28 +13,20 @@ class TcpState {
   final SocketConnectionState connectionState;
   final List<Iterable<int>> messages;
 
-  late bool encryptionEnabled;
-  late Uint8List sharedHash;
-
-  TcpState({
+  const TcpState({
     required this.connectionState,
     required this.messages,
-  }) {
-    encryptionEnabled = false;
-    sharedHash = Uint8List(0);
-  }
+  });
 
   TcpState.encryptedConstuctor({
     required this.connectionState,
     required this.messages,
-    required this.encryptionEnabled,
-    required this.sharedHash,
   });
 
   factory TcpState.initial() {
-    return TcpState(
+    return const TcpState(
         connectionState: SocketConnectionState.None,
-        messages: const <Iterable<int>>[]);
+        messages: <Iterable<int>>[]);
   }
 
   TcpState changeState({
@@ -52,15 +44,6 @@ class TcpState {
     return TcpState(
       connectionState: connectionState,
       messages: messages,
-    );
-  }
-
-  TcpState enableEncryption({required Uint8List sharedHash}) {
-    return TcpState.encryptedConstuctor(
-      connectionState: connectionState,
-      messages: messages,
-      encryptionEnabled: true,
-      sharedHash: sharedHash,
     );
   }
 }
