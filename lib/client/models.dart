@@ -19,10 +19,17 @@ class GetUserRequest extends Request{
 }
 
 abstract class Response{
+  Unmarshal(Map<String, Uint8List> params);
 }
 
 class GetUserResponse extends Response{
-  final String userName;
+  String? userName;
 
-  GetUserResponse({required this.userName});
+  GetUserResponse([String? userName]){
+    this.userName = userName!;
+  }
+
+  Unmarshal(Map<String, Uint8List> params){
+      userName = String.fromCharCodes(params["UserName"]!);
+  }
 }

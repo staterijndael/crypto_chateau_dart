@@ -23,7 +23,9 @@ dynamic GetResponse(String methodName, Uint8List data){
   switch(methodName){
     case "GetUser":
       checkCountParams(1, params.length);
-      return GetUserResponse(userName: String.fromCharCodes(params["UserName"]!));
+      var response = GetUserResponse();
+      response.Unmarshal(params);
+      return response;
   }
 }
 
