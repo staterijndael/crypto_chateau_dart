@@ -12,6 +12,7 @@ dependencies:
   crypto: ^3.0.2
   flutter:
     sdk: flutter
+  flutter_bloc: ^8.0.1
 
 dev_dependencies:
   flutter_test:
