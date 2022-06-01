@@ -28,14 +28,8 @@ class TcpBloc extends Bloc<TcpEvent, TcpState> {
   Uint8List? _secretKey;
   TcpBlocHandshake? tcpBlocHandshake;
 
-  TcpBloc({required void Function(Uint8List) readFunc, bool? encryptionEnabled})
+  TcpBloc({required void Function(Uint8List) readFunc})
       : super(TcpState.initial()) {
-    if (encryptionEnabled != null && encryptionEnabled) {
-      _encryptionState = EncryptionState.Enabling;
-      tcpBlocHandshake = TcpBlocHandshake(tcpBloc: this);
-      tcpBlocHandshake!.handshake(Uint8List(0));
-    }
-
     on<Connect>(_mapConnectToState);
     on<Disconnect>(_mapDisconnectToState);
     on<ErrorOccured>(_mapErrorToState);
@@ -59,6 +53,12 @@ class TcpBloc extends Bloc<TcpEvent, TcpState> {
       _socket!.handleError(() {
         add(ErrorOccured());
       });
+
+      if (event.encryptionEnabled) {
+        _encryptionState = EncryptionState.Enabling;
+        tcpBlocHandshake = TcpBlocHandshake(tcpBloc: this);
+        tcpBlocHandshake!.handshake(Uint8List(0));
+      }
 
       emit(state.changeState(connectionState: SocketConnectionState.Connected));
     } catch (err) {

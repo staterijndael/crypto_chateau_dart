@@ -11,7 +11,10 @@ class Connect extends TcpEvent {
   /// The port of the server to connect to.
   final int port;
 
-  Connect({required this.host, required this.port})
+  final bool encryptionEnabled;
+
+  Connect(
+      {required this.host, required this.port, required this.encryptionEnabled})
       : assert(host != null),
         assert(port != null);
 }
@@ -42,5 +45,3 @@ class EnableEncryption extends TcpEvent {
 
   EnableEncryption({required this.sharedKey});
 }
-
-
