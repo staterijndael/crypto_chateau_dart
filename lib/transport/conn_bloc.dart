@@ -38,8 +38,7 @@ class TcpBloc extends Bloc<TcpEvent, TcpState> {
     on<EnableEncryption>(_mapEnableEncryptionToState);
   }
 
-  Stream<TcpState> _mapConnectToState(
-      Connect event, Emitter<TcpState> emit) async* {
+  void _mapConnectToState(Connect event, Emitter<TcpState> emit) async {
     emit(state.changeState(connectionState: SocketConnectionState.Connecting));
     try {
       _socketConnectionTask = await Socket.startConnect(event.host, event.port);
@@ -66,8 +65,7 @@ class TcpBloc extends Bloc<TcpEvent, TcpState> {
     }
   }
 
-  Stream<TcpState> _mapDisconnectToState(
-      Disconnect event, Emitter<TcpState> emit) async* {
+  void _mapDisconnectToState(Disconnect event, Emitter<TcpState> emit) async {
     try {
       emit(state.changeState(
           connectionState: SocketConnectionState.Disconnecting));
@@ -80,19 +78,18 @@ class TcpBloc extends Bloc<TcpEvent, TcpState> {
     emit(state.changeState(connectionState: SocketConnectionState.None));
   }
 
-  Stream<TcpState> _mapErrorToState(
-      ErrorOccured event, Emitter<TcpState> emit) async* {
+  void _mapErrorToState(ErrorOccured event, Emitter<TcpState> emit) async {
     emit(state.changeState(connectionState: SocketConnectionState.Failed));
     await _socketStreamSub?.cancel();
     await _socket?.close();
   }
 
-  Stream<TcpState> _mapReceivedToState(
-      MessageReceived event, Emitter<TcpState> emit) async* {
+  void _mapReceivedToState(
+      MessageReceived event, Emitter<TcpState> emit) async {
     if (_encryptionState == EncryptionState.Enabling) {
       tcpBlocHandshake!.handshake(event.message);
       if (tcpBlocHandshake!.getCurrentStep() == HandshakeSteps.Finished) {
-        yield* _mapEnableEncryptionToState(
+        _mapEnableEncryptionToState(
             EnableEncryption(sharedKey: tcpBlocHandshake!.keyStore!.sharedKey),
             emit);
       }
@@ -104,8 +101,7 @@ class TcpBloc extends Bloc<TcpEvent, TcpState> {
     }
   }
 
-  Stream<TcpState> _mapSendMessageToState(
-      SendMessage event, Emitter<TcpState> emit) async* {
+  void _mapSendMessageToState(SendMessage event, Emitter<TcpState> emit) async {
     if (_socket != null) {
       Uint8List message;
       if (_encryptionState == EncryptionState.Enabled) {
@@ -118,8 +114,8 @@ class TcpBloc extends Bloc<TcpEvent, TcpState> {
     }
   }
 
-  Stream<TcpState> _mapEnableEncryptionToState(
-      EnableEncryption event, Emitter<TcpState> emit) async* {
+  void _mapEnableEncryptionToState(
+      EnableEncryption event, Emitter<TcpState> emit) async {
     // maybe we should change only state
     Uint8List sharedKeyBytes = bigIntToByteArray(event.sharedKey);
     List<int> hash = sha256.convert(sharedKeyBytes).bytes;
