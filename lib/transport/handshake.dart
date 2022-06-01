@@ -27,7 +27,7 @@ class TcpBlocHandshake {
     keyStore = KeyStore();
   }
 
-  handshake(Iterable<int> message) async* {
+  handshake(Iterable<int> message) {
     switch (_currentStep) {
       case HandshakeSteps.Ready:
         _currentStep = HandshakeSteps.ReadInitMsg;
@@ -52,7 +52,7 @@ class TcpBlocHandshake {
         keyStore!.GeneratePublicKey();
 
         _currentStep = HandshakeSteps.SendClientPublicKey;
-        yield* handshake(message);
+        handshake(message);
         return;
       case HandshakeSteps.SendClientPublicKey:
         Uint8List publicKeyBytes = bigIntToByteArray(keyStore!.publicKey);
