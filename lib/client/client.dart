@@ -15,7 +15,7 @@ class Client {
     _tcpBloc = TcpBloc(readFunc: handleFunc);
   }
 
-  void connect(
+  Future<void> connect(
       {required String host,
       required int port,
       required bool isEncryptionEnabled}) async {
