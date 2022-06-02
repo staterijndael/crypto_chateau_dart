@@ -33,7 +33,8 @@ class TcpBlocHandshake {
         _currentStep = HandshakeSteps.ReadInitMsg;
         return;
       case HandshakeSteps.ReadInitMsg:
-        _tcpBloc!.add(SendMessage(message: Uint8List.fromList("handshake".codeUnits)));
+        _tcpBloc!.sendMessage(
+            SendMessage(message: Uint8List.fromList("handshake".codeUnits)));
         return;
       case HandshakeSteps.GetDhParams:
         List<Uint8List> dhParams = parseMsg(message, 2);
@@ -56,7 +57,7 @@ class TcpBlocHandshake {
         return;
       case HandshakeSteps.SendClientPublicKey:
         Uint8List publicKeyBytes = bigIntToByteArray(keyStore!.publicKey);
-        _tcpBloc!.add(SendMessage(message: publicKeyBytes));
+        _tcpBloc!.sendMessage(SendMessage(message: publicKeyBytes));
         return;
       case HandshakeSteps.GetServerPublicKey:
         List<Uint8List> serverPublicKeyBytes = parseMsg(message, 1);

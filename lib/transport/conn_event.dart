@@ -23,7 +23,11 @@ class Connect extends TcpEvent {
 class Disconnect extends TcpEvent {}
 
 /// Represents a socket error.
-class ErrorOccured extends TcpEvent {}
+class ErrorOccured extends TcpEvent {
+  String? errMessage;
+
+  ErrorOccured({this.errMessage});
+}
 
 /// Represents the event of an incoming message from the TCP server.
 class MessageReceived extends TcpEvent {

@@ -16,7 +16,7 @@ class Client {
       required int port,
       required bool isEncryptionEnabled}) {
     _tcpBloc = TcpBloc(readFunc: handleFunc);
-    _tcpBloc!.add(Connect(
+    _tcpBloc!.connect(Connect(
         host: host, port: port, encryptionEnabled: isEncryptionEnabled));
   }
 
@@ -30,7 +30,7 @@ class Client {
 
   //handlers
   GetUserResponse GetUser(GetUserRequest request) {
-    _tcpBloc!.add(SendMessage(message: request.Marshal()));
+    _tcpBloc!.sendMessage(SendMessage(message: request.Marshal()));
     Uint8List rawResponse =
         WaitResponse(_waitResponsesMap, "GetUser", maxTimerDifference);
     GetUserResponse response =
