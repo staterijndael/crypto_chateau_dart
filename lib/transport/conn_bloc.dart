@@ -40,8 +40,8 @@ class TcpBloc {
         message: event,
       ));
     });
-    _socket!.handleError(() {
-      handleError(ErrorOccured(errMessage: "socket error"));
+    _socket!.handleError((err) {
+      handleError(ErrorOccured(errMessage: "socket error $err"));
     });
 
     if (event.encryptionEnabled) {
