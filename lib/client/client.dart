@@ -11,12 +11,15 @@ class Client {
 
   int maxTimerDifference = 5000;
 
-  Client(
+  Client() {
+    _tcpBloc = TcpBloc(readFunc: handleFunc);
+  }
+
+  void connect(
       {required String host,
       required int port,
-      required bool isEncryptionEnabled}) {
-    _tcpBloc = TcpBloc(readFunc: handleFunc);
-    _tcpBloc!.connect(Connect(
+      required bool isEncryptionEnabled}) async {
+    await _tcpBloc!.connect(Connect(
         host: host, port: port, encryptionEnabled: isEncryptionEnabled));
   }
 

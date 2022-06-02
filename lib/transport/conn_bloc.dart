@@ -31,7 +31,7 @@ class TcpBloc {
     _readFunc = readFunc;
   }
 
-  void connect(Connect event) async {
+  Future<void> connect(Connect event) async {
     _socketConnectionTask = await Socket.startConnect(event.host, event.port);
     _socket = await _socketConnectionTask!.socket;
 
