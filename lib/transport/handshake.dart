@@ -33,8 +33,10 @@ class TcpBlocHandshake {
         _currentStep = HandshakeSteps.ReadInitMsg;
         return;
       case HandshakeSteps.ReadInitMsg:
-        _tcpBloc!.sendMessage(
-            SendMessage(message: Uint8List.fromList("handshake".codeUnits)));
+        if (String.fromCharCodes(message) != "handshake") {
+          throw "incorrect handshake init message";
+        }
+        _currentStep = HandshakeSteps.GetDhParams;
         return;
       case HandshakeSteps.GetDhParams:
         List<Uint8List> dhParams = parseMsg(message, 2);
