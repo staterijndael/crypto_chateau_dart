@@ -64,6 +64,7 @@ class TcpBloc {
   void handleError(ErrorOccured event) async {
     await _socketStreamSub?.cancel();
     await _socket?.close();
+
     throw event.errMessage!;
   }
 
