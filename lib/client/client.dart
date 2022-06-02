@@ -15,14 +15,15 @@ class Client {
     _tcpBloc = TcpBloc(readFunc: handleFunc);
   }
 
-  Future<void> connect(
+  void connect(
       {required String host,
       required int port,
-      required bool isEncryptionEnabled}) async {
-    await _tcpBloc!
-        .connect(Connect(
-            host: host, port: port, encryptionEnabled: isEncryptionEnabled))
-        .onError((error, stackTrace) => throw error!);
+      required bool isEncryptionEnabled}) {
+    () async {
+      await _tcpBloc!.connect(Connect(
+          host: host, port: port, encryptionEnabled: isEncryptionEnabled));
+    }()
+        .ignore();
   }
 
   void handleFunc(Uint8List data) {
