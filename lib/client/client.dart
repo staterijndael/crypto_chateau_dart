@@ -1,3 +1,4 @@
+import 'dart:html';
 import 'dart:typed_data';
 
 import 'package:crypto_chateau_dart/client/response.dart';
@@ -5,22 +6,33 @@ import 'package:crypto_chateau_dart/client/response.dart';
 import '../transport/conn_bloc.dart';
 import 'models.dart';
 
+enum ConnectionState {
+  NotConnected,
+  Connecting,
+  Connected,
+  Disconnected,
+}
+
 class Client {
   TcpBloc? _tcpBloc;
   final Map<String, Uint8List> _waitResponsesMap = {};
+  ConnectionState? connectionState;
 
   int maxTimerDifference = 5000;
 
   Client() {
     _tcpBloc = TcpBloc(readFunc: handleFunc);
+    connectionState = ConnectionState.NotConnected;
   }
 
   void connect(
       {required String host,
       required int port,
       required bool isEncryptionEnabled}) async {
+    connectionState = ConnectionState.Connecting;
     await _tcpBloc!.connect(Connect(
         host: host, port: port, encryptionEnabled: isEncryptionEnabled));
+    connectionState = ConnectionState.Connected;
   }
 
   void handleFunc(Uint8List data) {
@@ -43,11 +55,12 @@ class Client {
       return response;
     } catch (err) {
       closeTcpBloc();
-      throw err;
+      rethrow;
     }
   }
 
   void closeTcpBloc() {
+    connectionState = ConnectionState.Disconnected;
     _tcpBloc!.close();
   }
 }
