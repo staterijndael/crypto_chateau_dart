@@ -19,8 +19,10 @@ class Client {
       {required String host,
       required int port,
       required bool isEncryptionEnabled}) async {
-    await _tcpBloc!.connect(Connect(
-        host: host, port: port, encryptionEnabled: isEncryptionEnabled));
+    await _tcpBloc!
+        .connect(Connect(
+            host: host, port: port, encryptionEnabled: isEncryptionEnabled))
+        .onError((error, stackTrace) => throw error!);
   }
 
   void handleFunc(Uint8List data) {
