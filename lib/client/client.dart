@@ -30,12 +30,22 @@ class Client {
 
   //handlers
   GetUserResponse GetUser(GetUserRequest request) {
-    _tcpBloc!.sendMessage(SendMessage(message: request.Marshal()));
-    Uint8List rawResponse =
-        WaitResponse(_waitResponsesMap, "GetUser", maxTimerDifference);
-    GetUserResponse response =
-        GetResponse("GetUser", rawResponse) as GetUserResponse;
-    return response;
+    try {
+      _tcpBloc!.sendMessage(SendMessage(message: request.Marshal()));
+      Uint8List rawResponse =
+          WaitResponse(_waitResponsesMap, "GetUser", maxTimerDifference);
+      GetUserResponse response =
+          GetResponse("GetUser", rawResponse) as GetUserResponse;
+      closeTcpBloc();
+      return response;
+    } catch (err) {
+      closeTcpBloc();
+      throw err;
+    }
+  }
+
+  void closeTcpBloc() {
+    _tcpBloc!.close();
   }
 }
 
