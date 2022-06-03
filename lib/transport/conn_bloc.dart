@@ -36,9 +36,13 @@ class TcpBloc {
     _socket = await _socketConnectionTask!.socket;
 
     _socketStreamSub = _socket!.asBroadcastStream().listen((event) {
-      handleReceivedMessage(MessageReceived(
-        message: event,
-      ));
+      List<Uint8List> messages = separateMessages(event);
+
+      for (var i = 0; i < messages.length; i++) {
+        handleReceivedMessage(MessageReceived(
+          message: messages[i],
+        ));
+      }
     });
     _socket!.handleError((err) {
       handleError(ErrorOccured(errMessage: "socket error $err"));
@@ -110,4 +114,27 @@ class TcpBloc {
     await _socketStreamSub?.cancel();
     await _socket?.close();
   }
+}
+
+List<Uint8List> separateMessages(Uint8List data) {
+  int lastIndex = 0;
+  List<Uint8List> messages = <Uint8List>[];
+
+  while (data.length - 1 != lastIndex) {
+    if (data.length - 1 - lastIndex < 2) {
+      if (kDebugMode) {
+        print("incorrect data length");
+      }
+      continue;
+    }
+
+    int messageLength = data[0] << 8 + data[1];
+
+    int startIndex = lastIndex + 2;
+
+    Uint8List message = data.sublist(startIndex, startIndex + messageLength);
+    messages.add(message);
+  }
+
+  return messages;
 }
