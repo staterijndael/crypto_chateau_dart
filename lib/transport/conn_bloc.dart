@@ -128,7 +128,7 @@ List<Uint8List> separateMessages(Uint8List data) {
       break;
     }
 
-    int messageLength = data[0] | data[1] << 8;
+    int messageLength = data[lastIndex] | data[lastIndex + 1] << 8;
 
     int startIndex = lastIndex + 2;
 
