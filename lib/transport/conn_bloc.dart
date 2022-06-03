@@ -120,12 +120,12 @@ List<Uint8List> separateMessages(Uint8List data) {
   int lastIndex = 0;
   List<Uint8List> messages = <Uint8List>[];
 
-  while (data.length - 1 != lastIndex) {
+  while (data.length - 1 > lastIndex) {
     if (data.length - 1 - lastIndex < 2) {
       if (kDebugMode) {
         print("incorrect data length");
       }
-      continue;
+      break;
     }
 
     int messageLength = data[0] << 8 + data[1];
@@ -134,6 +134,7 @@ List<Uint8List> separateMessages(Uint8List data) {
 
     Uint8List message = data.sublist(startIndex, startIndex + messageLength);
     messages.add(message);
+    lastIndex = startIndex + messageLength;
   }
 
   return messages;
