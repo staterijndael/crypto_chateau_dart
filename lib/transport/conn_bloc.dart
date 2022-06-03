@@ -128,12 +128,13 @@ List<Uint8List> separateMessages(Uint8List data) {
       break;
     }
 
-    int messageLength = data[0] << 8 + data[1];
+    int messageLength = data[0] | data[1] << 8;
 
     int startIndex = lastIndex + 2;
 
     Uint8List message = data.sublist(startIndex, startIndex + messageLength);
     messages.add(message);
+
     lastIndex = startIndex + messageLength;
   }
 
