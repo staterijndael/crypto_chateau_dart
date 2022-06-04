@@ -75,7 +75,7 @@ class TcpBloc {
   void handleReceivedMessage(MessageReceived event) async {
     if (_encryptionState == EncryptionState.Enabling) {
       tcpBlocHandshake!.handshake(event.message);
-      if (tcpBlocHandshake!.getCurrentStep() == HandshakeSteps.Finished) {
+      if (tcpBlocHandshake!.getCurrentStep() == HandshakeSteps.Served) {
         enableEncryption(
             EnableEncryption(sharedKey: tcpBlocHandshake!.keyStore!.sharedKey));
       }
@@ -107,6 +107,10 @@ class TcpBloc {
 
       _socket!.writeln(message);
     }
+  }
+
+  EncryptionState getEncryptionState() {
+    return _encryptionState;
   }
 
   @override

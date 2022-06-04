@@ -14,7 +14,7 @@ enum HandshakeSteps {
   GetDhParams,
   SendClientPublicKey,
   GetServerPublicKey,
-  Finished,
+  Served,
 }
 
 class TcpBlocHandshake {
@@ -67,10 +67,10 @@ class TcpBlocHandshake {
         BigInt serverPublicKey = byteArrayToBigInt(serverPublicKeyBytes[0]);
         keyStore!.GenerateSharedKey(receivedPublicKey: serverPublicKey);
 
-        _currentStep = HandshakeSteps.Finished;
+        _currentStep = HandshakeSteps.Served;
         return;
-      case HandshakeSteps.Finished:
-        throw "handshake already finished";
+      case HandshakeSteps.Served:
+        throw "handshake already served";
     }
   }
 
