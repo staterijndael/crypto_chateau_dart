@@ -24,7 +24,7 @@ class TcpBlocHandshake {
 
   TcpBlocHandshake({required TcpBloc tcpBloc}) {
     _currentStep = HandshakeSteps.Ready;
-    tcpBloc = tcpBloc;
+    _tcpBloc = tcpBloc;
     keyStore = KeyStore();
   }
 
