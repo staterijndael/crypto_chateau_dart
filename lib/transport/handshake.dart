@@ -14,6 +14,7 @@ enum HandshakeSteps {
   GetDhParams,
   SendClientPublicKey,
   GetServerPublicKey,
+  GetSuccessMsg,
   Served,
 }
 
@@ -67,6 +68,12 @@ class TcpBlocHandshake {
         BigInt serverPublicKey = byteArrayToBigInt(serverPublicKeyBytes[0]);
         keyStore!.GenerateSharedKey(receivedPublicKey: serverPublicKey);
 
+        _currentStep = HandshakeSteps.Served;
+        return;
+      case HandshakeSteps.GetSuccessMsg:
+        if (message != utf8.encode('1')) {
+          throw "message is not sucess";
+        }
         _currentStep = HandshakeSteps.Served;
         return;
       case HandshakeSteps.Served:
