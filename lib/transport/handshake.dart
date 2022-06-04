@@ -56,19 +56,20 @@ class TcpBlocHandshake {
         keyStore!.GeneratePrivateKey();
         keyStore!.GeneratePublicKey();
 
-        _currentStep = HandshakeSteps.SendClientPublicKey;
+        _currentStep = HandshakeSteps.GetServerPublicKey;
         handshake(message);
-        return;
-      case HandshakeSteps.SendClientPublicKey:
-        Uint8List publicKeyBytes = bigIntToByteArray(keyStore!.publicKey);
-        _tcpBloc!.sendMessage(SendMessage(message: publicKeyBytes));
         return;
       case HandshakeSteps.GetServerPublicKey:
         List<Uint8List> serverPublicKeyBytes = parseMsg(message, 1);
         BigInt serverPublicKey = byteArrayToBigInt(serverPublicKeyBytes[0]);
         keyStore!.GenerateSharedKey(receivedPublicKey: serverPublicKey);
 
-        _currentStep = HandshakeSteps.Served;
+        _currentStep = HandshakeSteps.SendClientPublicKey;
+        return;
+      case HandshakeSteps.SendClientPublicKey:
+        Uint8List publicKeyBytes = bigIntToByteArray(keyStore!.publicKey);
+        _tcpBloc!.sendMessage(SendMessage(message: publicKeyBytes));
+        _currentStep = HandshakeSteps.GetSuccessMsg;
         return;
       case HandshakeSteps.GetSuccessMsg:
         if (message != utf8.encode('1')) {
