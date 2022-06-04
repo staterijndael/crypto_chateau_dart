@@ -31,10 +31,6 @@ class Client {
     connState = ConnState.Connecting;
     await _tcpBloc!.connect(Connect(
         host: host, port: port, encryptionEnabled: isEncryptionEnabled));
-    while (isEncryptionEnabled &&
-        _tcpBloc!.getEncryptionState() != EncryptionState.Enabled) {
-      continue;
-    }
     connState = ConnState.Connected;
   }
 
@@ -65,6 +61,10 @@ class Client {
   void closeTcpBloc() {
     connState = ConnState.Disconnected;
     _tcpBloc!.close();
+  }
+
+  EncryptionState getEncryptionStatus() {
+    return _tcpBloc!.getEncryptionState();
   }
 }
 
