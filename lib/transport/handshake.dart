@@ -103,7 +103,7 @@ List<Uint8List> parseMsg(Iterable<int> msg, int paramsNum) {
         throw "incorrect params count";
       }
 
-      result[currentResultIndex] = buf.sublist(lastIndex + 1);
+      result[currentResultIndex] = buf.sublist(lastIndex + 1, currentIndex);
       currentResultIndex++;
 
       lastIndex = currentIndex;
@@ -117,7 +117,7 @@ List<Uint8List> parseMsg(Iterable<int> msg, int paramsNum) {
     throw "incorrect message format";
   }
 
-  result[currentResultIndex] = buf.sublist(lastIndex + 1);
+  result[currentResultIndex] = buf.sublist(lastIndex + 1, currentIndex);
   currentResultIndex++;
 
   return result;
