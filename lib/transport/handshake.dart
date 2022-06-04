@@ -4,6 +4,7 @@ import 'dart:typed_data';
 
 import 'package:crypto_chateau_dart/dh/dh.dart';
 import 'package:crypto_chateau_dart/dh/params.dart';
+import 'package:flutter/foundation.dart';
 
 import 'conn_bloc.dart';
 
@@ -85,40 +86,30 @@ List<Uint8List> parseMsg(Iterable<int> msg, int paramsNum) {
   List<Uint8List> result = List.filled(paramsNum, Uint8List(0));
 
   Uint8List buf = Uint8List(msg.length);
-  var lastIndex = -1;
+  var lastIndex = 0;
 
   var currentResultIndex = 0;
 
-  var delimSymb = utf8.encode("|")[0];
+  Uint8List convertedMsg = msg as Uint8List;
 
-  var currentIndex = 0;
-
-  for (final symb in msg) {
-    if (symb == delimSymb) {
-      if (lastIndex + 1 == currentIndex) {
-        throw "incorrect message format";
+  while (msg.length - 1 > lastIndex) {
+    if (msg.length - 1 - lastIndex < 2) {
+      if (kDebugMode) {
+        print("incorrect data length");
       }
-
-      if (currentResultIndex >= result.length) {
-        throw "incorrect params count";
-      }
-
-      result[currentResultIndex] = buf.sublist(lastIndex + 1, currentIndex);
-      currentResultIndex++;
-
-      lastIndex = currentIndex;
+      break;
     }
 
-    buf[currentIndex] = symb;
-    currentIndex++;
-  }
+    int messageLength = msg[lastIndex] | msg[lastIndex + 1] << 8;
 
-  if (lastIndex == buf.length - 1) {
-    throw "incorrect message format";
-  }
+    int startIndex = lastIndex + 2;
 
-  result[currentResultIndex] = buf.sublist(lastIndex + 1, currentIndex);
-  currentResultIndex++;
+    Uint8List message = msg.sublist(startIndex, startIndex + messageLength);
+    result[currentResultIndex] = message;
+    currentResultIndex++;
+
+    lastIndex = startIndex + messageLength;
+  }
 
   return result;
 }
