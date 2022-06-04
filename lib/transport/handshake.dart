@@ -88,7 +88,6 @@ List<Uint8List> parseMsg(Iterable<int> msg, int paramsNum) {
   var lastIndex = -1;
 
   var currentResultIndex = 0;
-  var currentBufIndex = 0;
 
   var delimSymb = utf8.encode("|")[0];
 
@@ -104,15 +103,13 @@ List<Uint8List> parseMsg(Iterable<int> msg, int paramsNum) {
         throw "incorrect params count";
       }
 
-      result[currentResultIndex] =
-          buf.sublist(lastIndex + 1, currentBufIndex + 1);
+      result[currentResultIndex] = buf.sublist(lastIndex + 1);
       currentResultIndex++;
 
       lastIndex = currentIndex;
     }
 
-    buf[currentBufIndex] = symb;
-    currentBufIndex++;
+    buf[currentIndex] = symb;
     currentIndex++;
   }
 
@@ -120,7 +117,7 @@ List<Uint8List> parseMsg(Iterable<int> msg, int paramsNum) {
     throw "incorrect message format";
   }
 
-  result[currentResultIndex] = buf.sublist(lastIndex + 1, currentBufIndex + 1);
+  result[currentResultIndex] = buf.sublist(lastIndex + 1);
   currentResultIndex++;
 
   return result;
