@@ -65,6 +65,7 @@ class TcpBlocHandshake {
         keyStore!.GenerateSharedKey(receivedPublicKey: serverPublicKey);
 
         _currentStep = HandshakeSteps.SendClientPublicKey;
+        handshake(Uint8List(0));
         return;
       case HandshakeSteps.SendClientPublicKey:
         Uint8List publicKeyBytes = bigIntToByteArray(keyStore!.publicKey);
