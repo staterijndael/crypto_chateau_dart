@@ -105,7 +105,15 @@ class TcpBloc {
         message = event.message;
       }
 
-      _socket!.writeln(message);
+      Uint8List messageWithLength = Uint8List(2 + message.length);
+      messageWithLength[0] = message.length;
+      messageWithLength[1] = message.length >> 8;
+
+      for (var i = 0; i < message.length; i++) {
+        messageWithLength[i + 2] = message[i];
+      }
+
+      _socket!.writeln(messageWithLength);
     }
   }
 
