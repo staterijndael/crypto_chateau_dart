@@ -57,7 +57,6 @@ class TcpBlocHandshake {
         keyStore!.GeneratePublicKey();
 
         _currentStep = HandshakeSteps.GetServerPublicKey;
-        handshake(message);
         return;
       case HandshakeSteps.GetServerPublicKey:
         List<Uint8List> serverPublicKeyBytes = parseMsg(message, 1);
