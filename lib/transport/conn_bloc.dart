@@ -113,7 +113,7 @@ class TcpBloc {
         messageWithLength[i + 2] = message[i];
       }
 
-      _socket!.writeln(messageWithLength);
+      _socket!.writeAll(messageWithLength);
     }
   }
 
