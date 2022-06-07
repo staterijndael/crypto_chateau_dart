@@ -105,8 +105,9 @@ class TcpBloc {
         message = event.message;
       }
 
-      Uint8List messageWithLength = Uint8List(2 + message.length)
-        ..buffer.asByteData().setUint16(0, message.length, Endian.little);
+      Uint8List messageWithLength = Uint8List(2 + message.length);
+      messageWithLength[0] = message.length ~/ 255;
+      messageWithLength[1] = message.length % 255;
 
       for (var i = 0; i < message.length; i++) {
         messageWithLength[i + 2] = message[i];
