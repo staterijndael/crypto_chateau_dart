@@ -73,7 +73,7 @@ class TcpBlocHandshake {
         return;
       case HandshakeSteps.GetSuccessMsg:
         if (message.elementAt(0) != utf8.encode('1')[0]) {
-          throw "message is not sucess";
+          throw "message is not success";
         }
         _currentStep = HandshakeSteps.Served;
         return;
