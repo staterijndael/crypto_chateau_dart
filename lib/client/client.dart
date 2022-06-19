@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'dart:ui';
 
 import 'package:crypto_chateau_dart/client/response.dart';
 
@@ -12,46 +13,59 @@ enum ConnState {
   Disconnected,
 }
 
+class ClientController {
+  late VoidCallback onEncryptionEnabled;
+  late void Function(Response) onEndpointMessageReceived;
+}
+
 class Client {
   TcpBloc? _tcpBloc;
-  final Map<String, Uint8List> _waitResponsesMap = {};
+  TcpController? tcpController;
+  ClientController? clientController;
+
+  final Map<String, List<List<Uint8List>>> _waitResponsesMap = {};
+
   ConnState? connState;
 
-  int maxTimerDifference = 5000;
-
-  Client() {
-    _tcpBloc = TcpBloc(readFunc: handleFunc);
+  Client({required this.clientController}) {
+    _tcpBloc = TcpBloc();
+    tcpController = TcpController(
+        onEncryptionEnabled: onEncryptionEnabled,
+        onEndpointMessageReceived: onEndpointMessageReceived);
     connState = ConnState.NotConnected;
   }
 
-  void connect(
+  Future<void> connect(
       {required String host,
       required int port,
       required bool isEncryptionEnabled}) async {
     connState = ConnState.Connecting;
-    await _tcpBloc!.connect(Connect(
-        host: host, port: port, encryptionEnabled: isEncryptionEnabled));
+    await _tcpBloc!.connect(
+        tcpController!,
+        Connect(
+            host: host, port: port, encryptionEnabled: isEncryptionEnabled));
     connState = ConnState.Connected;
   }
 
-  void handleFunc(Uint8List data) {
+  void onEndpointMessageReceived(Uint8List data) {
     int lastMethodNameIndex = getLastMethodNameIndex(data);
     String methodName =
         String.fromCharCodes(data.sublist(0, lastMethodNameIndex));
 
-    _waitResponsesMap[methodName] = data.sublist(lastMethodNameIndex + 1);
+    Uint8List body = data.sublist(lastMethodNameIndex + 1);
+    Response response = GetResponse(methodName, body);
+    clientController!.onEndpointMessageReceived(response);
+    closeTcpBloc();
+  }
+
+  void onEncryptionEnabled() {
+    clientController!.onEncryptionEnabled();
   }
 
   //handlers
-  GetUserResponse GetUser(GetUserRequest request) {
+  GetUser(GetUserRequest request) async {
     try {
       _tcpBloc!.sendMessage(SendMessage(message: request.Marshal()));
-      Uint8List rawResponse =
-          WaitResponse(_waitResponsesMap, "GetUser", maxTimerDifference);
-      GetUserResponse response =
-          GetResponse("GetUser", rawResponse) as GetUserResponse;
-      closeTcpBloc();
-      return response;
     } catch (err) {
       closeTcpBloc();
       rethrow;

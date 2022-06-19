@@ -8,6 +8,7 @@ import 'package:crypto_chateau_dart/dh/params.dart';
 import 'package:crypto_chateau_dart/transport/handshake.dart';
 import 'package:flutter/foundation.dart';
 import 'package:crypto/crypto.dart';
+import 'package:flutter/widgets.dart';
 
 part 'conn_event.dart';
 
@@ -17,21 +18,27 @@ enum EncryptionState {
   Enabled,
 }
 
+class TcpController {
+  late VoidCallback onEncryptionEnabled;
+  late Function(Uint8List data) onEndpointMessageReceived;
+
+  TcpController(
+      {required this.onEncryptionEnabled,
+      required this.onEndpointMessageReceived});
+}
+
 class TcpBloc {
   Socket? _socket;
   StreamSubscription? _socketStreamSub;
   ConnectionTask<Socket>? _socketConnectionTask;
-  void Function(Uint8List)? _readFunc;
 
   EncryptionState _encryptionState = EncryptionState.Disabled;
   Uint8List? _secretKey;
   TcpBlocHandshake? tcpBlocHandshake;
 
-  TcpBloc({required void Function(Uint8List) readFunc}) : super() {
-    _readFunc = readFunc;
-  }
+  TcpBloc() : super();
 
-  Future<void> connect(Connect event) async {
+  Future<void> connect(TcpController controller, Connect event) async {
     _socketConnectionTask = await Socket.startConnect(event.host, event.port);
     _socket = await _socketConnectionTask!.socket;
 
@@ -39,9 +46,11 @@ class TcpBloc {
       List<Uint8List> messages = separateMessages(event);
 
       for (var i = 0; i < messages.length; i++) {
-        handleReceivedMessage(MessageReceived(
-          message: messages[i],
-        ));
+        handleReceivedMessage(
+            controller,
+            MessageReceived(
+              message: messages[i],
+            ));
       }
     });
     _socket!.handleError((err) {
@@ -72,18 +81,20 @@ class TcpBloc {
     throw event.errMessage!;
   }
 
-  void handleReceivedMessage(MessageReceived event) async {
+  void handleReceivedMessage(
+      TcpController controller, MessageReceived event) async {
     if (_encryptionState == EncryptionState.Enabling) {
       tcpBlocHandshake!.handshake(event.message);
       if (tcpBlocHandshake!.getCurrentStep() == HandshakeSteps.Served) {
         enableEncryption(
             EnableEncryption(sharedKey: tcpBlocHandshake!.keyStore!.sharedKey));
+        controller.onEncryptionEnabled();
       }
     } else if (_encryptionState == EncryptionState.Enabled) {
       Uint8List decryptedData = Decrypt(event.message, _secretKey!);
-      _readFunc!(decryptedData);
+      controller.onEndpointMessageReceived(decryptedData);
     } else {
-      _readFunc!(event.message);
+      controller.onEndpointMessageReceived(event.message);
     }
   }
 
