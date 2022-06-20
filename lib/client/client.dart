@@ -16,6 +16,10 @@ enum ConnState {
 class ClientController {
   late VoidCallback onEncryptionEnabled;
   late void Function(Response) onEndpointMessageReceived;
+
+  ClientController(
+      {required this.onEncryptionEnabled,
+      required this.onEndpointMessageReceived});
 }
 
 class Client {
