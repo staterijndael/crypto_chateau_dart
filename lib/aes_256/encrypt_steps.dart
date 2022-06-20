@@ -6,7 +6,7 @@ import 'params.dart';
 List<Uint16List> subBytes(List<Uint16List> state) {
   for (var i = 0; i < state.length; i++) {
     for (var j = 0; j < state[i].length; j++) {
-      int row = (state[i][j] / 0x10) as int;
+      int row = state[i][j] ~/ 0x10;
       var col = state[i][j] % 0x10;
 
       var sboxElem = Sbox[16 * row + col];
@@ -48,7 +48,7 @@ List<Uint16List> keyExpansion(Uint8List key) {
       for (var row = 0; row < 4; row++) {
         var s = keySchedule[row][col - 4] ^
             tmpPrevCol[row] ^
-            Rcon[row][col / Nk - 1 as int];
+            Rcon[row][col ~/ Nk - 1];
         keySchedule[row][col] = s;
       }
     } else {
