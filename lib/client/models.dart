@@ -17,7 +17,7 @@ class GetUserRequest extends Request {
     var bDataArr =
         bdata.buffer.asUint8List(bdata.offsetInBytes, bdata.lengthInBytes);
 
-    String marshalStr = "GetUserRequest# UserID: $bDataArr";
+    String marshalStr = "GetUser# UserID: $bDataArr";
 
     Uint8List data = Uint8List.fromList(marshalStr.codeUnits);
 
