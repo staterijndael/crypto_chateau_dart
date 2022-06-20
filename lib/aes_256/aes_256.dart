@@ -33,7 +33,7 @@ Uint8List Encrypt(Uint8List inputBytes, Uint8List key) {
 
   Uint8List result = Uint8List(correctedInputBytes.length);
 
-  for (var batch = 1; batch <= inputBytes.length / (Nb * 4); batch++) {
+  for (var batch = 1; batch <= correctedInputBytes.length / (Nb * 4); batch++) {
     var offset = (batch - 1) * Nb * 4;
     var limit = offset + Nb * 4;
 
@@ -89,9 +89,10 @@ Uint8List encrypt(Uint8List inputBytes, Uint8List key) {
     throw "incorrect input bytes length";
   }
 
-  List<Uint16List> state = List.filled(4, Uint16List(Nb), growable: false);
+  List<Uint16List> state = List.filled(4, Uint16List(0), growable: false);
 
   for (var r = 0; r < 4; r++) {
+    state[r] = Uint16List(Nb);
     for (var c = 0; c < Nb; c++) {
       state[r][c] = inputBytes[r + 4 * c];
     }
@@ -124,9 +125,10 @@ Uint8List encrypt(Uint8List inputBytes, Uint8List key) {
 }
 
 Uint8List decrypt(Uint8List cipher, Uint8List key) {
-  List<Uint16List> state = List.filled(4, Uint16List(4), growable: false);
+  List<Uint16List> state = List.filled(4, Uint16List(0), growable: false);
 
   for (var r = 0; r < 4; r++) {
+    state[r] = Uint16List(4);
     for (var c = 0; c < Nb; c++) {
       state[r][c] = cipher[r + 4 * c];
     }

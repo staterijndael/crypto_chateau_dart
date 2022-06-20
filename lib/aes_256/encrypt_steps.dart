@@ -22,10 +22,10 @@ List<Uint16List> keyExpansion(Uint8List key) {
     throw "incorrect len of secret key(should be 32(4 * nk))";
   }
 
-  List<Uint16List> keySchedule =
-      List.filled(4, Uint16List(Nb * (Nr + 1)), growable: false);
+  List<Uint16List> keySchedule = List.filled(4, Uint16List(0), growable: false);
 
   for (var r = 0; r < 4; r++) {
+    keySchedule[r] = Uint16List(Nb * (Nr + 1));
     for (var c = 0; c < Nk; c++) {
       keySchedule[r][c] = key[r + 4 * c];
     }
