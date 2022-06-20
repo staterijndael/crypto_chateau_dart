@@ -15,11 +15,13 @@ enum ConnState {
 
 class ClientController {
   late VoidCallback onEncryptionEnabled;
+  late VoidCallback onClientConnected;
   late void Function(Response) onEndpointMessageReceived;
 
   ClientController(
       {required this.onEncryptionEnabled,
-      required this.onEndpointMessageReceived});
+      required this.onEndpointMessageReceived,
+      required this.onClientConnected});
 }
 
 class Client {
@@ -49,6 +51,7 @@ class Client {
         Connect(
             host: host, port: port, encryptionEnabled: isEncryptionEnabled));
     connState = ConnState.Connected;
+    clientController!.onClientConnected();
   }
 
   void onEndpointMessageReceived(Uint8List data) {
