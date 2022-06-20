@@ -263,22 +263,22 @@ final BigInt Generator = BigInt.from(2);
 final BigInt Prime = byteArrayToBigInt(primeRaw);
 
 BigInt byteArrayToBigInt(Uint8List byteArray) {
-    BigInt value = BigInt.from(0);
-    for (var i = 0; i < byteArray.length; i++) {
-		var bi = BigInt.from(byteArray[i]);
-        value = (value << 8) + bi;
-    }
+  BigInt value = BigInt.from(0);
+  for (var i = 0; i < byteArray.length; i++) {
+    var bi = BigInt.from(byteArray[i]);
+    value = (value << 8) + bi;
+  }
 
-    return value;
+  return value;
 }
 
 Uint8List bigIntToByteArray(BigInt number) {
-  int bytes = (number.bitLength + 7) >> 3;
-  var b256 = BigInt.from(256);
-  var result = Uint8List(bytes);
-  for (int i = 0; i < bytes; i++) {
-    result[i] = number.remainder(b256).toInt();
+  final data = ByteData((number.bitLength / 8).ceil());
+
+  for (var i = 1; i <= data.lengthInBytes; i++) {
+    data.setUint8(data.lengthInBytes - i, number.toUnsigned(8).toInt());
     number = number >> 8;
   }
-  return result;
+
+  return data.buffer.asUint8List();
 }
