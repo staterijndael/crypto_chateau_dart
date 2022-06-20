@@ -1,8 +1,11 @@
+import 'dart:convert';
 import 'dart:typed_data';
 
 import 'decrypt_steps.dart';
 import 'encrypt_steps.dart';
 import 'params.dart';
+
+int whitespaceSymb = utf8.encode(' ')[0];
 
 Uint8List Encrypt(Uint8List inputBytes, Uint8List key) {
   if (inputBytes.isEmpty) {
@@ -25,7 +28,7 @@ Uint8List Encrypt(Uint8List inputBytes, Uint8List key) {
   }
 
   for (var i = startIndex; i <= endIndex; i++) {
-    correctedInputBytes[i] = ' ' as int;
+    correctedInputBytes[i] = whitespaceSymb;
   }
 
   Uint8List result = Uint8List(correctedInputBytes.length);
@@ -70,7 +73,7 @@ Uint8List Decrypt(Uint8List cipher, Uint8List key) {
 
   var finalIndex = result.length - 1;
   for (var i = result.length - 1; i >= 0; i--) {
-    if (result[i] != ' ' as int) {
+    if (result[i] != whitespaceSymb) {
       finalIndex = i + 1;
       break;
     }
