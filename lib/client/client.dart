@@ -7,14 +7,9 @@ import '../transport/conn_bloc.dart';
 import 'models.dart';
 
 class ClientController {
-  late VoidCallback onEncryptionEnabled;
-  late VoidCallback onClientConnected;
   late void Function(Response) onEndpointMessageReceived;
 
-  ClientController(
-      {required this.onEncryptionEnabled,
-      required this.onEndpointMessageReceived,
-      required this.onClientConnected});
+  ClientController({required this.onEndpointMessageReceived});
 }
 
 class ConnectParams {
@@ -44,10 +39,6 @@ class Client {
     Uint8List body = data.sublist(lastMethodNameIndex + 1);
     Response response = GetResponse(methodName, body);
     clientController.onEndpointMessageReceived(response);
-  }
-
-  void onEncryptionEnabled() {
-    clientController.onEncryptionEnabled();
   }
 
   //handlers
