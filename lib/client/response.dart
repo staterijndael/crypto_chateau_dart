@@ -29,8 +29,8 @@ Map<String, Uint8List> getParams(Uint8List p) {
   Uint8List paramBuf = Uint8List(p.length);
   Uint8List valueBuf = Uint8List(p.length);
 
-  int paramBufLast = 0;
-  int valueBufLast = 0;
+  int paramBufLast = -1;
+  int valueBufLast = -1;
   int paramBufIndex = 0;
   int valueBufIndex = 0;
 
@@ -53,15 +53,15 @@ Map<String, Uint8List> getParams(Uint8List p) {
 
       if (paramBuf.isNotEmpty && valueBuf.isNotEmpty) {
         String param = String.fromCharCodes(
-            paramBuf.sublist(paramBufLast + 1, paramBuf.length));
-        Uint8List value = valueBuf.sublist(valueBufLast + 1, valueBuf.length);
+            paramBuf.sublist(paramBufLast + 1, paramBufIndex));
+        Uint8List value = valueBuf.sublist(valueBufLast + 1, valueBufIndex);
         params[param] = value;
 
-        paramBufLast = i;
+        paramBufLast = paramBufIndex;
+        valueBufLast = valueBufIndex;
         paramFilled = false;
       }
     } else if (p[i] == colonSymb) {
-      valueBufLast = i;
       paramFilled = true;
     } else if (p[i] == spaceSymb) {
       continue;
