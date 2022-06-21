@@ -42,7 +42,9 @@ class GetUserResponse extends Response {
   String? userName;
 
   GetUserResponse([String? userName]) {
-    this.userName = userName!;
+    if (userName != null) {
+      this.userName = userName;
+    }
   }
 
   Unmarshal(Map<String, Uint8List> params) {
