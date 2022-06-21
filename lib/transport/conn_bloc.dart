@@ -20,7 +20,7 @@ enum EncryptionState {
 
 class TcpController {
   late VoidCallback onEncryptionEnabled;
-  late Function(Uint8List data) onEndpointMessageReceived;
+  late Function(TcpBloc tcpBloc, Uint8List data) onEndpointMessageReceived;
 
   TcpController(
       {required this.onEncryptionEnabled,
@@ -92,9 +92,9 @@ class TcpBloc {
       }
     } else if (_encryptionState == EncryptionState.Enabled) {
       Uint8List decryptedData = Decrypt(event.message, _secretKey!);
-      controller.onEndpointMessageReceived(decryptedData);
+      controller.onEndpointMessageReceived(this, decryptedData);
     } else {
-      controller.onEndpointMessageReceived(event.message);
+      controller.onEndpointMessageReceived(this, event.message);
     }
   }
 
