@@ -76,7 +76,7 @@ class Client {
   }
 
   void onEncryptionEnabled() {
-    clientController!.onEncryptionEnabled();
+    clientController.onEncryptionEnabled();
   }
 
   //handlers
