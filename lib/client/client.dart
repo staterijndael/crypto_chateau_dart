@@ -6,13 +6,6 @@ import 'package:crypto_chateau_dart/client/response.dart';
 import '../transport/conn_bloc.dart';
 import 'models.dart';
 
-enum ConnState {
-  NotConnected,
-  Connecting,
-  Connected,
-  Disconnected,
-}
-
 class ClientController {
   late VoidCallback onEncryptionEnabled;
   late VoidCallback onClientConnected;
@@ -24,35 +17,26 @@ class ClientController {
       required this.onClientConnected});
 }
 
+class ConnectParams {
+  String host;
+  int port;
+  bool isEncryptionEnabled;
+
+  ConnectParams(
+      {required this.host,
+      required this.port,
+      required this.isEncryptionEnabled});
+}
+
 class Client {
-  TcpBloc? _tcpBloc;
-  TcpController? tcpController;
   ClientController clientController;
+  ConnectParams connectParams;
 
-  ConnState? connState;
+  Client({required this.clientController, required this.connectParams});
 
-  Client({required this.clientController}) {
-    _tcpBloc = TcpBloc();
-    tcpController = TcpController(
-        onEncryptionEnabled: onEncryptionEnabled,
-        onEndpointMessageReceived: onEndpointMessageReceived);
-    connState = ConnState.NotConnected;
-  }
+  void onEndpointMessageReceived(TcpBloc tcpBloc, Uint8List data) {
+    tcpBloc.close();
 
-  Future<void> connect(
-      {required String host,
-      required int port,
-      required bool isEncryptionEnabled}) async {
-    connState = ConnState.Connecting;
-    await _tcpBloc!.connect(
-        tcpController!,
-        Connect(
-            host: host, port: port, encryptionEnabled: isEncryptionEnabled));
-    connState = ConnState.Connected;
-    clientController.onClientConnected();
-  }
-
-  void onEndpointMessageReceived(Uint8List data) {
     int lastMethodNameIndex = getLastMethodNameIndex(data);
     String methodName =
         String.fromCharCodes(data.sublist(0, lastMethodNameIndex));
@@ -60,7 +44,6 @@ class Client {
     Uint8List body = data.sublist(lastMethodNameIndex + 1);
     Response response = GetResponse(methodName, body);
     clientController.onEndpointMessageReceived(response);
-    closeTcpBloc();
   }
 
   void onEncryptionEnabled() {
@@ -69,21 +52,22 @@ class Client {
 
   //handlers
   GetUser(GetUserRequest request) async {
-    try {
-      _tcpBloc!.sendMessage(SendMessage(message: request.Marshal()));
-    } catch (e) {
-      closeTcpBloc();
-      rethrow;
+    TcpBloc tcpBloc = TcpBloc();
+
+    onEncryptEnabled() {
+      tcpBloc.sendMessage(SendMessage(message: request.Marshal()));
     }
-  }
 
-  void closeTcpBloc() {
-    connState = ConnState.Disconnected;
-    _tcpBloc!.close();
-  }
+    TcpController tcpController = TcpController(
+        onEncryptionEnabled: onEncryptEnabled,
+        onEndpointMessageReceived: onEndpointMessageReceived);
 
-  EncryptionState getEncryptionStatus() {
-    return _tcpBloc!.getEncryptionState();
+    tcpBloc.connect(
+        tcpController,
+        Connect(
+            host: connectParams.host,
+            port: connectParams.port,
+            encryptionEnabled: connectParams.isEncryptionEnabled));
   }
 }
 
