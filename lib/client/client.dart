@@ -24,16 +24,26 @@ class ClientController {
       required this.onClientConnected});
 }
 
+class ConnectParams {
+  final String host;
+  final int port;
+  final bool isEncryptionEnabled;
+
+  ConnectParams(
+      {required this.host,
+      required this.port,
+      required this.isEncryptionEnabled});
+}
+
 class Client {
   TcpBloc? _tcpBloc;
   TcpController? tcpController;
-  ClientController? clientController;
-
-  final Map<String, List<List<Uint8List>>> _waitResponsesMap = {};
+  ClientController clientController;
+  ConnectParams connectParams;
 
   ConnState? connState;
 
-  Client({required this.clientController}) {
+  Client({required this.clientController, required this.connectParams}) {
     _tcpBloc = TcpBloc();
     tcpController = TcpController(
         onEncryptionEnabled: onEncryptionEnabled,
@@ -41,7 +51,7 @@ class Client {
     connState = ConnState.NotConnected;
   }
 
-  Future<void> connect(
+  Future<void> _connect(
       {required String host,
       required int port,
       required bool isEncryptionEnabled}) async {
@@ -51,7 +61,7 @@ class Client {
         Connect(
             host: host, port: port, encryptionEnabled: isEncryptionEnabled));
     connState = ConnState.Connected;
-    clientController!.onClientConnected();
+    clientController.onClientConnected();
   }
 
   void onEndpointMessageReceived(Uint8List data) {
@@ -71,12 +81,12 @@ class Client {
 
   //handlers
   GetUser(GetUserRequest request) async {
-    try {
-      _tcpBloc!.sendMessage(SendMessage(message: request.Marshal()));
-    } catch (err) {
-      closeTcpBloc();
-      rethrow;
-    }
+    await _connect(
+        host: connectParams.host,
+        port: connectParams.port,
+        isEncryptionEnabled: connectParams.isEncryptionEnabled);
+    _tcpBloc!.sendMessage(SendMessage(message: request.Marshal()));
+    closeTcpBloc();
   }
 
   void closeTcpBloc() {
