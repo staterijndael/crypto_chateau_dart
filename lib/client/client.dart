@@ -24,26 +24,14 @@ class ClientController {
       required this.onClientConnected});
 }
 
-class ConnectParams {
-  final String host;
-  final int port;
-  final bool isEncryptionEnabled;
-
-  ConnectParams(
-      {required this.host,
-      required this.port,
-      required this.isEncryptionEnabled});
-}
-
 class Client {
   TcpBloc? _tcpBloc;
   TcpController? tcpController;
   ClientController clientController;
-  ConnectParams connectParams;
 
   ConnState? connState;
 
-  Client({required this.clientController, required this.connectParams}) {
+  Client({required this.clientController}) {
     _tcpBloc = TcpBloc();
     tcpController = TcpController(
         onEncryptionEnabled: onEncryptionEnabled,
@@ -81,11 +69,12 @@ class Client {
 
   //handlers
   GetUser(GetUserRequest request) async {
-    await _connect(
-        host: connectParams.host,
-        port: connectParams.port,
-        isEncryptionEnabled: connectParams.isEncryptionEnabled);
-    _tcpBloc!.sendMessage(SendMessage(message: request.Marshal()));
+    try {
+      _tcpBloc!.sendMessage(SendMessage(message: request.Marshal()));
+    } catch (e) {
+      closeTcpBloc();
+      rethrow;
+    }
   }
 
   void closeTcpBloc() {
