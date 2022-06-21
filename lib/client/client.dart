@@ -39,7 +39,7 @@ class Client {
     connState = ConnState.NotConnected;
   }
 
-  Future<void> _connect(
+  Future<void> connect(
       {required String host,
       required int port,
       required bool isEncryptionEnabled}) async {
