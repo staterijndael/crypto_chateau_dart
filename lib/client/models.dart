@@ -14,12 +14,21 @@ class GetUserRequest extends Request {
     var bdata = ByteData.view(buffer);
     bdata.setUint64(0, userID);
 
-    var bDataArr =
+    Uint8List bDataArr =
         bdata.buffer.asUint8List(bdata.offsetInBytes, bdata.lengthInBytes);
 
-    String marshalStr = "GetUser# UserID: $bDataArr";
+    String marshalStr = "GetUser# UserID: ";
+    List<int> MarshalStrBytes = marshalStr.codeUnits;
 
-    Uint8List data = Uint8List.fromList(marshalStr.codeUnits);
+    Uint8List data = Uint8List(MarshalStrBytes.length + bDataArr.length);
+
+    for (var i = 0; i < MarshalStrBytes.length; i++) {
+      data[i] = MarshalStrBytes[i];
+    }
+
+    for (var i = 0; i < bDataArr.length; i++) {
+      data[MarshalStrBytes.length + i] = bDataArr[i];
+    }
 
     return data;
   }
