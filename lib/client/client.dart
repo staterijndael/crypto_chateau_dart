@@ -71,7 +71,7 @@ class Client {
 
     Uint8List body = data.sublist(lastMethodNameIndex + 1);
     Response response = GetResponse(methodName, body);
-    clientController!.onEndpointMessageReceived(response);
+    clientController.onEndpointMessageReceived(response);
     closeTcpBloc();
   }
 
@@ -86,7 +86,6 @@ class Client {
         port: connectParams.port,
         isEncryptionEnabled: connectParams.isEncryptionEnabled);
     _tcpBloc!.sendMessage(SendMessage(message: request.Marshal()));
-    closeTcpBloc();
   }
 
   void closeTcpBloc() {
