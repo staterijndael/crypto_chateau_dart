@@ -76,9 +76,5 @@ Map<String, Uint8List> getParams(Uint8List p) {
     }
   }
 
-  if (paramBuf.isNotEmpty || valueBuf.isNotEmpty) {
-    throw "incorrect message format";
-  }
-
   return params;
 }
