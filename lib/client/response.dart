@@ -69,11 +69,7 @@ Map<String, Uint8List> getParams(Uint8List p) {
     } else if (p[i] == spaceSymb && stringParamParsing == false) {
       continue;
     } else if (p[i] == quoteSymb) {
-      if (stringParamParsing == true) {
-        stringParamParsing = false;
-      } else {
-        stringParamParsing = true;
-      }
+      stringParamParsing = !stringParamParsing;
     } else {
       if (!paramFilled) {
         paramBuf[paramBufIndex] = p[i];
