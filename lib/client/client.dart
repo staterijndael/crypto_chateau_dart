@@ -60,6 +60,29 @@ class Client {
             port: connectParams.port,
             encryptionEnabled: connectParams.isEncryptionEnabled));
   }
+
+  //streams
+
+  typedef void SendStreamMessage(Request request);
+
+  ListenUpdates(GetUserRequest request) async {
+    TcpBloc tcpBloc = TcpBloc();
+
+    onEncryptEnabled() {
+      tcpBloc.sendMessage(SendMessage(message: request.Marshal()));
+    }
+
+    TcpController tcpController = TcpController(
+        onEncryptionEnabled: onEncryptEnabled,
+        onEndpointMessageReceived: onEndpointMessageReceived);
+
+    tcpBloc.connect(
+        tcpController,
+        Connect(
+            host: connectParams.host,
+            port: connectParams.port,
+            encryptionEnabled: connectParams.isEncryptionEnabled));
+  }
 }
 
 int getLastMethodNameIndex(Uint8List data) {
