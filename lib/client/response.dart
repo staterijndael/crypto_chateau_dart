@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:crypto_chateau_dart/client/models.dart';
+import 'package:flutter/material.dart';
 
 Response GetResponse(String methodName, Uint8List data) {
   Map<String, Uint8List> params = getParams(data);
@@ -35,10 +36,12 @@ Map<String, Uint8List> getParams(Uint8List p) {
   int valueBufIndex = 0;
 
   bool paramFilled = false;
+  bool stringParamParsing = false;
 
   int delimSymb = utf8.encode(',')[0];
   int colonSymb = utf8.encode(':')[0];
   int spaceSymb = utf8.encode(' ')[0];
+  int quoteSymb = utf8.encode('"')[0];
 
   for (var i = 0; i < p.length; i++) {
     if (p[i] == delimSymb || i == p.length - 1) {
@@ -61,10 +64,16 @@ Map<String, Uint8List> getParams(Uint8List p) {
         valueBufLast = valueBufIndex;
         paramFilled = false;
       }
-    } else if (p[i] == colonSymb) {
+    } else if (p[i] == colonSymb && stringParamParsing == false) {
       paramFilled = true;
-    } else if (p[i] == spaceSymb) {
+    } else if (p[i] == spaceSymb && stringParamParsing == false) {
       continue;
+    } else if (p[i] == quoteSymb) {
+      if (stringParamParsing == true) {
+        stringParamParsing = false;
+      } else {
+        stringParamParsing = true;
+      }
     } else {
       if (!paramFilled) {
         paramBuf[paramBufIndex] = p[i];
