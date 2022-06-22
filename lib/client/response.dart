@@ -54,16 +54,18 @@ Map<String, Uint8List> getParams(Uint8List p) {
         valueBufIndex++;
       }
 
-      if (paramBuf.isNotEmpty && valueBuf.isNotEmpty) {
-        String param = String.fromCharCodes(
-            paramBuf.sublist(paramBufLast + 1, paramBufIndex));
-        Uint8List value = valueBuf.sublist(valueBufLast + 1, valueBufIndex);
-        params[param] = value;
-
-        paramBufLast = paramBufIndex;
-        valueBufLast = valueBufIndex;
-        paramFilled = false;
+      if (paramBufLast == paramBufIndex || valueBufLast == valueBufIndex) {
+        throw "incorrect message format: null value";
       }
+
+      String param = String.fromCharCodes(
+          paramBuf.sublist(paramBufLast + 1, paramBufIndex));
+      Uint8List value = valueBuf.sublist(valueBufLast + 1, valueBufIndex);
+      params[param] = value;
+
+      paramBufLast = paramBufIndex;
+      valueBufLast = valueBufIndex;
+      paramFilled = false;
     } else if (p[i] == colonSymb && stringParamParsing == false) {
       paramFilled = true;
     } else if (p[i] == spaceSymb && stringParamParsing == false) {
