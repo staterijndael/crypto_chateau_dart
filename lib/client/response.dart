@@ -49,7 +49,7 @@ Map<String, Uint8List> getParams(Uint8List p) {
         continue;
       }
 
-      if (i == p.length - 1) {
+      if (i == p.length - 1 && stringParamParsing == false) {
         valueBuf[valueBufIndex] = p[i];
         valueBufIndex++;
       }
