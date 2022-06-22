@@ -49,7 +49,9 @@ Map<String, Uint8List> getParams(Uint8List p) {
         continue;
       }
 
-      if (i == p.length - 1 && stringParamParsing == true && i != quoteSymb) {
+      if (i == p.length - 1 &&
+          stringParamParsing == true &&
+          p[i] != quoteSymb) {
         throw "incorrect message format: close quote is missing";
       }
 
