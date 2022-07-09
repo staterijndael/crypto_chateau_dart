@@ -42,6 +42,12 @@ class TcpBloc {
     _socketConnectionTask = await Socket.startConnect(event.host, event.port);
     _socket = await _socketConnectionTask!.socket;
 
+    if (event.encryptionEnabled) {
+      _encryptionState = EncryptionState.Enabling;
+      tcpBlocHandshake = TcpBlocHandshake(tcpBloc: this, keyStore: keyStore);
+      tcpBlocHandshake!.handshake(Uint8List(0));
+    }
+
     _socketStreamSub = _socket!.asBroadcastStream().listen((event) {
       List<Uint8List> messages = separateMessages(event);
 
@@ -56,12 +62,6 @@ class TcpBloc {
     _socket!.handleError((err) {
       handleError(ErrorOccured(errMessage: "socket error $err"));
     });
-
-    if (event.encryptionEnabled) {
-      _encryptionState = EncryptionState.Enabling;
-      tcpBlocHandshake = TcpBlocHandshake(tcpBloc: this, keyStore: keyStore);
-      tcpBlocHandshake!.handshake(Uint8List(0));
-    }
   }
 
   void disconnect(Disconnect event) async {
