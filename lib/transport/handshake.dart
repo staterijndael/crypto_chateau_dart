@@ -10,7 +10,7 @@ import 'conn_bloc.dart';
 
 enum HandshakeSteps {
   Ready,
-  ReadInitMsg,
+  SendInitMsg,
   GetDhParams,
   SendClientPublicKey,
   GetServerPublicKey,
@@ -38,12 +38,11 @@ class TcpBlocHandshake {
           throw "incorrect public key during initializing";
         }
 
-        _currentStep = HandshakeSteps.ReadInitMsg;
+        _currentStep = HandshakeSteps.SendInitMsg;
         return;
-      case HandshakeSteps.ReadInitMsg:
-        if (String.fromCharCodes(message) != "handshake") {
-          throw "incorrect handshake init message";
-        }
+      case HandshakeSteps.SendInitMsg:
+        tcpBloc!.sendMessage(
+            SendMessage(message: Uint8List.fromList("handshake".codeUnits)));
         _currentStep = HandshakeSteps.GetDhParams;
         return;
       case HandshakeSteps.GetDhParams:
