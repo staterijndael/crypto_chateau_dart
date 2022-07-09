@@ -23,9 +23,8 @@ class TcpBlocHandshake {
   TcpBloc? tcpBloc;
   KeyStore? keyStore;
 
-  TcpBlocHandshake({required tcpBloc, required keyStore}) {
+  TcpBlocHandshake({required this.tcpBloc, required this.keyStore}) {
     _currentStep = HandshakeSteps.Ready;
-    TcpBlocHandshake(tcpBloc: tcpBloc, keyStore: keyStore);
   }
 
   handshake(Iterable<int> message) {
