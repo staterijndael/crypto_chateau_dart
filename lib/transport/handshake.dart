@@ -1,10 +1,10 @@
 import 'dart:convert';
-import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:crypto_chateau_dart/dh/dh.dart';
 import 'package:crypto_chateau_dart/dh/params.dart';
 import 'package:flutter/foundation.dart';
+import 'package:collection/collection.dart';
 
 import 'conn_bloc.dart';
 
@@ -53,7 +53,8 @@ class TcpBlocHandshake {
         BigInt generatorParam = byteArrayToBigInt(dhParams[0]);
         Uint8List primeHashParam = dhParams[1];
 
-        if (generatorParam != Generator || primeHashParam != PrimeHash) {
+        if (generatorParam != Generator ||
+            !ListEquality().equals(primeHashParam, PrimeHash)) {
           throw "incorrect values of params for diffie-hellman key exchange";
         }
 
