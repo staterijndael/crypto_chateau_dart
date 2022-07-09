@@ -38,6 +38,7 @@ class TcpBlocHandshake {
         }
 
         _currentStep = HandshakeSteps.SendInitMsg;
+        handshake(Uint8List(0));
         return;
       case HandshakeSteps.SendInitMsg:
         tcpBloc!.sendMessage(
