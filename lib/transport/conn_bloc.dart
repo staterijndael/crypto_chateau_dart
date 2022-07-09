@@ -2,13 +2,12 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:bloc/bloc.dart';
 import 'package:crypto_chateau_dart/aes_256/aes_256.dart';
+import 'package:crypto_chateau_dart/dh/dh.dart';
 import 'package:crypto_chateau_dart/dh/params.dart';
 import 'package:crypto_chateau_dart/transport/handshake.dart';
 import 'package:flutter/foundation.dart';
 import 'package:crypto/crypto.dart';
-import 'package:flutter/widgets.dart';
 
 part 'conn_event.dart';
 
@@ -31,12 +30,13 @@ class TcpBloc {
   Socket? _socket;
   StreamSubscription? _socketStreamSub;
   ConnectionTask<Socket>? _socketConnectionTask;
+  KeyStore keyStore;
 
   EncryptionState _encryptionState = EncryptionState.Disabled;
   Uint8List? _secretKey;
   TcpBlocHandshake? tcpBlocHandshake;
 
-  TcpBloc() : super();
+  TcpBloc({required this.keyStore}) : super();
 
   Future<void> connect(TcpController controller, Connect event) async {
     _socketConnectionTask = await Socket.startConnect(event.host, event.port);
@@ -59,7 +59,7 @@ class TcpBloc {
 
     if (event.encryptionEnabled) {
       _encryptionState = EncryptionState.Enabling;
-      tcpBlocHandshake = TcpBlocHandshake(tcpBloc: this);
+      tcpBlocHandshake = TcpBlocHandshake(tcpBloc: this, keyStore: keyStore);
       tcpBlocHandshake!.handshake(Uint8List(0));
     }
   }

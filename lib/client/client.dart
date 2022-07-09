@@ -1,7 +1,7 @@
 import 'dart:typed_data';
-import 'dart:ui';
 
 import 'package:crypto_chateau_dart/client/response.dart';
+import 'package:crypto_chateau_dart/dh/dh.dart';
 
 import '../transport/conn_bloc.dart';
 import 'models.dart';
@@ -26,8 +26,12 @@ class ConnectParams {
 class Client {
   ClientController clientController;
   ConnectParams connectParams;
+  KeyStore keyStore = KeyStore();
 
-  Client({required this.clientController, required this.connectParams});
+  Client({required this.clientController, required this.connectParams}) {
+    keyStore.GeneratePrivateKey();
+    keyStore.GeneratePublicKey();
+  }
 
   void onEndpointMessageReceived(TcpBloc tcpBloc, Uint8List data) {
     tcpBloc.close();
@@ -43,7 +47,7 @@ class Client {
 
   //handlers
   GetUser(GetUserRequest request) async {
-    TcpBloc tcpBloc = TcpBloc();
+    TcpBloc tcpBloc = TcpBloc(keyStore: keyStore);
 
     onEncryptEnabled() {
       tcpBloc.sendMessage(SendMessage(message: request.Marshal()));
@@ -61,16 +65,31 @@ class Client {
             encryptionEnabled: connectParams.isEncryptionEnabled));
   }
 
+  // SendCode(SendCodeRequest request) async {
+  //   TcpBloc tcpBloc = TcpBloc();
+
+  //   onEncryptEnabled() {
+  //     tcpBloc.sendMessage(SendMessage(message: request.Marshal()));
+  //   }
+
+  //   TcpController tcpController = TcpController(
+  //       onEncryptionEnabled: onEncryptEnabled,
+  //       onEndpointMessageReceived: onEndpointMessageReceived);
+
+  //   tcpBloc.connect(
+  //       tcpController,
+  //       Connect(
+  //           host: connectParams.host,
+  //           port: connectParams.port,
+  //           encryptionEnabled: connectParams.isEncryptionEnabled));
+  // }
+
   //streams
 
-  typedef void SendStreamMessage(Request request);
+  void ListenUpdates() async {
+    TcpBloc tcpBloc = TcpBloc(keyStore: keyStore);
 
-  ListenUpdates(GetUserRequest request) async {
-    TcpBloc tcpBloc = TcpBloc();
-
-    onEncryptEnabled() {
-      tcpBloc.sendMessage(SendMessage(message: request.Marshal()));
-    }
+    onEncryptEnabled() {}
 
     TcpController tcpController = TcpController(
         onEncryptionEnabled: onEncryptEnabled,

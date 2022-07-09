@@ -20,18 +20,23 @@ enum HandshakeSteps {
 
 class TcpBlocHandshake {
   HandshakeSteps? _currentStep;
-  TcpBloc? _tcpBloc;
+  TcpBloc? tcpBloc;
   KeyStore? keyStore;
 
-  TcpBlocHandshake({required TcpBloc tcpBloc}) {
+  TcpBlocHandshake({required tcpBloc, required keyStore}) {
     _currentStep = HandshakeSteps.Ready;
-    _tcpBloc = tcpBloc;
-    keyStore = KeyStore();
   }
 
   handshake(Iterable<int> message) {
     switch (_currentStep) {
       case HandshakeSteps.Ready:
+        if (!keyStore!.IsKeyValid(keyStore!.privateKey)) {
+          throw "incorrect private key during initializing";
+        }
+        if (!keyStore!.IsKeyValid(keyStore!.publicKey)) {
+          throw "incorrect public key during initializing";
+        }
+
         _currentStep = HandshakeSteps.ReadInitMsg;
         return;
       case HandshakeSteps.ReadInitMsg:
@@ -47,14 +52,11 @@ class TcpBlocHandshake {
         }
 
         BigInt generatorParam = byteArrayToBigInt(dhParams[0]);
-        BigInt primeParam = byteArrayToBigInt(dhParams[1]);
+        Uint8List primeHashParam = dhParams[1];
 
-        if (generatorParam != Generator || primeParam != Prime) {
+        if (generatorParam != Generator || primeHashParam != PrimeHash) {
           throw "incorrect values of params for diffie-hellman key exchange";
         }
-
-        keyStore!.GeneratePrivateKey();
-        keyStore!.GeneratePublicKey();
 
         _currentStep = HandshakeSteps.GetServerPublicKey;
         return;
@@ -68,7 +70,7 @@ class TcpBlocHandshake {
         return;
       case HandshakeSteps.SendClientPublicKey:
         Uint8List publicKeyBytes = bigIntToByteArray(keyStore!.publicKey);
-        _tcpBloc!.sendMessage(SendMessage(message: publicKeyBytes));
+        tcpBloc!.sendMessage(SendMessage(message: publicKeyBytes));
         _currentStep = HandshakeSteps.GetSuccessMsg;
         return;
       case HandshakeSteps.GetSuccessMsg:

@@ -10,27 +10,16 @@ class GetUserRequest extends Request {
   GetUserRequest({required this.userID});
 
   Uint8List Marshal() {
-    var buffer = Uint8List(8).buffer;
-    var bdata = ByteData.view(buffer);
+    var bdata = ByteData.view(Uint8List(8).buffer);
     bdata.setUint64(0, userID);
 
     Uint8List bDataArr =
         bdata.buffer.asUint8List(bdata.offsetInBytes, bdata.lengthInBytes);
 
-    String marshalStr = "GetUser# UserID: ";
-    List<int> MarshalStrBytes = marshalStr.codeUnits;
-
-    Uint8List data = Uint8List(MarshalStrBytes.length + bDataArr.length);
-
-    for (var i = 0; i < MarshalStrBytes.length; i++) {
-      data[i] = MarshalStrBytes[i];
-    }
-
-    for (var i = 0; i < bDataArr.length; i++) {
-      data[MarshalStrBytes.length + i] = bDataArr[i];
-    }
-
-    return data;
+    List<int> data = List.from("GetUser# UserID: ".codeUnits)
+      ..addAll(
+          bdata.buffer.asUint8List(bdata.offsetInBytes, bdata.lengthInBytes));
+    return Uint8List.fromList(data);
   }
 }
 
@@ -50,4 +39,14 @@ class GetUserResponse extends Response {
   Unmarshal(Map<String, Uint8List> params) {
     userName = String.fromCharCodes(params["UserName"]!);
   }
+}
+
+// streams
+class ListenUpdatesSend {}
+
+class ListenUpdatesGet {
+  String eventType;
+  String eventBody;
+
+  ListenUpdatesGet({required this.eventBody, required this.eventType});
 }

@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'package:crypto/crypto.dart';
 
 var primeRaw = Uint8List.fromList([
   0xFF,
@@ -261,6 +262,7 @@ var primeRaw = Uint8List.fromList([
 
 final BigInt Generator = BigInt.from(2);
 final BigInt Prime = byteArrayToBigInt(primeRaw);
+final Uint8List PrimeHash = Uint8List.fromList(sha1.convert(primeRaw).bytes);
 
 BigInt byteArrayToBigInt(Uint8List byteArray) {
   BigInt value = BigInt.from(0);

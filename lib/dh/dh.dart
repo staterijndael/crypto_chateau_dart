@@ -39,4 +39,12 @@ class KeyStore {
 
     privateKey = byteArrayToBigInt(builder.toBytes());
   }
+
+  bool IsKeyValid(BigInt key) {
+    if (key == BigInt.from(0) || key.bitLength == 0) {
+      return false;
+    }
+
+    return true;
+  }
 }
