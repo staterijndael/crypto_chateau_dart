@@ -38,10 +38,15 @@ Map<String, Uint8List> getParams(Uint8List p) {
   bool paramFilled = false;
   bool stringParamParsing = false;
 
+  int objectOpenBracketsCount = 0;
+  int objectCloseBracketsCount = 0;
+
   int delimSymb = utf8.encode(',')[0];
   int colonSymb = utf8.encode(':')[0];
   int spaceSymb = utf8.encode(' ')[0];
   int quoteSymb = utf8.encode('"')[0];
+  int openBracketSymb = utf8.encode('(')[0];
+  int closeBracketSymb = utf8.encode(')')[0];
 
   for (var i = 0; i < p.length; i++) {
     if (p[i] == delimSymb || i == p.length - 1) {
@@ -72,12 +77,19 @@ Map<String, Uint8List> getParams(Uint8List p) {
       paramBufLast = paramBufIndex;
       valueBufLast = valueBufIndex;
       paramFilled = false;
+
+      objectOpenBracketsCount = 0;
+      objectCloseBracketsCount = 0;
     } else if (p[i] == colonSymb && stringParamParsing == false) {
       paramFilled = true;
     } else if (p[i] == spaceSymb && stringParamParsing == false) {
       continue;
     } else if (p[i] == quoteSymb) {
       stringParamParsing = !stringParamParsing;
+    } else if (p[i] == openBracketSymb) {
+      objectOpenBracketsCount++;
+    } else if (p[i] == closeBracketSymb) {
+      objectCloseBracketsCount++;
     } else {
       if (!paramFilled) {
         paramBuf[paramBufIndex] = p[i];
