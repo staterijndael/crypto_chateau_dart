@@ -24,7 +24,7 @@ checkCountParams(int assertCount, int actualCount) {
   }
 }
 
-Map<String, Uint8List> getParams(Uint8List p) {
+Map<String, Uint8List> getParams(Uint8List p, [deep = false]) {
   Map<String, Uint8List> params = {};
 
   Uint8List paramBuf = Uint8List(p.length);
@@ -36,6 +36,10 @@ Map<String, Uint8List> getParams(Uint8List p) {
   int valueBufIndex = 0;
 
   bool paramFilled = false;
+  if (deep = true) {
+    paramFilled = true;
+  }
+
   bool stringParamParsing = false;
 
   int objectOpenBracketsCount = 0;
