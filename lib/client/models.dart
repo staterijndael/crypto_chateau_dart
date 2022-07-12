@@ -92,7 +92,8 @@ class GetUserResponse extends Message {
   }
 
   Unmarshal(Map<String, Uint8List> params) {
-    Map<String, Uint8List> userParams = getParams(params["User"]!, true);
+    Uint8List paramUser = params["User"]!;
+    Map<String, Uint8List> userParams = getParams(paramUser, true);
     user.Unmarshal(userParams);
   }
 
