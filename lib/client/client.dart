@@ -7,7 +7,7 @@ import '../transport/conn_bloc.dart';
 import 'models.dart';
 
 class ClientController {
-  late void Function(Response) onEndpointMessageReceived;
+  late void Function(Message) onEndpointMessageReceived;
 
   ClientController({required this.onEndpointMessageReceived});
 }
@@ -41,7 +41,7 @@ class Client {
         String.fromCharCodes(data.sublist(0, lastMethodNameIndex));
 
     Uint8List body = data.sublist(lastMethodNameIndex + 1);
-    Response response = GetResponse(methodName, body);
+    Message response = GetResponse(methodName, body);
     clientController.onEndpointMessageReceived(response);
   }
 

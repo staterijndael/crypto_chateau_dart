@@ -1,17 +1,71 @@
 import 'dart:typed_data';
 
-abstract class Request {
+abstract class Message {
   Uint8List Marshal();
+  Unmarshal(Map<String, Uint8List> params);
 }
 
-class GetUserRequest extends Request {
-  final int userID;
+class User extends Message {
+  int? id;
+  String? nickname;
+  int? age;
+  bool? gender;
+  String? status;
 
-  GetUserRequest({required this.userID});
+  User({this.id, this.nickname, this.age, this.gender, this.status});
+
+  Uint8List Marshal() {
+    var idConvertedBytes = ByteData.view(Uint8List(8).buffer);
+    idConvertedBytes.setUint64(0, id!);
+
+    var ageConvertedBytes = ByteData.view(Uint8List(8).buffer);
+    ageConvertedBytes.setUint64(0, id!);
+
+    int convertedGender = 0;
+
+    if (gender == true) {
+      convertedGender = 1;
+    }
+
+    List<int> data = List.from("(Id:".codeUnits)
+      ..addAll(idConvertedBytes.buffer.asUint8List(
+          idConvertedBytes.offsetInBytes, idConvertedBytes.lengthInBytes))
+      ..addAll(",nickname:\"$nickname\",age:".codeUnits)
+      ..addAll(ageConvertedBytes.buffer.asUint8List(
+          ageConvertedBytes.offsetInBytes, ageConvertedBytes.lengthInBytes))
+      ..addAll(",gender:".codeUnits)
+      ..add(convertedGender)
+      ..addAll(",status:\"$status\"".codeUnits);
+
+    return Uint8List.fromList(data);
+  }
+
+  Unmarshal(Map<String, Uint8List> params) {
+    var idBytes = ByteData.view(params["Id"]!.buffer);
+    id = idBytes.getUint64(0);
+
+    var ageBytes = ByteData.view(params["Age"]!.buffer);
+    age = ageBytes.getUint64(0);
+
+    if (params["Gender"]![0] == 1) {
+      gender = true;
+    } else {
+      gender = false;
+    }
+
+    nickname = String.fromCharCodes(params["Nickname"]!);
+    status = String.fromCharCodes(params["Status"]!);
+  }
+}
+
+class GetUserRequest extends Message {
+  int? userID;
+
+  GetUserRequest({this.userID});
 
   Uint8List Marshal() {
     var bdata = ByteData.view(Uint8List(8).buffer);
-    bdata.setUint64(0, userID);
+    bdata.setUint64(0, userID!);
 
     Uint8List bDataArr =
         bdata.buffer.asUint8List(bdata.offsetInBytes, bdata.lengthInBytes);
@@ -21,23 +75,25 @@ class GetUserRequest extends Request {
           bdata.buffer.asUint8List(bdata.offsetInBytes, bdata.lengthInBytes));
     return Uint8List.fromList(data);
   }
+
+  Unmarshal(Map<String, Uint8List> params) {}
 }
 
-abstract class Response {
-  Unmarshal(Map<String, Uint8List> params);
-}
+class GetUserResponse extends Message {
+  User? user;
 
-class GetUserResponse extends Response {
-  String? userName;
-
-  GetUserResponse([String? userName]) {
-    if (userName != null) {
-      this.userName = userName;
+  GetUserResponse([User? user]) {
+    if (user != null) {
+      this.user = user;
     }
   }
 
   Unmarshal(Map<String, Uint8List> params) {
-    userName = String.fromCharCodes(params["UserName"]!);
+    user!.Unmarshal(params);
+  }
+
+  Uint8List Marshal() {
+    return Uint8List(0);
   }
 }
 

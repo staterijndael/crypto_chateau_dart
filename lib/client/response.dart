@@ -4,7 +4,7 @@ import 'dart:typed_data';
 import 'package:crypto_chateau_dart/client/models.dart';
 import 'package:flutter/material.dart';
 
-Response GetResponse(String methodName, Uint8List data) {
+Message GetResponse(String methodName, Uint8List data) {
   Map<String, Uint8List> params = getParams(data);
 
   switch (methodName) {
