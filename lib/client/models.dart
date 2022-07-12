@@ -92,13 +92,7 @@ class GetUserResponse extends Message {
   }
 
   Unmarshal(Map<String, Uint8List> params) {
-    Uint8List? paramUser = params["User"];
-    if (paramUser![0] != utf8.encode('(') ||
-        paramUser[paramUser.length - 1] != utf8.encode(')')) {
-      throw 'incorrect user object data';
-    }
-
-    Map<String, Uint8List> userParams = getParams(paramUser);
+    Map<String, Uint8List> userParams = getParams(params["User"]!);
     user.Unmarshal(userParams);
   }
 
