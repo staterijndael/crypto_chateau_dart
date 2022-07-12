@@ -80,7 +80,7 @@ class GetUserRequest extends Message {
 }
 
 class GetUserResponse extends Message {
-  User? user;
+  User user = User();
 
   GetUserResponse([User? user]) {
     if (user != null) {
@@ -89,7 +89,7 @@ class GetUserResponse extends Message {
   }
 
   Unmarshal(Map<String, Uint8List> params) {
-    user!.Unmarshal(params);
+    user.Unmarshal(params);
   }
 
   Uint8List Marshal() {
