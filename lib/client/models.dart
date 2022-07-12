@@ -1,4 +1,7 @@
+import 'dart:convert';
 import 'dart:typed_data';
+
+import 'package:crypto_chateau_dart/client/response.dart';
 
 abstract class Message {
   Uint8List Marshal();
@@ -89,7 +92,14 @@ class GetUserResponse extends Message {
   }
 
   Unmarshal(Map<String, Uint8List> params) {
-    user.Unmarshal(params);
+    Uint8List? paramUser = params["User"];
+    if (paramUser![0] != utf8.encode('(') ||
+        paramUser[paramUser.length - 1] != utf8.encode(')')) {
+      throw 'incorrect user object data';
+    }
+
+    Map<String, Uint8List> userParams = getParams(paramUser);
+    user.Unmarshal(userParams);
   }
 
   Uint8List Marshal() {
