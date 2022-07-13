@@ -49,6 +49,8 @@ Map<String, Uint8List> getParams(Uint8List p) {
   int openBracketSymb = utf8.encode('(')[0];
   int closeBracketSymb = utf8.encode(')')[0];
 
+  print(utf8.encode(')'));
+
   for (var i = 0; i < p.length; i++) {
     if ((p[i] == delimSymb &&
             (objectOpenBracketsCount == objectCloseBracketsCount)) ||
