@@ -83,7 +83,9 @@ Map<String, Uint8List> getParams(Uint8List p) {
 
       objectOpenBracketsCount = 0;
       objectCloseBracketsCount = 0;
-    } else if (p[i] == colonSymb && stringParamParsing == false) {
+    } else if (p[i] == colonSymb &&
+        stringParamParsing == false &&
+        objectOpenBracketsCount == objectCloseBracketsCount) {
       paramFilled = true;
     } else if (p[i] == spaceSymb && stringParamParsing == false) {
       continue;
