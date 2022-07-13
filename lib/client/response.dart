@@ -24,7 +24,7 @@ checkCountParams(int assertCount, int actualCount) {
   }
 }
 
-Map<String, Uint8List> getParams(Uint8List p, [deep = false]) {
+Map<String, Uint8List> getParams(Uint8List p) {
   Map<String, Uint8List> params = {};
 
   Uint8List paramBuf = Uint8List(p.length);
@@ -36,9 +36,6 @@ Map<String, Uint8List> getParams(Uint8List p, [deep = false]) {
   int valueBufIndex = 0;
 
   bool paramFilled = false;
-  if (deep == true) {
-    paramFilled = true;
-  }
 
   bool stringParamParsing = false;
 
@@ -54,7 +51,6 @@ Map<String, Uint8List> getParams(Uint8List p, [deep = false]) {
 
   for (var i = 0; i < p.length; i++) {
     if ((p[i] == delimSymb &&
-            deep == false &&
             (objectOpenBracketsCount == objectCloseBracketsCount)) ||
         i == p.length - 1) {
       if ((i != p.length - 1) && (p[i + 1] == delimSymb)) {
@@ -72,8 +68,7 @@ Map<String, Uint8List> getParams(Uint8List p, [deep = false]) {
         valueBufIndex++;
       }
 
-      if (paramBufLast == paramBufIndex ||
-          (valueBufLast == valueBufIndex && deep == false)) {
+      if (paramBufLast == paramBufIndex || (valueBufLast == valueBufIndex)) {
         throw "incorrect message format: null value";
       }
 
