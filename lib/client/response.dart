@@ -36,7 +36,7 @@ Map<String, Uint8List> getParams(Uint8List p, [deep = false]) {
   int valueBufIndex = 0;
 
   bool paramFilled = false;
-  if (deep = true) {
+  if (deep == true) {
     paramFilled = true;
   }
 
