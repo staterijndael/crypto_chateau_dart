@@ -54,6 +54,7 @@ Map<String, Uint8List> getParams(Uint8List p, [deep = false]) {
 
   for (var i = 0; i < p.length; i++) {
     if ((p[i] == delimSymb &&
+            deep == false &&
             (objectOpenBracketsCount == objectCloseBracketsCount)) ||
         i == p.length - 1) {
       if ((i != p.length - 1) && (p[i + 1] == delimSymb)) {
