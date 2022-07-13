@@ -71,7 +71,8 @@ Map<String, Uint8List> getParams(Uint8List p, [deep = false]) {
         valueBufIndex++;
       }
 
-      if (paramBufLast == paramBufIndex || valueBufLast == valueBufIndex) {
+      if (paramBufLast == paramBufIndex ||
+          (valueBufLast == valueBufIndex && deep == false)) {
         throw "incorrect message format: null value";
       }
 
