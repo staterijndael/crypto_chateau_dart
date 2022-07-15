@@ -56,8 +56,8 @@ class User extends Message {
       gender = false;
     }
 
-    nickname = String.fromCharCodes(params["Nickname"]!);
-    status = String.fromCharCodes(params["Status"]!);
+    nickname = utf8.decode(params["Nickname"]!);
+    status = utf8.decode(params["Status"]!);
   }
 }
 
