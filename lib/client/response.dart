@@ -65,7 +65,9 @@ Map<String, Uint8List> getParams(Uint8List p) {
         throw "incorrect message format: close quote is missing";
       }
 
-      if (i == p.length - 1 && stringParamParsing == false) {
+      if (i == p.length - 1 &&
+          stringParamParsing == false &&
+          p[i] != closeBracketSymb) {
         valueBuf[valueBufIndex] = p[i];
         valueBufIndex++;
       }
