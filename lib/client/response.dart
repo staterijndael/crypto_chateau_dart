@@ -36,6 +36,7 @@ Map<String, Uint8List> getParams(Uint8List p) {
   int valueBufIndex = 0;
 
   bool paramFilled = false;
+  bool startedParsingValue = false;
 
   bool stringParamParsing = false;
 
@@ -84,20 +85,24 @@ Map<String, Uint8List> getParams(Uint8List p) {
       paramBufLast = paramBufIndex - 1;
       valueBufLast = valueBufIndex - 1;
       paramFilled = false;
+      startedParsingValue = false;
 
       objectOpenBracketsCount = 0;
       objectCloseBracketsCount = 0;
     } else if (p[i] == colonSymb &&
         stringParamParsing == false &&
-        objectOpenBracketsCount == objectCloseBracketsCount) {
+        objectOpenBracketsCount == objectCloseBracketsCount &&
+        startedParsingValue == false) {
       paramFilled = true;
-    } else if (p[i] == spaceSymb && stringParamParsing == false) {
+    } else if (p[i] == spaceSymb &&
+        stringParamParsing == false &&
+        startedParsingValue == false) {
       continue;
-    } else if (p[i] == quoteSymb) {
+    } else if (p[i] == quoteSymb && startedParsingValue == false) {
       stringParamParsing = !stringParamParsing;
-    } else if (p[i] == openBracketSymb) {
+    } else if (p[i] == openBracketSymb && startedParsingValue == false) {
       objectOpenBracketsCount++;
-    } else if (p[i] == closeBracketSymb) {
+    } else if (p[i] == closeBracketSymb && startedParsingValue == false) {
       objectCloseBracketsCount++;
     } else {
       if (!paramFilled) {
@@ -106,6 +111,7 @@ Map<String, Uint8List> getParams(Uint8List p) {
       } else {
         valueBuf[valueBufIndex] = p[i];
         valueBufIndex++;
+        startedParsingValue = true;
       }
     }
   }
