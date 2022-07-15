@@ -81,8 +81,8 @@ Map<String, Uint8List> getParams(Uint8List p) {
       Uint8List value = valueBuf.sublist(valueBufLast + 1, valueBufIndex);
       params[param] = value;
 
-      paramBufLast = paramBufIndex;
-      valueBufLast = valueBufIndex;
+      paramBufLast = paramBufIndex - 1;
+      valueBufLast = valueBufIndex - 1;
       paramFilled = false;
 
       objectOpenBracketsCount = 0;
