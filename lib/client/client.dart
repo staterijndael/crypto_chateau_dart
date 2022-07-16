@@ -65,6 +65,24 @@ class Client {
             encryptionEnabled: connectParams.isEncryptionEnabled));
   }
 
+  SendCode(SendCodeRequest request) async {
+    TcpBloc tcpBloc = TcpBloc(keyStore: keyStore);
+
+    onEncryptEnabled() {
+      tcpBloc.sendMessage(SendMessage(message: request.Marshal()));
+    }
+
+    TcpController tcpController = TcpController(
+        onEncryptionEnabled: onEncryptEnabled,
+        onEndpointMessageReceived: onEndpointMessageReceived);
+
+    tcpBloc.connect(
+        tcpController,
+        Connect(
+            host: connectParams.host,
+            port: connectParams.port,
+            encryptionEnabled: connectParams.isEncryptionEnabled));
+  }
   // SendCode(SendCodeRequest request) async {
   //   TcpBloc tcpBloc = TcpBloc();
 

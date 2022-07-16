@@ -101,6 +101,33 @@ class GetUserResponse extends Message {
   }
 }
 
+class SendCodeRequest extends Message {
+  String? number;
+  String? hash;
+
+  SendCodeRequest({this.number, this.hash});
+
+  Unmarshal(Map<String, Uint8List> params) {
+    number = utf8.decode(params["Number"]!);
+    hash = utf8.decode(params["Hash"]!);
+  }
+
+  Uint8List Marshal() {
+    List<int> data = "SendCode# Number:$number,hash:$hash".codeUnits;
+    return Uint8List.fromList(data);
+  }
+}
+
+class SendCodeResponse extends Message {
+  Uint8List Marshal() {
+    return Uint8List(0);
+  }
+
+  Unmarshal(Map<String, Uint8List> params) {
+    return;
+  }
+}
+
 // streams
 class ListenUpdatesSend {}
 

@@ -13,6 +13,10 @@ Message GetResponse(String methodName, Uint8List data) {
       var response = GetUserResponse();
       response.Unmarshal(params);
       return response;
+    case "SendCode":
+      checkCountParams(0, params.length);
+      var response = SendCodeResponse();
+      return response;
   }
 
   throw "incorrect method";
