@@ -103,17 +103,17 @@ class GetUserResponse extends Message {
 
 class SendCodeRequest extends Message {
   String? number;
-  String? hash;
+  String? passHash;
 
-  SendCodeRequest({this.number, this.hash});
+  SendCodeRequest({this.number, this.passHash});
 
   Unmarshal(Map<String, Uint8List> params) {
     number = utf8.decode(params["Number"]!);
-    hash = utf8.decode(params["Hash"]!);
+    passHash = utf8.decode(params["PassHash"]!);
   }
 
   Uint8List Marshal() {
-    List<int> data = "SendCode# Number:$number,Hash:$hash".codeUnits;
+    List<int> data = "SendCode# Number:$number,PassHash:$passHash".codeUnits;
     return Uint8List.fromList(data);
   }
 }
