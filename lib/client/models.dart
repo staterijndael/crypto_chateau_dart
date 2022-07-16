@@ -113,7 +113,7 @@ class SendCodeRequest extends Message {
   }
 
   Uint8List Marshal() {
-    List<int> data = "SendCode# Number:$number,hash:$hash".codeUnits;
+    List<int> data = "SendCode# Number:$number,Hash:$hash".codeUnits;
     return Uint8List.fromList(data);
   }
 }
