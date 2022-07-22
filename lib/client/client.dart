@@ -47,29 +47,18 @@ class Client {
 
   //handlers
   GetUser(GetUserRequest request) async {
-    TcpBloc tcpBloc = TcpBloc(keyStore: keyStore);
-
-    onEncryptEnabled() {
-      tcpBloc.sendMessage(SendMessage(message: request.Marshal()));
-    }
-
-    TcpController tcpController = TcpController(
-        onEncryptionEnabled: onEncryptEnabled,
-        onEndpointMessageReceived: onEndpointMessageReceived);
-
-    tcpBloc.connect(
-        tcpController,
-        Connect(
-            host: connectParams.host,
-            port: connectParams.port,
-            encryptionEnabled: connectParams.isEncryptionEnabled));
+    handleMessage(request.Marshal());
   }
 
   SendCode(SendCodeRequest request) async {
+    handleMessage(request.Marshal());
+  }
+
+  handleMessage(Uint8List data) {
     TcpBloc tcpBloc = TcpBloc(keyStore: keyStore);
 
     onEncryptEnabled() {
-      tcpBloc.sendMessage(SendMessage(message: request.Marshal()));
+      tcpBloc.sendMessage(SendMessage(message: data));
     }
 
     TcpController tcpController = TcpController(
