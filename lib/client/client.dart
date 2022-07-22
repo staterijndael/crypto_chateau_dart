@@ -50,6 +50,22 @@ class Client {
     handleMessage(request.Marshal());
   }
 
+  Register(RegisterRequest request) async {
+    handleMessage(request.Marshal());
+  }
+
+  HandleCode(HandleCodeRequest request) async {
+    handleMessage(request.Marshal());
+  }
+
+  AuthToken(AuthTokenRequest request) async {
+    handleMessage(request.Marshal());
+  }
+
+  AuthCreds(AuthCredentialsRequest request) async {
+    handleMessage(request.Marshal());
+  }
+
   handleMessage(Uint8List data) {
     TcpBloc tcpBloc = TcpBloc(keyStore: keyStore);
 

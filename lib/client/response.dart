@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:crypto_chateau_dart/client/models.dart';
-import 'package:flutter/material.dart';
 
 Message GetResponse(String methodName, Uint8List data) {
   Map<String, Uint8List> params = getParams(data);
@@ -11,6 +10,24 @@ Message GetResponse(String methodName, Uint8List data) {
     case "SendCode":
       checkCountParams(0, params.length);
       var response = SendCodeResponse();
+      return response;
+    case "Register":
+      checkCountParams(1, params.length);
+      var response = RegisterResponse();
+      response.Unmarshal(params);
+      return response;
+    case "HandleCode":
+      checkCountParams(0, params.length);
+      var response = HandleCodeResponse();
+      return response;
+    case "AuthToken":
+      checkCountParams(0, params.length);
+      var response = AuthTokenResponse();
+      return response;
+    case "AuthCreds":
+      checkCountParams(1, params.length);
+      var response = AuthCredentialsResponse();
+      response.Unmarshal(params);
       return response;
   }
 
