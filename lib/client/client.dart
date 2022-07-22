@@ -46,10 +46,6 @@ class Client {
   }
 
   //handlers
-  GetUser(GetUserRequest request) async {
-    handleMessage(request.Marshal());
-  }
-
   SendCode(SendCodeRequest request) async {
     handleMessage(request.Marshal());
   }

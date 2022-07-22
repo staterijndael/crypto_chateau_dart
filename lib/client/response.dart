@@ -8,11 +8,6 @@ Message GetResponse(String methodName, Uint8List data) {
   Map<String, Uint8List> params = getParams(data);
 
   switch (methodName) {
-    case "GetUser":
-      checkCountParams(1, params.length);
-      var response = GetUserResponse();
-      response.Unmarshal(params);
-      return response;
     case "SendCode":
       checkCountParams(0, params.length);
       var response = SendCodeResponse();
