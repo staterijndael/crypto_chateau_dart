@@ -61,43 +61,111 @@ class User extends Message {
   }
 }
 
-class GetUserRequest extends Message {
-  int? userID;
+class AuthTokenRequest extends Message {
+  String? sessionToken;
 
-  GetUserRequest({this.userID});
+  AuthTokenRequest({this.sessionToken});
 
   Uint8List Marshal() {
-    var bdata = ByteData.view(Uint8List(8).buffer);
-    bdata.setUint64(0, userID!);
+    List<int> data =
+        List.from("AuthToken# SessionToken:$sessionToken".codeUnits);
 
-    Uint8List bDataArr =
-        bdata.buffer.asUint8List(bdata.offsetInBytes, bdata.lengthInBytes);
-
-    List<int> data = List.from("GetUser# UserID: ".codeUnits)
-      ..addAll(
-          bdata.buffer.asUint8List(bdata.offsetInBytes, bdata.lengthInBytes));
     return Uint8List.fromList(data);
   }
 
+  @override
+  Unmarshal(Map<String, Uint8List> params) {
+    // TODO: implement Unmarshal
+    throw UnimplementedError();
+  }
+}
+
+class AuthTokenResponse extends Message {
+  @override
+  Uint8List Marshal() {
+    // TODO: implement Marshal
+    throw UnimplementedError();
+  }
+
+  @override
   Unmarshal(Map<String, Uint8List> params) {}
 }
 
-class GetUserResponse extends Message {
-  User user = User();
+class AuthCredentialsRequest extends Message {
+  String? number;
+  String? passHash;
 
-  GetUserResponse([User? user]) {
-    if (user != null) {
-      this.user = user;
-    }
-  }
+  AuthCredentialsRequest({this.number, this.passHash});
 
-  Unmarshal(Map<String, Uint8List> params) {
-    Map<String, Uint8List> userParams = getParams(params["User"]!);
-    user.Unmarshal(userParams);
-  }
-
+  @override
   Uint8List Marshal() {
-    return Uint8List(0);
+    List<int> data = List.from(
+        "AuthCredentials# Number:$number,PassHash:$passHash".codeUnits);
+
+    return Uint8List.fromList(data);
+  }
+
+  @override
+  Unmarshal(Map<String, Uint8List> params) {
+    // TODO: implement Unmarshal
+    throw UnimplementedError();
+  }
+}
+
+class AuthCredentialsResponse extends Message {
+  String? sessionToken;
+
+  AuthCredentialsResponse({this.sessionToken});
+
+  @override
+  Uint8List Marshal() {
+    // TODO: implement Marshal
+    throw UnimplementedError();
+  }
+
+  @override
+  Unmarshal(Map<String, Uint8List> params) {
+    sessionToken = utf8.decode(params["SessionToken"]!);
+  }
+}
+
+class RegisterRequest extends Message {
+  String? number;
+  String? passHash;
+  String? status;
+
+  RegisterRequest({this.number, this.passHash, this.status});
+
+  @override
+  Uint8List Marshal() {
+    List<int> data = List.from(
+        "Register# Number: $number,PassHash:$passHash,Status:$status"
+            .codeUnits);
+
+    return Uint8List.fromList(data);
+  }
+
+  @override
+  Unmarshal(Map<String, Uint8List> params) {
+    // TODO: implement Unmarshal
+    throw UnimplementedError();
+  }
+}
+
+class RegisterResponse extends Message {
+  String? sessionToken;
+
+  RegisterResponse({this.sessionToken});
+
+  @override
+  Uint8List Marshal() {
+    // TODO: implement Marshal
+    throw UnimplementedError();
+  }
+
+  @override
+  Unmarshal(Map<String, Uint8List> params) {
+    sessionToken = utf8.decode(params["SessionToken"]!);
   }
 }
 
@@ -126,6 +194,42 @@ class SendCodeResponse extends Message {
   Unmarshal(Map<String, Uint8List> params) {
     return;
   }
+}
+
+class HandleCodeRequest extends Message {
+  String? number;
+  int? code;
+
+  HandleCodeRequest({this.number, this.code});
+
+  @override
+  Uint8List Marshal() {
+    var codeConvertedBytes = ByteData.view(Uint8List(8).buffer);
+    codeConvertedBytes.setUint8(0, code!);
+
+    List<int> data = List.from("HandleCode# Number:$number, Code:".codeUnits)
+      ..addAll(codeConvertedBytes.buffer.asUint8List(
+          codeConvertedBytes.offsetInBytes, codeConvertedBytes.lengthInBytes));
+
+    return Uint8List.fromList(data);
+  }
+
+  @override
+  Unmarshal(Map<String, Uint8List> params) {
+    // TODO: implement Unmarshal
+    throw UnimplementedError();
+  }
+}
+
+class HandleCodeResponse extends Message {
+  @override
+  Uint8List Marshal() {
+    // TODO: implement Marshal
+    throw UnimplementedError();
+  }
+
+  @override
+  Unmarshal(Map<String, Uint8List> params) {}
 }
 
 // streams
