@@ -8,23 +8,43 @@ Message GetResponse(String methodName, Uint8List data) {
 
   switch (methodName) {
     case "SendCode":
+      Uint8List? err = params["error"];
+      if (err != null) {
+        return Error(handlerName: methodName, msg: String.fromCharCodes(err));
+      }
       checkCountParams(0, params.length);
       var response = SendCodeResponse();
       return response;
     case "Register":
+      Uint8List? err = params["error"];
+      if (err != null) {
+        return Error(handlerName: methodName, msg: String.fromCharCodes(err));
+      }
       checkCountParams(1, params.length);
       var response = RegisterResponse();
       response.Unmarshal(params);
       return response;
     case "HandleCode":
+      Uint8List? err = params["error"];
+      if (err != null) {
+        return Error(handlerName: methodName, msg: String.fromCharCodes(err));
+      }
       checkCountParams(0, params.length);
       var response = HandleCodeResponse();
       return response;
     case "AuthToken":
+      Uint8List? err = params["error"];
+      if (err != null) {
+        return Error(handlerName: methodName, msg: String.fromCharCodes(err));
+      }
       checkCountParams(0, params.length);
       var response = AuthTokenResponse();
       return response;
     case "AuthCreds":
+      Uint8List? err = params["error"];
+      if (err != null) {
+        return Error(handlerName: methodName, msg: String.fromCharCodes(err));
+      }
       checkCountParams(1, params.length);
       var response = AuthCredentialsResponse();
       response.Unmarshal(params);

@@ -8,6 +8,25 @@ abstract class Message {
   Unmarshal(Map<String, Uint8List> params);
 }
 
+class Error extends Message {
+  final String handlerName;
+  final String msg;
+
+  Error({required this.handlerName, required this.msg});
+
+  @override
+  Unmarshal(Map<String, Uint8List> params) {
+    // TODO: implement Unmarshal
+    throw UnimplementedError();
+  }
+
+  @override
+  Uint8List Marshal() {
+    // TODO: implement Marshal
+    throw UnimplementedError();
+  }
+}
+
 class User extends Message {
   int? id;
   String? nickname;
