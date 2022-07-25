@@ -24,11 +24,11 @@ class ConnectParams {
 }
 
 class Client {
-  ClientController clientController;
+  ClientController? clientController;
   ConnectParams connectParams;
   KeyStore keyStore = KeyStore();
 
-  Client({required this.clientController, required this.connectParams}) {
+  Client({this.clientController, required this.connectParams}) {
     keyStore.GeneratePrivateKey();
     keyStore.GeneratePublicKey();
   }
@@ -42,7 +42,7 @@ class Client {
 
     Uint8List body = data.sublist(lastMethodNameIndex + 1);
     Message response = GetResponse(methodName, body);
-    clientController.onEndpointMessageReceived(response);
+    clientController!.onEndpointMessageReceived(response);
   }
 
   //handlers
