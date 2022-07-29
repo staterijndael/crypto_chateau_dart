@@ -36,9 +36,12 @@ class TcpBloc {
   Uint8List? _secretKey;
   TcpBlocHandshake? tcpBlocHandshake;
 
+  Stream<Uint8List> responseStream = const Stream.empty();
+
   TcpBloc({required this.keyStore}) : super();
 
-  Future<void> connect(TcpController controller, Connect event) async {
+  Future<Stream<Uint8List>> connect(
+      Function onEncryptionEnabled, Connect event) async {
     _socketConnectionTask = await Socket.startConnect(event.host, event.port);
     _socket = await _socketConnectionTask!.socket;
 
@@ -52,8 +55,8 @@ class TcpBloc {
       List<Uint8List> messages = separateMessages(event);
 
       for (var i = 0; i < messages.length; i++) {
-        handleReceivedMessage(
-            controller,
+        responseStream = handleReceivedMessage(
+            onEncryptionEnabled,
             MessageReceived(
               message: messages[i],
             ));
@@ -62,6 +65,8 @@ class TcpBloc {
     _socket!.handleError((err) {
       handleError(ErrorOccured(errMessage: "socket error $err"));
     });
+
+    return responseStream;
   }
 
   void disconnect(Disconnect event) async {
@@ -81,20 +86,20 @@ class TcpBloc {
     throw event.errMessage!;
   }
 
-  void handleReceivedMessage(
-      TcpController controller, MessageReceived event) async {
+  Stream<Uint8List> handleReceivedMessage(
+      Function onEncryptionEnabled, MessageReceived event) async* {
     if (_encryptionState == EncryptionState.Enabling) {
       tcpBlocHandshake!.handshake(event.message);
       if (tcpBlocHandshake!.getCurrentStep() == HandshakeSteps.Served) {
         enableEncryption(
             EnableEncryption(sharedKey: tcpBlocHandshake!.keyStore!.sharedKey));
-        controller.onEncryptionEnabled();
+        onEncryptionEnabled();
       }
     } else if (_encryptionState == EncryptionState.Enabled) {
       Uint8List decryptedData = Decrypt(event.message, _secretKey!);
-      controller.onEndpointMessageReceived(this, decryptedData);
+      yield decryptedData;
     } else {
-      controller.onEndpointMessageReceived(this, event.message);
+      yield event.message;
     }
   }
 

@@ -14,9 +14,9 @@ class Connect extends TcpEvent {
   final bool encryptionEnabled;
 
   Connect(
-      {required this.host, required this.port, required this.encryptionEnabled})
-      : assert(host != null),
-        assert(port != null);
+      {required this.host,
+      required this.port,
+      required this.encryptionEnabled});
 }
 
 /// Represents a request to disconnect from the server or abort the current connection request.

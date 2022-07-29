@@ -24,65 +24,64 @@ class ConnectParams {
 }
 
 class Client {
-  ClientController? clientController;
   ConnectParams connectParams;
   KeyStore keyStore = KeyStore();
 
-  Client({this.clientController, required this.connectParams}) {
+  Client({required this.connectParams}) {
     keyStore.GeneratePrivateKey();
     keyStore.GeneratePublicKey();
   }
 
-  void onEndpointMessageReceived(TcpBloc tcpBloc, Uint8List data) {
-    tcpBloc.close();
-
-    int lastMethodNameIndex = getLastMethodNameIndex(data);
-    String methodName =
-        String.fromCharCodes(data.sublist(0, lastMethodNameIndex));
-
-    Uint8List body = data.sublist(lastMethodNameIndex + 1);
-    Message response = GetResponse(methodName, body);
-    clientController!.onEndpointMessageReceived(response);
-  }
-
   //handlers
-  SendCode(SendCodeRequest request) async {
-    handleMessage(request.Marshal());
+  Future<Message> SendCode(SendCodeRequest request) async {
+    return handleMessage(request.Marshal());
   }
 
-  Register(RegisterRequest request) async {
-    handleMessage(request.Marshal());
+  Future<Message> Register(RegisterRequest request) async {
+    return handleMessage(request.Marshal());
   }
 
-  HandleCode(HandleCodeRequest request) async {
-    handleMessage(request.Marshal());
+  Future<Message> HandleCode(HandleCodeRequest request) async {
+    return handleMessage(request.Marshal());
   }
 
-  AuthToken(AuthTokenRequest request) async {
-    handleMessage(request.Marshal());
+  Future<Message> AuthToken(AuthTokenRequest request) async {
+    return handleMessage(request.Marshal());
   }
 
-  AuthCreds(AuthCredentialsRequest request) async {
-    handleMessage(request.Marshal());
+  Future<Message> AuthCreds(AuthCredentialsRequest request) async {
+    return handleMessage(request.Marshal());
   }
 
-  handleMessage(Uint8List data) {
+  handleMessage(Uint8List data) async {
     TcpBloc tcpBloc = TcpBloc(keyStore: keyStore);
 
     onEncryptEnabled() {
       tcpBloc.sendMessage(SendMessage(message: data));
     }
 
-    TcpController tcpController = TcpController(
-        onEncryptionEnabled: onEncryptEnabled,
-        onEndpointMessageReceived: onEndpointMessageReceived);
-
-    tcpBloc.connect(
-        tcpController,
+    Stream<Uint8List> responseStream = await tcpBloc.connect(
+        onEncryptEnabled,
         Connect(
             host: connectParams.host,
             port: connectParams.port,
             encryptionEnabled: connectParams.isEncryptionEnabled));
+
+    Uint8List rawResponse = await responseStream.first;
+
+    tcpBloc.close();
+
+    return getResponse(rawResponse);
+  }
+
+  Message getResponse(Uint8List rawResponse) {
+    int lastMethodNameIndex = getLastMethodNameIndex(rawResponse);
+    String methodName =
+        String.fromCharCodes(rawResponse.sublist(0, lastMethodNameIndex));
+
+    Uint8List body = rawResponse.sublist(lastMethodNameIndex + 1);
+    Message response = GetResponse(methodName, body);
+    return response;
   }
   // SendCode(SendCodeRequest request) async {
   //   TcpBloc tcpBloc = TcpBloc();
@@ -110,12 +109,8 @@ class Client {
 
     onEncryptEnabled() {}
 
-    TcpController tcpController = TcpController(
-        onEncryptionEnabled: onEncryptEnabled,
-        onEndpointMessageReceived: onEndpointMessageReceived);
-
     tcpBloc.connect(
-        tcpController,
+        onEncryptEnabled,
         Connect(
             host: connectParams.host,
             port: connectParams.port,
