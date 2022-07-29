@@ -7,9 +7,7 @@ import '../transport/conn_bloc.dart';
 import 'models.dart';
 
 class ClientController {
-  late void Function(Message) onEndpointMessageReceived;
-
-  ClientController({required this.onEndpointMessageReceived});
+  ClientController();
 }
 
 class ConnectParams {
