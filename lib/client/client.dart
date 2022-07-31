@@ -65,7 +65,12 @@ class Client {
             port: connectParams.port,
             encryptionEnabled: connectParams.isEncryptionEnabled));
 
-    Uint8List rawResponse = await responseStream.first;
+    late Uint8List rawResponse;
+
+    responseStream.listen((event) {
+      rawResponse = event;
+    });
+    await responseStream.first;
 
     tcpBloc.close();
 
