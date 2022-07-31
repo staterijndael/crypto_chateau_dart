@@ -33,23 +33,23 @@ class Client {
 
   //handlers
   Future<Message> SendCode(SendCodeRequest request) async {
-    return handleMessage(request.Marshal());
+    return await handleMessage(request.Marshal());
   }
 
   Future<Message> Register(RegisterRequest request) async {
-    return handleMessage(request.Marshal());
+    return await handleMessage(request.Marshal());
   }
 
   Future<Message> HandleCode(HandleCodeRequest request) async {
-    return handleMessage(request.Marshal());
+    return await handleMessage(request.Marshal());
   }
 
   Future<Message> AuthToken(AuthTokenRequest request) async {
-    return handleMessage(request.Marshal());
+    return await handleMessage(request.Marshal());
   }
 
   Future<Message> AuthCreds(AuthCredentialsRequest request) async {
-    return handleMessage(request.Marshal());
+    return await handleMessage(request.Marshal());
   }
 
   handleMessage(Uint8List data) async {
