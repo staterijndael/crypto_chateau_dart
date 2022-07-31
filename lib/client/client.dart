@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:crypto_chateau_dart/client/response.dart';
@@ -65,16 +66,17 @@ class Client {
             port: connectParams.port,
             encryptionEnabled: connectParams.isEncryptionEnabled));
 
-    late Uint8List rawResponse;
+    var firstValueReceived = Completer<Uint8List>();
 
     responseStream.listen((event) {
-      rawResponse = event;
+      if (!firstValueReceived.isCompleted) {
+        firstValueReceived.complete();
+      }
     });
-    await responseStream.first;
 
     tcpBloc.close();
 
-    return getResponse(rawResponse);
+    return getResponse(await firstValueReceived.future);
   }
 
   Message getResponse(Uint8List rawResponse) {
