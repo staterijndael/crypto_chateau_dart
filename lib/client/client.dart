@@ -59,12 +59,18 @@ class Client {
       tcpBloc.sendMessage(SendMessage(message: data));
     }
 
-    Stream<Uint8List> responseStream = await tcpBloc.connect(
+    StreamController streamController = StreamController();
+
+    tcpBloc.connect(
         onEncryptEnabled,
+        streamController,
         Connect(
             host: connectParams.host,
             port: connectParams.port,
             encryptionEnabled: connectParams.isEncryptionEnabled));
+
+    Stream<Uint8List> responseStream =
+        streamController.stream as Stream<Uint8List>;
 
     var firstValueReceived = Completer<Uint8List>();
 
@@ -114,8 +120,11 @@ class Client {
 
     onEncryptEnabled() {}
 
+    StreamController streamController = StreamController();
+
     tcpBloc.connect(
         onEncryptEnabled,
+        streamController,
         Connect(
             host: connectParams.host,
             port: connectParams.port,
