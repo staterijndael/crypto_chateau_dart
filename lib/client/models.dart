@@ -151,14 +151,17 @@ class AuthCredentialsResponse extends Message {
 class RegisterRequest extends Message {
   String? number;
   String? passHash;
-  String? status;
+  String? bio;
+  String? code;
+  String? nickname;
 
-  RegisterRequest({this.number, this.passHash, this.status});
+  RegisterRequest(
+      {this.number, this.passHash, this.bio, this.code, this.nickname});
 
   @override
   Uint8List Marshal() {
     List<int> data = List.from(
-        "Register# Number: $number,PassHash:$passHash,Status:$status"
+        "Register# Number:$number,PassHash:$passHash,Bio:$bio,Code:$code,Nickname:$nickname"
             .codeUnits);
 
     return Uint8List.fromList(data);
@@ -190,17 +193,15 @@ class RegisterResponse extends Message {
 
 class SendCodeRequest extends Message {
   String? number;
-  String? passHash;
 
-  SendCodeRequest({this.number, this.passHash});
+  SendCodeRequest({this.number});
 
   Unmarshal(Map<String, Uint8List> params) {
     number = utf8.decode(params["Number"]!);
-    passHash = utf8.decode(params["PassHash"]!);
   }
 
   Uint8List Marshal() {
-    List<int> data = "SendCode# Number:$number,PassHash:$passHash".codeUnits;
+    List<int> data = "SendCode# Number:$number".codeUnits;
     return Uint8List.fromList(data);
   }
 }
