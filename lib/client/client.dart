@@ -61,6 +61,8 @@ class Client {
 
     StreamController streamController = StreamController();
 
+    Stream responseStream = streamController.stream;
+
     tcpBloc.connect(
         onEncryptEnabled,
         streamController,
@@ -68,9 +70,6 @@ class Client {
             host: connectParams.host,
             port: connectParams.port,
             encryptionEnabled: connectParams.isEncryptionEnabled));
-
-    Stream<Uint8List> responseStream =
-        streamController.stream as Stream<Uint8List>;
 
     var firstValueReceived = Completer<Uint8List>();
 
