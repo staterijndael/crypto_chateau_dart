@@ -118,8 +118,8 @@ class AuthCredentialsRequest extends Message {
 
   @override
   Uint8List Marshal() {
-    List<int> data = List.from(
-        "AuthCredentials# Number:$number,PassHash:$passHash".codeUnits);
+    List<int> data =
+        List.from("AuthCreds# Number:$number,PassHash:$passHash".codeUnits);
 
     return Uint8List.fromList(data);
   }

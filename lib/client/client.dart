@@ -80,9 +80,11 @@ class Client {
       }
     });
 
+    Uint8List rawResponse = await firstValueReceived.future;
+
     tcpBloc.close();
 
-    return getResponse(await firstValueReceived.future);
+    return getResponse(rawResponse);
   }
 
   Message getResponse(Uint8List rawResponse) {
