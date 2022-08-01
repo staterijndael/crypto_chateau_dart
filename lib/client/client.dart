@@ -75,7 +75,7 @@ class Client {
 
     responseStream.listen((event) {
       if (!firstValueReceived.isCompleted) {
-        firstValueReceived.complete();
+        firstValueReceived.complete(event);
       }
     });
 
