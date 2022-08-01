@@ -38,12 +38,10 @@ class TcpBloc {
 
   TcpBloc({required this.keyStore}) : super();
 
-  Future<Stream<Uint8List>> connect(
-      Function onEncryptionEnabled, Connect event) async {
+  Future<void> connect(Function onEncryptionEnabled,
+      StreamController _streamController, Connect event) async {
     _socketConnectionTask = await Socket.startConnect(event.host, event.port);
     _socket = await _socketConnectionTask!.socket;
-
-    StreamController _streamController = StreamController();
 
     if (event.encryptionEnabled) {
       _encryptionState = EncryptionState.Enabling;
@@ -70,8 +68,6 @@ class TcpBloc {
     _socket!.handleError((err) {
       handleError(ErrorOccured(errMessage: "socket error $err"));
     });
-
-    return _streamController.stream as Stream<Uint8List>;
   }
 
   void disconnect(Disconnect event) async {
