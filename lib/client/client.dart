@@ -32,27 +32,28 @@ class Client {
   }
 
   //handlers
-  Future<Message> SendCode(SendCodeRequest request) async {
-    return await handleMessage(request.Marshal());
+  Future<SendCodeResponse> SendCode(SendCodeRequest request) async {
+    return await handleMessage(request.Marshal()) as SendCodeResponse;
   }
 
-  Future<Message> Register(RegisterRequest request) async {
-    return await handleMessage(request.Marshal());
+  Future<RegisterResponse> Register(RegisterRequest request) async {
+    return await handleMessage(request.Marshal()) as RegisterResponse;
   }
 
-  Future<Message> HandleCode(HandleCodeRequest request) async {
-    return await handleMessage(request.Marshal());
+  Future<HandleCodeResponse> HandleCode(HandleCodeRequest request) async {
+    return await handleMessage(request.Marshal()) as HandleCodeResponse;
   }
 
-  Future<Message> AuthToken(AuthTokenRequest request) async {
-    return await handleMessage(request.Marshal());
+  Future<AuthTokenResponse> AuthToken(AuthTokenRequest request) async {
+    return await handleMessage(request.Marshal()) as AuthTokenResponse;
   }
 
-  Future<Message> AuthCreds(AuthCredentialsRequest request) async {
-    return await handleMessage(request.Marshal());
+  Future<AuthCredentialsResponse> AuthCreds(
+      AuthCredentialsRequest request) async {
+    return await handleMessage(request.Marshal()) as AuthCredentialsResponse;
   }
 
-  handleMessage(Uint8List data) async {
+  Future<Message> handleMessage(Uint8List data) async {
     TcpBloc tcpBloc = TcpBloc(keyStore: keyStore);
 
     onEncryptEnabled() {
