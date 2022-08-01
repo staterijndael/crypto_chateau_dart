@@ -36,14 +36,14 @@ class TcpBloc {
   Uint8List? _secretKey;
   TcpBlocHandshake? tcpBlocHandshake;
 
-  Stream<Uint8List> responseStream = const Stream.empty();
-
   TcpBloc({required this.keyStore}) : super();
 
   Future<Stream<Uint8List>> connect(
       Function onEncryptionEnabled, Connect event) async {
     _socketConnectionTask = await Socket.startConnect(event.host, event.port);
     _socket = await _socketConnectionTask!.socket;
+
+    StreamController _streamController = StreamController();
 
     if (event.encryptionEnabled) {
       _encryptionState = EncryptionState.Enabling;
@@ -55,18 +55,23 @@ class TcpBloc {
       List<Uint8List> messages = separateMessages(event);
 
       for (var i = 0; i < messages.length; i++) {
-        responseStream = handleReceivedMessage(
+        Uint8List? receivedMsg = handleReceivedMessage(
             onEncryptionEnabled,
             MessageReceived(
               message: messages[i],
             ));
+        if (receivedMsg == null) {
+          continue;
+        }
+
+        _streamController.add(receivedMsg);
       }
     });
     _socket!.handleError((err) {
       handleError(ErrorOccured(errMessage: "socket error $err"));
     });
 
-    return responseStream;
+    return _streamController.stream as Stream<Uint8List>;
   }
 
   void disconnect(Disconnect event) async {
@@ -86,8 +91,8 @@ class TcpBloc {
     throw event.errMessage!;
   }
 
-  Stream<Uint8List> handleReceivedMessage(
-      Function onEncryptionEnabled, MessageReceived event) async* {
+  Uint8List? handleReceivedMessage(
+      Function onEncryptionEnabled, MessageReceived event) {
     if (_encryptionState == EncryptionState.Enabling) {
       tcpBlocHandshake!.handshake(event.message);
       if (tcpBlocHandshake!.getCurrentStep() == HandshakeSteps.Served) {
@@ -97,9 +102,9 @@ class TcpBloc {
       }
     } else if (_encryptionState == EncryptionState.Enabled) {
       Uint8List decryptedData = Decrypt(event.message, _secretKey!);
-      yield decryptedData;
+      return decryptedData;
     } else {
-      yield event.message;
+      return event.message;
     }
   }
 
