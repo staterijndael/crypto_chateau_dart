@@ -152,7 +152,7 @@ class RegisterRequest extends Message {
   String? number;
   String? passHash;
   String? bio;
-  String? code;
+  int? code;
   String? nickname;
 
   RegisterRequest(
@@ -160,9 +160,13 @@ class RegisterRequest extends Message {
 
   @override
   Uint8List Marshal() {
+    var codeConvertedBytes = ByteData.view(Uint8List(8).buffer);
+    codeConvertedBytes.setUint8(0, code!);
+
     List<int> data = List.from(
-        "Register# Number:$number,PassHash:$passHash,Bio:$bio,Code:$code,Nickname:$nickname"
-            .codeUnits);
+        "Register# Number:$number,PassHash:$passHash,Bio:$bio,Code:".codeUnits)
+      ..addAll(codeConvertedBytes.buffer.asUint8List(
+          codeConvertedBytes.offsetInBytes, codeConvertedBytes.lengthInBytes));
 
     return Uint8List.fromList(data);
   }
