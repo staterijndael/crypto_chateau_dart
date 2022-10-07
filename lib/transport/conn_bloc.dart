@@ -3,8 +3,6 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:crypto_chateau_dart/aes_256/aes_256.dart';
-import 'package:crypto_chateau_dart/dh/dh.dart';
-import 'package:crypto_chateau_dart/dh/params.dart';
 import 'package:crypto_chateau_dart/transport/handshake.dart';
 import 'package:flutter/foundation.dart';
 import 'package:crypto/crypto.dart';
@@ -30,13 +28,12 @@ class TcpBloc {
   Socket? _socket;
   StreamSubscription? _socketStreamSub;
   ConnectionTask<Socket>? _socketConnectionTask;
-  KeyStore keyStore;
 
   EncryptionState _encryptionState = EncryptionState.Disabled;
   Uint8List? _secretKey;
   TcpBlocHandshake? tcpBlocHandshake;
 
-  TcpBloc({required this.keyStore}) : super();
+  TcpBloc() : super();
 
   Future<void> connect(Function onEncryptionEnabled,
       StreamController _streamController, Connect event) async {
@@ -45,7 +42,7 @@ class TcpBloc {
 
     if (event.encryptionEnabled) {
       _encryptionState = EncryptionState.Enabling;
-      tcpBlocHandshake = TcpBlocHandshake(tcpBloc: this, keyStore: keyStore);
+      tcpBlocHandshake = TcpBlocHandshake(tcpBloc: this);
       tcpBlocHandshake!.handshake(Uint8List(0));
     }
 
@@ -93,7 +90,7 @@ class TcpBloc {
       tcpBlocHandshake!.handshake(event.message);
       if (tcpBlocHandshake!.getCurrentStep() == HandshakeSteps.Served) {
         enableEncryption(
-            EnableEncryption(sharedKey: tcpBlocHandshake!.keyStore!.sharedKey));
+            EnableEncryption(sharedKey: tcpBlocHandshake!.sharedKey!));
         onEncryptionEnabled();
       }
     } else if (_encryptionState == EncryptionState.Enabled) {
@@ -106,8 +103,7 @@ class TcpBloc {
 
   void enableEncryption(EnableEncryption event) async {
     // maybe we should change only state
-    Uint8List sharedKeyBytes = bigIntToByteArray(event.sharedKey);
-    List<int> hash = sha256.convert(sharedKeyBytes).bytes;
+    List<int> hash = sha256.convert(event.sharedKey).bytes;
 
     _secretKey = Uint8List.fromList(hash);
     _encryptionState = EncryptionState.Enabled;

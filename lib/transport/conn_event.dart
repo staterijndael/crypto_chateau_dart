@@ -45,7 +45,7 @@ class SendMessage extends TcpEvent {
 }
 
 class EnableEncryption extends TcpEvent {
-  final BigInt sharedKey;
+  final Uint8List sharedKey;
 
   EnableEncryption({required this.sharedKey});
 }

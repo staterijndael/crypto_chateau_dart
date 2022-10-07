@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:crypto_chateau_dart/client/response.dart';
-import 'package:crypto_chateau_dart/dh/dh.dart';
 
 import '../transport/conn_bloc.dart';
 import 'models.dart';
@@ -24,12 +23,8 @@ class ConnectParams {
 
 class Client {
   ConnectParams connectParams;
-  KeyStore keyStore = KeyStore();
 
-  Client({required this.connectParams}) {
-    keyStore.GeneratePrivateKey();
-    keyStore.GeneratePublicKey();
-  }
+  Client({required this.connectParams});
 
   //handlers
   Future<SendCodeResponse> SendCode(SendCodeRequest request) async {
@@ -54,7 +49,7 @@ class Client {
   }
 
   Future<Message> handleMessage(Uint8List data) async {
-    TcpBloc tcpBloc = TcpBloc(keyStore: keyStore);
+    TcpBloc tcpBloc = TcpBloc();
 
     onEncryptEnabled() {
       tcpBloc.sendMessage(SendMessage(message: data));
@@ -118,7 +113,7 @@ class Client {
   //streams
 
   void ListenUpdates() async {
-    TcpBloc tcpBloc = TcpBloc(keyStore: keyStore);
+    TcpBloc tcpBloc = TcpBloc();
 
     onEncryptEnabled() {}
 

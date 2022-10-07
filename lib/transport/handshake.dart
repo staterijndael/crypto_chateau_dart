@@ -1,8 +1,8 @@
 import 'dart:convert';
+import 'dart:ffi';
 import 'dart:typed_data';
 
-import 'package:crypto_chateau_dart/dh/dh.dart';
-import 'package:crypto_chateau_dart/dh/params.dart';
+import 'package:x25519/x25519.dart';
 import 'package:flutter/foundation.dart';
 import 'package:collection/collection.dart';
 
@@ -11,7 +11,6 @@ import 'conn_bloc.dart';
 enum HandshakeSteps {
   Ready,
   SendInitMsg,
-  GetDhParams,
   SendClientPublicKey,
   GetServerPublicKey,
   GetSuccessMsg,
@@ -21,21 +20,16 @@ enum HandshakeSteps {
 class TcpBlocHandshake {
   HandshakeSteps? _currentStep;
   TcpBloc? tcpBloc;
-  KeyStore? keyStore;
-
-  TcpBlocHandshake({required this.tcpBloc, required this.keyStore}) {
+  KeyPair? ecdhKeyPair;
+  Uint8List? sharedKey;
+  TcpBlocHandshake({required this.tcpBloc}) {
     _currentStep = HandshakeSteps.Ready;
   }
 
   handshake(Iterable<int> message) {
     switch (_currentStep) {
       case HandshakeSteps.Ready:
-        if (!keyStore!.IsKeyValid(keyStore!.privateKey)) {
-          throw "incorrect private key during initializing";
-        }
-        if (!keyStore!.IsKeyValid(keyStore!.publicKey)) {
-          throw "incorrect public key during initializing";
-        }
+        ecdhKeyPair = generateKeyPair();
 
         _currentStep = HandshakeSteps.SendInitMsg;
         handshake(Uint8List(0));
@@ -43,35 +37,18 @@ class TcpBlocHandshake {
       case HandshakeSteps.SendInitMsg:
         tcpBloc!.sendMessage(
             SendMessage(message: Uint8List.fromList("handshake".codeUnits)));
-        _currentStep = HandshakeSteps.GetDhParams;
-        return;
-      case HandshakeSteps.GetDhParams:
-        List<Uint8List> dhParams = parseMsg(message, 2);
-        if (dhParams.length != 2) {
-          throw "incorrect count of diffie-hellman key exchange init params";
-        }
-
-        BigInt generatorParam = byteArrayToBigInt(dhParams[0]);
-        Uint8List primeHashParam = dhParams[1];
-
-        if (generatorParam != Generator ||
-            !ListEquality().equals(primeHashParam, PrimeHash)) {
-          throw "incorrect values of params for diffie-hellman key exchange";
-        }
-
         _currentStep = HandshakeSteps.GetServerPublicKey;
         return;
       case HandshakeSteps.GetServerPublicKey:
         List<Uint8List> serverPublicKeyBytes = parseMsg(message, 1);
-        BigInt serverPublicKey = byteArrayToBigInt(serverPublicKeyBytes[0]);
-        keyStore!.GenerateSharedKey(receivedPublicKey: serverPublicKey);
+        Uint8List serverPublicKey = serverPublicKeyBytes[0];
+        sharedKey = X25519(ecdhKeyPair!.privateKey, serverPublicKey);
 
         _currentStep = HandshakeSteps.SendClientPublicKey;
         handshake(Uint8List(0));
         return;
       case HandshakeSteps.SendClientPublicKey:
-        Uint8List publicKeyBytes = bigIntToByteArray(keyStore!.publicKey);
-        tcpBloc!.sendMessage(SendMessage(message: publicKeyBytes));
+        tcpBloc!.sendMessage(SendMessage(message: Uint8List.fromList(ecdhKeyPair!.publicKey)));
         _currentStep = HandshakeSteps.GetSuccessMsg;
         return;
       case HandshakeSteps.GetSuccessMsg:

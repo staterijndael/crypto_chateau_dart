@@ -2,6 +2,12 @@
   "configVersion": 2,
   "packages": [
     {
+      "name": "adaptive_number",
+      "rootUri": "file:///Users/oringik/system/flutter/.pub-cache/hosted/pub.dartlang.org/adaptive_number-1.0.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
       "name": "async",
       "rootUri": "file:///Users/oringik/system/flutter/.pub-cache/hosted/pub.dartlang.org/async-2.8.2",
       "packageUri": "lib/",
@@ -52,6 +58,12 @@
     {
       "name": "fake_async",
       "rootUri": "file:///Users/oringik/system/flutter/.pub-cache/hosted/pub.dartlang.org/fake_async-1.3.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
+      "name": "fixnum",
+      "rootUri": "file:///Users/oringik/system/flutter/.pub-cache/hosted/pub.dartlang.org/fixnum-1.0.1",
       "packageUri": "lib/",
       "languageVersion": "2.12"
     },
@@ -176,13 +188,19 @@
       "languageVersion": "2.14"
     },
     {
+      "name": "x25519",
+      "rootUri": "file:///Users/oringik/system/flutter/.pub-cache/hosted/pub.dartlang.org/x25519-0.1.1",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
       "name": "crypto_chateau_dart",
       "rootUri": "../",
       "packageUri": "lib/",
       "languageVersion": "2.17"
     }
   ],
-  "generated": "2022-07-09T21:25:27.484356Z",
+  "generated": "2022-10-07T17:38:29.227826Z",
   "generator": "pub",
-  "generatorVersion": "2.17.5"
+  "generatorVersion": "2.17.6"
 }
