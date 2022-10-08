@@ -50,10 +50,22 @@
       "languageVersion": "2.12"
     },
     {
+      "name": "convert",
+      "rootUri": "file:///Users/oringik/system/flutter/.pub-cache/hosted/pub.dartlang.org/convert-3.0.2",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
       "name": "crypto",
       "rootUri": "file:///Users/oringik/system/flutter/.pub-cache/hosted/pub.dartlang.org/crypto-3.0.2",
       "packageUri": "lib/",
       "languageVersion": "2.14"
+    },
+    {
+      "name": "ed25519_edwards",
+      "rootUri": "file:///Users/oringik/system/flutter/.pub-cache/hosted/pub.dartlang.org/ed25519_edwards-0.3.1",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
     },
     {
       "name": "fake_async",
@@ -200,7 +212,7 @@
       "languageVersion": "2.17"
     }
   ],
-  "generated": "2022-10-07T18:31:08.297198Z",
+  "generated": "2022-10-08T15:17:48.896668Z",
   "generator": "pub",
   "generatorVersion": "2.17.6"
 }
