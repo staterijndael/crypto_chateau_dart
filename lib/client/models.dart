@@ -1,8 +1,5 @@
 import 'dart:convert';
-import 'dart:html';
 import 'dart:typed_data';
-
-import 'package:crypto_chateau_dart/client/response.dart';
 
 abstract class Message {
   Uint8List Marshal();
@@ -101,7 +98,7 @@ class FindUsersByPartNicknameRequest extends Message {
 }
 
 // class UserPresent extends Message {
-  
+
 // }
 
 // class FindUsersByPartNicknameResponse extends Message {
