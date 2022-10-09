@@ -100,13 +100,13 @@ class FindUsersByPartNicknameRequest extends Message {
   }
 }
 
-class UserPresent extends Message {
+// class UserPresent extends Message {
   
-}
+// }
 
-class FindUsersByPartNicknameResponse extends Message {
+// class FindUsersByPartNicknameResponse extends Message {
 
-}
+// }
 
 class AuthTokenRequest extends Message {
   Uint8List? sessionToken;
