@@ -48,6 +48,25 @@ class Client {
     return await handleMessage(request.Marshal()) as AuthCredentialsResponse;
   }
 
+  Future<FindUsersByPartNicknameResponse> FindUsersByPartNickname(
+      FindUsersByPartNicknameRequest request) async {
+    return await handleMessage(request.Marshal())
+        as FindUsersByPartNicknameResponse;
+  }
+
+  Future<GetInitMsgKeysResponse> GetInitMsgKeys(
+      GetInitMsgKeysRequest request) async {
+    return await handleMessage(request.Marshal()) as GetInitMsgKeysResponse;
+  }
+
+  Future<LoadOPKResponse> GetInitMsgKeys(LoadOPKRequest request) async {
+    return await handleMessage(request.Marshal()) as LoadOPKResponse;
+  }
+
+  Future<RequiredOPKResponse> RequiredOPK(RequiredOPKRequest request) async {
+    return await handleMessage(request.Marshal()) as RequiredOPKResponse;
+  }
+
   Future<Message> handleMessage(Uint8List data) async {
     TcpBloc tcpBloc = TcpBloc();
 

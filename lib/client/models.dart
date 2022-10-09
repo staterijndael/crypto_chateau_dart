@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:html';
 import 'dart:typed_data';
 
 import 'package:crypto_chateau_dart/client/response.dart';
@@ -80,14 +81,41 @@ class User extends Message {
   }
 }
 
+class FindUsersByPartNicknameRequest extends Message {
+  String? partNickname;
+
+  FindUsersByPartNicknameRequest({this.partNickname});
+
+  Uint8List Marshal() {
+    List<int> data = List.from(
+        "FindUsersByPartNickname# PartNickname:$partNickname".codeUnits);
+
+    return Uint8List.fromList(data);
+  }
+
+  @override
+  Unmarshal(Map<String, Uint8List> params) {
+    // TODO: implement Unmarshal
+    throw UnimplementedError();
+  }
+}
+
+class UserPresent extends Message {
+  
+}
+
+class FindUsersByPartNicknameResponse extends Message {
+
+}
+
 class AuthTokenRequest extends Message {
-  String? sessionToken;
+  Uint8List? sessionToken;
 
   AuthTokenRequest({this.sessionToken});
 
   Uint8List Marshal() {
-    List<int> data =
-        List.from("AuthToken# SessionToken:$sessionToken".codeUnits);
+    List<int> data = List.from("AuthToken# SessionToken:".codeUnits)
+      ..addAll(sessionToken!);
 
     return Uint8List.fromList(data);
   }
@@ -132,7 +160,7 @@ class AuthCredentialsRequest extends Message {
 }
 
 class AuthCredentialsResponse extends Message {
-  String? sessionToken;
+  Uint8List? sessionToken;
 
   AuthCredentialsResponse({this.sessionToken});
 
@@ -144,7 +172,7 @@ class AuthCredentialsResponse extends Message {
 
   @override
   Unmarshal(Map<String, Uint8List> params) {
-    sessionToken = utf8.decode(params["SessionToken"]!);
+    sessionToken = params["SessionToken"]!;
   }
 }
 
@@ -179,7 +207,7 @@ class RegisterRequest extends Message {
 }
 
 class RegisterResponse extends Message {
-  String? sessionToken;
+  Uint8List? sessionToken;
 
   RegisterResponse({this.sessionToken});
 
@@ -191,7 +219,7 @@ class RegisterResponse extends Message {
 
   @override
   Unmarshal(Map<String, Uint8List> params) {
-    sessionToken = utf8.decode(params["SessionToken"]!);
+    sessionToken = params["SessionToken"]!;
   }
 }
 
