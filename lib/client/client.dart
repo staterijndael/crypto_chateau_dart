@@ -57,7 +57,7 @@ class InternalClient {
     return body;
   }
 
-  Future<void Function(SendMessage msg)> ListenUpdates<T>(
+  Future<void Function(SendMessage msg)> listenUpdates<T>(
       String handlerName,
       void Function() onEncryptEnabled,
       T respType,
