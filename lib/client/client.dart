@@ -13,7 +13,7 @@ Uint8List decorateRawDataByHandlerName(String handlerName, Uint8List data) {
   for (int i = handlerName.codeUnits.length + 1;
       i < handlerName.codeUnits.length + 1 + data.length;
       i++) {
-    decoratedRawData[i] = data[i];
+    decoratedRawData[i] = data[i - handlerName.codeUnits.length - 1];
   }
 
   return decoratedRawData;
