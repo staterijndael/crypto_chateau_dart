@@ -138,7 +138,7 @@ List GetArray(Uint8List p) {
     throw ("expected end of array");
   }
 
-  List values = splitBytes(p.sublist(1, i + 1), utf8.encode(',')[0]);
+  List values = splitBytes(p.sublist(1, i), utf8.encode(',')[0]);
   for (int i = 0; i < values.length; i++) {
     values[i] = trimSpace(values[i]);
   }
