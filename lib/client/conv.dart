@@ -109,18 +109,6 @@ Uint8List ConvertObjectToBytes(Message msg) {
   return msg.Marshal();
 }
 
-int getLastMethodNameIndex(Uint8List data) {
-  int finalIndex = 0;
-
-  for (var i = 0; i < data.length; i++) {
-    if (data[i] == utf8.encode('#')[0]) {
-      finalIndex = i;
-    }
-  }
-
-  return finalIndex;
-}
-
 List GetArray(Uint8List p) {
   if (p.isEmpty) {
     throw ("array is zero length");
