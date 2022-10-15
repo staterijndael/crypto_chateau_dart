@@ -162,7 +162,7 @@ Uint8List trimSpace(Uint8List b) {
 }
 
 List splitBytes(Uint8List b, int delimiter) {
-  var arr = [];
+  List arr = [];
 
   int lastSplitIndex = -1;
 
