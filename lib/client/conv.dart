@@ -143,6 +143,15 @@ List GetArray(Uint8List p) {
     values[i] = trimSpace(values[i]);
   }
 
+  if (values[0][0] == '{') {
+    values[0] = values[0].sublist(1);
+  }
+
+  if (values[values.length - 1][values[values.length - 1].length - 1] == '}') {
+    values[values.length - 1] =
+        values[values.length - 1].sublist(values[values.length - 1].length - 2);
+  }
+
   return [i, values];
 }
 
