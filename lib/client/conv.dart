@@ -143,11 +143,12 @@ List GetArray(Uint8List p) {
     values[i] = trimSpace(values[i]);
   }
 
-  if (values[0][0] == '{') {
+  if (values[0][0] == utf8.encode('{')[0]) {
     values[0] = values[0].sublist(1);
   }
 
-  if (values[values.length - 1][values[values.length - 1].length - 1] == '}') {
+  if (values[values.length - 1][values[values.length - 1].length - 1] ==
+      utf8.encode('}')[0]) {
     values[values.length - 1] =
         values[values.length - 1].sublist(values[values.length - 1].length - 2);
   }
