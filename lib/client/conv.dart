@@ -38,7 +38,7 @@ Uint8List ConvertInt32ToBytes(int num) {
 }
 
 Uint8List ConvertInt64ToBytes(int num) {
-  Uint8List buf = Uint8List(4);
+  Uint8List buf = Uint8List(8);
   buf[0] = num >> 56;
   buf[1] = num >> 48;
   buf[2] = num >> 40;
