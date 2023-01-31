@@ -9,7 +9,7 @@ class Pipe {
   int? futurePacketLength;
 
   Pipe(this.tcpConn) {
-    reservedData = List.filled(0, 0);
+    reservedData = List.empty();
     futurePacketLength = 0;
   }
 

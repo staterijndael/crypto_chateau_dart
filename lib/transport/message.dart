@@ -17,7 +17,7 @@ Future<FullMessage> getFullMessage(
     bufSize = 1024;
   }
 
-  var buf = List.filled(bufSize + 4, 0, growable: true);
+  var buf = List.filled(0, 0, growable: true);
 
   while (true) {
     if (reservedData.isNotEmpty) {
@@ -28,7 +28,7 @@ Future<FullMessage> getFullMessage(
       }
 
       buf.addAll(reservedData);
-      reservedData = List.filled(bufSize, 0, growable: true);
+      reservedData = List.filled(0, 0, growable: true);
 
       if (buf.length >= futurePacketLength) {
         if (futurePacketLength != buf.length) {

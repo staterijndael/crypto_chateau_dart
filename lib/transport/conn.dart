@@ -21,7 +21,7 @@ class Conn implements Socket {
   late Encryption encryption;
 
   Conn(this.tcpConn) {
-    reservedData = List.filled(0, 0);
+    reservedData = List.empty();
     futurePacketLength = 0;
     encryption = Encryption(sharedKey: List.empty());
   }
