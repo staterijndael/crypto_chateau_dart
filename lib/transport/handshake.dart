@@ -15,10 +15,7 @@ ServerHandshake(Conn conn) async {
 
   pipe.write(Uint8List.fromList([104, 97, 110, 100, 115, 104, 97, 107, 101]));
 
-  var connPublicKey, err = await readConnPubKey(pipe);
-  if (err != null) {
-    return null;
-  }
+  var connPublicKey = await readConnPubKey(pipe);
 
   var priv = Uint8List(32);
   var secureRandom = Random.secure();
