@@ -46,7 +46,7 @@ Future<FullMessage> getFullMessage(
     if (isRawTCP) {
       localBuf = await tcpConn.first;
     } else {
-      localBuf = await tcpConn.read(bufSize);
+      localBuf = await tcpConn.firstWhere((data) => data.isNotEmpty);
     }
 
     buf.addAll(localBuf);
