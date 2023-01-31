@@ -44,8 +44,7 @@ Future<FullMessage> getFullMessage(
     final List<int> localBuf;
 
     if (isRawTCP) {
-      localBuf = await tcpConn
-          .asBroadcastStream()
+      localBuf = await tcpConn.broadcastStream
           .where((data) => data != null)
           .firstWhere((data) => data.length > 0);
     } else {
