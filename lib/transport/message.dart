@@ -28,8 +28,7 @@ Future<FullMessage> getFullMessage(
       }
 
       buf.addAll(reservedData);
-      reservedData = List.filled(0, 0);
-      reservedData.length = bufSize;
+      reservedData = List.filled(bufSize, 0, growable: true);
 
       if (buf.length >= futurePacketLength) {
         if (futurePacketLength != buf.length) {
