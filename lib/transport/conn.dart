@@ -183,8 +183,7 @@ class Conn implements Socket {
   @override
   Future<Uint8List> firstWhere(bool Function(Uint8List element) test,
       {Uint8List Function()? orElse}) {
-    // TODO: implement firstWhere
-    throw UnimplementedError();
+    return tcpConn.firstWhere(test, orElse: orElse);
   }
 
   @override
