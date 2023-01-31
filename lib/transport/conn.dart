@@ -16,22 +16,23 @@ class Encryption {
 
 class Conn implements Socket {
   final Socket tcpConn;
-  List<int>? reservedData;
+  late List<int> reservedData;
   int? futurePacketLength;
-  Encryption? encryption;
+  late Encryption encryption;
 
   Conn(this.tcpConn) {
     reservedData = List.filled(0, 0);
     futurePacketLength = 0;
+    encryption = Encryption(sharedKey: List.empty());
   }
 
   Future<void> enableEncryption(List<int> sharedKey) async {
-    if (encryption!.enabled) {
+    if (encryption.enabled) {
       throw Exception("encryption already enabled");
     }
     var sharedKeyHash = getSha256FromBytes(sharedKey);
-    encryption!.enabled = true;
-    encryption!.sharedKey = sharedKeyHash;
+    encryption.enabled = true;
+    encryption.sharedKey = sharedKeyHash;
   }
 
   void write(Object? obj) async {
