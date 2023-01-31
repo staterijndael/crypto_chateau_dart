@@ -27,7 +27,26 @@ Uint8List ConvertInt8ToBytes(int num) {
   return Uint8List.fromList([num]);
 }
 
+Uint8List ConvertInt16ToBytes(int num) {
+  var list = new Uint8List(2);
+
+  list[0] = num >> 8;
+  list[1] = num;
+
+  return list;
+}
+
 Uint8List ConvertInt32ToBytes(int num) {
+  Uint8List buf = Uint8List(4);
+  buf[0] = num >> 24;
+  buf[1] = num >> 16;
+  buf[2] = num >> 8;
+  buf[3] = num;
+
+  return buf;
+}
+
+Uint8List ConvertSizeToBytes(int num) {
   Uint8List buf = Uint8List(4);
   buf[0] = num >> 24;
   buf[1] = num >> 16;
