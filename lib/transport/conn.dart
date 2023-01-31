@@ -51,7 +51,7 @@ class Conn implements Socket {
     dataWithLength[0] = convertedLength & 0xff;
     dataWithLength[1] = (convertedLength & 0xff00) >> 8;
     dataWithLength.setRange(2, dataWithLength.length, p);
-    tcpConn.write(dataWithLength);
+    tcpConn.add(dataWithLength);
   }
 
   Future<List<int>> read(int length) async {
