@@ -71,6 +71,10 @@ Uint8List ConvertInt64ToBytes(int num) {
   return buf;
 }
 
+int ConvertBytesToInt16(BinaryIterator b) {
+  return b.bytes[1] | b.bytes[0] << 8;
+}
+
 int ConvertBytesToUint16(BinaryIterator b) {
   return b.bytes[1] | b.bytes[0] << 8;
 }
