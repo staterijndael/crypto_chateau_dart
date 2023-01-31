@@ -44,13 +44,12 @@ Future<FullMessage> getFullMessage(
     final List<int> localBuf;
 
     if (isRawTCP) {
-      localBuf = await tcpConn.first;
-    } else {
       localBuf = await tcpConn
           .asBroadcastStream()
           .where((data) => data != null)
           .firstWhere((data) => data.length > 0);
-      ;
+    } else {
+      localBuf = await tcpConn.read(bufSize);
     }
 
     buf.addAll(localBuf);
