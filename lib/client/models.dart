@@ -5,7 +5,7 @@ import 'package:crypto_chateau_dart/client/binary_iterator.dart';
 
 abstract class Message {
   Uint8List Marshal();
-  void Unmarshal(BinaryIterator iterator);
+  void Unmarshal(BinaryIterator b);
 }
 
 class Error extends Message {
