@@ -22,6 +22,7 @@ class Conn implements Socket {
 
   Conn(this.tcpConn) {
     reservedData = List.filled(0, 0);
+    futurePacketLength = 0;
   }
 
   Future<void> enableEncryption(List<int> sharedKey) async {
@@ -54,8 +55,9 @@ class Conn implements Socket {
   }
 
   Future<List<int>> read(int length) async {
-    var fullMsg =
-        await getFullMessage(this, length, reservedData!, futurePacketLength!, isRawTCP: true);
+    var fullMsg = await getFullMessage(
+        this, length, reservedData!, futurePacketLength!,
+        isRawTCP: true);
     futurePacketLength = fullMsg.gotFuturePacketLength!;
     reservedData = fullMsg.gotReservedData!;
     List<int> decryptedData;
