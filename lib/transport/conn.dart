@@ -103,8 +103,7 @@ class Conn implements Socket {
   Stream<Uint8List> asBroadcastStream(
       {void Function(StreamSubscription<Uint8List> subscription)? onListen,
       void Function(StreamSubscription<Uint8List> subscription)? onCancel}) {
-    // TODO: implement asBroadcastStream
-    throw UnimplementedError();
+    return asBroadcastStream(onListen: onListen, onCancel: onCancel);
   }
 
   @override
