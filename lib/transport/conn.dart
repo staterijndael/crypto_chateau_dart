@@ -41,17 +41,16 @@ class Conn implements Socket {
     }
 
     List<int> p = obj;
-    List<int> dataWithLength;
     if (encryption!.enabled) {
       var encryptedData = Encrypt(
           Uint8List.fromList(p), Uint8List.fromList(encryption!.sharedKey));
       p = encryptedData;
     }
-    dataWithLength = List.filled(0, 0, growable: true);
-    int convertedLength = p.length;
-    dataWithLength
-        .addAll([convertedLength & 0xff, (convertedLength >> 8) & 0xff]);
-    dataWithLength.addAll(p);
+    var dataWithLength = List.filled(p.length + 2, 0);
+    var convertedLength = p.length;
+    dataWithLength[0] = convertedLength & 0xff;
+    dataWithLength[1] = (convertedLength & 0xff00) >> 8;
+    dataWithLength.setRange(2, dataWithLength.length, p);
     tcpConn.write(dataWithLength);
   }
 
