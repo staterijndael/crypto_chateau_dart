@@ -2,25 +2,26 @@ import 'dart:convert';
 import 'dart:core';
 import 'dart:typed_data';
 
+import 'package:crypto_chateau_dart/client/binary_iterator.dart';
 import 'package:crypto_chateau_dart/client/models.dart';
 
-int ConvertBytesToInt8(Uint8List b) {
-  return b[0];
+int ConvertBytesToInt8(BinaryIterator b) {
+  return b.bytes[0];
 }
 
-int ConvertBytesToInt32(Uint8List b) {
-  return b[3] | b[2] << 8 | b[1] << 16 | b[0] << 24;
+int ConvertBytesToInt32(BinaryIterator b) {
+  return b.bytes[3] | b.bytes[2] << 8 | b.bytes[1] << 16 | b.bytes[0] << 24;
 }
 
-int ConvertBytesToInt64(Uint8List b) {
-  return b[7] |
-      b[6] << 8 |
-      b[5] << 16 |
-      b[4] << 24 |
-      b[3] << 32 |
-      b[2] << 40 |
-      b[1] << 48 |
-      b[0] << 56;
+int ConvertBytesToInt64(BinaryIterator b) {
+  return b.bytes[7] |
+      b.bytes[6] << 8 |
+      b.bytes[5] << 16 |
+      b.bytes[4] << 24 |
+      b.bytes[3] << 32 |
+      b.bytes[2] << 40 |
+      b.bytes[1] << 48 |
+      b.bytes[0] << 56;
 }
 
 Uint8List ConvertInt8ToBytes(int num) {
@@ -70,8 +71,8 @@ Uint8List ConvertInt64ToBytes(int num) {
   return buf;
 }
 
-int ConvertBytesToUint16(Uint8List b) {
-  return b[1] | b[0] << 8;
+int ConvertBytesToUint16(BinaryIterator b) {
+  return b.bytes[1] | b.bytes[0] << 8;
 }
 
 Uint8List ConvertUint16ToBytes(int num) {
@@ -90,43 +91,39 @@ Uint8List ConvertByteToBytes(int byte) {
   return list;
 }
 
-int ConvertBytesToUint8(Uint8List b) {
-  return b[0];
+int ConvertBytesToUint8(BinaryIterator b) {
+  return b.bytes[0];
 }
 
-int ConvertBytesToUint32(Uint8List b) {
-  return b[3] | b[2] << 8 | b[1] << 16 | b[0] << 24;
+int ConvertBytesToUint32(BinaryIterator b) {
+  return b.bytes[3] | b.bytes[2] << 8 | b.bytes[1] << 16 | b.bytes[0] << 24;
 }
 
-int ConvertBytesToUint64(Uint8List b) {
-  return b[7] |
-      b[6] << 8 |
-      b[5] << 16 |
-      b[4] << 24 |
-      b[3] << 32 |
-      b[2] << 40 |
-      b[1] << 48 |
-      b[0] << 56;
+int ConvertBytesToUint64(BinaryIterator b) {
+  return b.bytes[7] |
+      b.bytes[6] << 8 |
+      b.bytes[5] << 16 |
+      b.bytes[4] << 24 |
+      b.bytes[3] << 32 |
+      b.bytes[2] << 40 |
+      b.bytes[1] << 48 |
+      b.bytes[0] << 56;
 }
 
-String ConvertBytesToString(Uint8List b) {
-  return String.fromCharCodes(b);
+String ConvertBytesToString(BinaryIterator b) {
+  return String.fromCharCodes(b.bytes);
 }
 
-bool ConvertBoolToString(Uint8List b) {
-  if (b[0] == utf8.encode('1')[0]) {
-    return true;
-  }
-
-  return false;
+bool ConvertBytesToBool(BinaryIterator b) {
+  return b.bytes == 0x01;
 }
 
 Uint8List ConvertUint8ToBytes(int num) {
   return Uint8List.fromList([num]);
 }
 
-int ConvertBytesToByte(Uint8List b) {
-  return b[0];
+int ConvertBytesToByte(BinaryIterator b) {
+  return b.bytes[0];
 }
 
 Uint8List ConvertUint32ToBytes(int num) {
