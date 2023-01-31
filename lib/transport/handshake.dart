@@ -33,9 +33,8 @@ ServerHandshake(Conn conn) async {
 
   pipe.write(pub);
   var msg = await pipe.read(bufSize: 1);
-
   if (msg[0] != 49) {
-    return null;
+    throw "expected success handshake message from server";
   }
 
   var sharedKey = X25519(priv, connPublicKey);
