@@ -17,8 +17,7 @@ Future<FullMessage> getFullMessage(
     bufSize = 1024;
   }
 
-  var buf = List.filled(0, 0);
-  buf.length = bufSize + 4;
+  var buf = List.filled(bufSize + 4, 0, growable: true);
 
   while (true) {
     if (reservedData.isNotEmpty) {
@@ -43,12 +42,12 @@ Future<FullMessage> getFullMessage(
       }
     }
 
-    final localBuf;
+    final List<int> localBuf;
 
     if (isRawTCP) {
-      localBuf = tcpConn.first;
+      localBuf = await tcpConn.first;
     } else {
-      localBuf = tcpConn.read(bufSize);
+      localBuf = await tcpConn.read(bufSize);
     }
 
     buf.addAll(localBuf);
