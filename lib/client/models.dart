@@ -1,9 +1,11 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:crypto_chateau_dart/client/binary_iterator.dart';
+
 abstract class Message {
   Uint8List Marshal();
-  void Unmarshal(Map<String, Uint8List> params);
+  void Unmarshal(BinaryIterator iterator);
 }
 
 class Error extends Message {
@@ -13,7 +15,7 @@ class Error extends Message {
   Error({required this.handlerName, required this.msg});
 
   @override
-  Unmarshal(Map<String, Uint8List> params) {
+  Unmarshal(BinaryIterator iterator) {
     // TODO: implement Unmarshal
     throw UnimplementedError();
   }
