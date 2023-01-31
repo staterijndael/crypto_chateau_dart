@@ -46,7 +46,7 @@ class Peer {
     pipe.write(resp);
   }
 
-  Future<void> readMessage(Message msg) async {
+  Future<Message> readMessage(Message msg) async {
     final msgRaw = await pipe.read();
 
     final serverRespMetaInfo = getServerRespMetaInfo(msgRaw);
@@ -61,8 +61,10 @@ class Peer {
       throw Exception('not enough for size and message');
     }
 
-    msg.Unmarshal(BinaryIterator(
-        msgRaw.sublist(offset + 1 + objectBytesPrefixLength)));
+    msg.Unmarshal(
+        BinaryIterator(msgRaw.sublist(offset + 1 + objectBytesPrefixLength)));
+
+    return msg;
   }
 
   Future<void> writeError(Object error) async {
