@@ -24,6 +24,17 @@ int ConvertBytesToInt64(BinaryIterator b) {
       b.bytes[0] << 56;
 }
 
+int ConvertBytesToInt(BinaryIterator b) {
+  return b.bytes[7] |
+      b.bytes[6] << 8 |
+      b.bytes[5] << 16 |
+      b.bytes[4] << 24 |
+      b.bytes[3] << 32 |
+      b.bytes[2] << 40 |
+      b.bytes[1] << 48 |
+      b.bytes[0] << 56;
+}
+
 Uint8List ConvertInt8ToBytes(int num) {
   return Uint8List.fromList([num]);
 }
@@ -58,6 +69,20 @@ Uint8List ConvertSizeToBytes(int num) {
 }
 
 Uint8List ConvertInt64ToBytes(int num) {
+  Uint8List buf = Uint8List(8);
+  buf[0] = num >> 56;
+  buf[1] = num >> 48;
+  buf[2] = num >> 40;
+  buf[3] = num >> 32;
+  buf[4] = num >> 24;
+  buf[5] = num >> 16;
+  buf[6] = num >> 8;
+  buf[7] = num;
+
+  return buf;
+}
+
+Uint8List ConvertIntToBytes(int num) {
   Uint8List buf = Uint8List(8);
   buf[0] = num >> 56;
   buf[1] = num >> 48;
