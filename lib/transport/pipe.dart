@@ -5,12 +5,11 @@ import 'package:crypto_chateau_dart/transport/message.dart';
 
 class Pipe {
   Conn tcpConn;
-  List<int>? reservedData;
-  int? futurePacketLength;
+  late MessageController messageController;
 
   Pipe(this.tcpConn) {
-    reservedData = List.empty();
-    futurePacketLength = 0;
+    messageController = MessageController(
+        reservedData: List.filled(0, 0, growable: true), futurePacketLength: 0);
   }
 
   void write(List<int> p) async {
@@ -27,12 +26,9 @@ class Pipe {
       bufSize = 1024;
     }
 
-    var fullMessage = await getFullMessage(
-        tcpConn, bufSize + 2, reservedData!, futurePacketLength!);
+    List<int> msg =
+        await messageController.getFullMessage(tcpConn, bufSize + 2);
 
-    futurePacketLength = fullMessage.gotFuturePacketLength;
-    reservedData = fullMessage.gotReservedData;
-
-    return fullMessage.msg!;
+    return msg;
   }
 }

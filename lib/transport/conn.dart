@@ -17,13 +17,12 @@ class Encryption {
 class Conn implements Socket {
   final Socket tcpConn;
   late Stream<List<int>> broadcastStream;
-  late List<int> reservedData;
-  int? futurePacketLength;
+  late MessageController messageController;
   late Encryption encryption;
 
   Conn(this.tcpConn) {
-    reservedData = List.empty();
-    futurePacketLength = 0;
+    messageController = MessageController(
+        reservedData: List.filled(0, 0, growable: true), futurePacketLength: 0);
     encryption = Encryption(sharedKey: List.empty());
     broadcastStream = tcpConn.asBroadcastStream();
   }
@@ -57,17 +56,14 @@ class Conn implements Socket {
   }
 
   Future<List<int>> read(int length) async {
-    var fullMsg = await getFullMessage(
-        this, length, reservedData!, futurePacketLength!,
-        isRawTCP: true);
-    futurePacketLength = fullMsg.gotFuturePacketLength!;
-    reservedData = fullMsg.gotReservedData!;
+    var fullMsg =
+        await messageController.getFullMessage(this, length, isRawTCP: true);
     List<int> decryptedData;
     if (encryption!.enabled) {
-      decryptedData = await Decrypt(Uint8List.fromList(fullMsg.msg!),
-          Uint8List.fromList(encryption!.sharedKey));
+      decryptedData = await Decrypt(Uint8List.fromList(fullMsg),
+          Uint8List.fromList(encryption.sharedKey));
     } else {
-      decryptedData = fullMsg.msg!;
+      decryptedData = fullMsg;
     }
     return decryptedData;
   }
