@@ -35,7 +35,7 @@ class MessageController {
           if (oldFuturePacketLength != buf.length) {
             reservedData = buf.sublist(oldFuturePacketLength);
           }
-          return buf.sublist(0, futurePacketLength);
+          return buf.sublist(0, oldFuturePacketLength);
         }
       }
 
@@ -66,7 +66,7 @@ class MessageController {
         if (oldFuturePacketLength != buf.length) {
           reservedData = buf.sublist(oldFuturePacketLength);
         }
-        return buf.sublist(0, futurePacketLength);
+        return buf.sublist(0, oldFuturePacketLength);
       }
     }
   }
