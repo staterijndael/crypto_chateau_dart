@@ -17,6 +17,7 @@ class Encryption {
 class Conn implements Socket {
   final Socket tcpConn;
   late Stream<List<int>> broadcastStream;
+  late StreamIterator streamIterator;
   late MessageController messageController;
   late Encryption encryption;
 
@@ -25,6 +26,7 @@ class Conn implements Socket {
         reservedData: List.filled(0, 0, growable: true), futurePacketLength: 0);
     encryption = Encryption(sharedKey: List.empty());
     broadcastStream = tcpConn.asBroadcastStream();
+    streamIterator = StreamIterator(broadcastStream);
   }
 
   Future<void> enableEncryption(List<int> sharedKey) async {

@@ -16,6 +16,7 @@ class MultiplexConn implements Conn {
   bool _isClosed = false;
 
   late Stream<List<int>> broadcastStream;
+  late StreamIterator streamIterator;
   late MessageController messageController;
   late Encryption encryption;
 
@@ -25,7 +26,10 @@ class MultiplexConn implements Conn {
   MultiplexConn._(
     this.pool,
     this._requestID,
-  );
+  ) {
+    broadcastStream = pool.conn.broadcastStream;
+    streamIterator = pool.conn.streamIterator;
+  }
 
   @override
   Future<Uint8List> get read async {
