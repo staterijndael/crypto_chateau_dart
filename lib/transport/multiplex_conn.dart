@@ -457,7 +457,6 @@ class MultiplexConnPool {
       final msg = _toWriteQueue.removeFirst();
       final data = msg.data;
       final requestID = msg.requestID;
-      final len = data.length;
       final header = Uint8List(2);
       header[0] = (requestID >> 0) & 0xFF;
       header[1] = (requestID >> 8) & 0xFF;
