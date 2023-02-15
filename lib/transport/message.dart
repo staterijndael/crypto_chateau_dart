@@ -44,29 +44,7 @@ class MessageController {
       List<int> localBuf;
 
       if (isRawTCP) {
-        while (true) {
-          // wait for the next message
-          bool found = false;
-          localBuf = await conn.broadcastStream
-              .where((data) => data != null && data.length > 0)
-              .skip(messageCount)
-              .take(1)
-              .toList()
-              .then((list) async {
-            if (list.isNotEmpty) {
-              found = true;
-              messageCount++;
-              return list.first;
-            } else {
-              found = false;
-              return List.empty();
-            }
-          });
-
-          if (found) {
-            break;
-          }
-        }
+        localBuf = await conn.broadcastStream.first;
       } else {
         localBuf = await conn.read;
       }
