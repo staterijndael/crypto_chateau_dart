@@ -18,8 +18,7 @@ class Peer {
   Peer(this.pipe);
 
   Future<void> establishSecureConn() async {
-    Conn conn = Conn(pipe.tcpConn);
-    final securedConnect = await ServerHandshake(conn);
+    final securedConnect = await ServerHandshake(pipe.tcpConn);
     pipe.tcpConn = securedConnect;
   }
 
