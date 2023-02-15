@@ -7,6 +7,7 @@ import 'package:crypto_chateau_dart/transport/multiplex_conn.dart';
 class MessageController {
   List<int> reservedData;
   int futurePacketLength;
+  int messageCount = 0;
 
   MessageController(
       {required this.reservedData, required this.futurePacketLength});
@@ -44,8 +45,13 @@ class MessageController {
 
       if (isRawTCP) {
         localBuf = await conn.broadcastStream
-            .where((data) => data != null)
-            .firstWhere((data) => data.length > 0);
+            .where((data) => data != null && data.length > 0)
+            .skip(
+                messageCount) // skip over the messages that have already been received
+            .take(1)
+            .first;
+
+        messageCount++;
       } else {
         localBuf = await conn.read;
       }
