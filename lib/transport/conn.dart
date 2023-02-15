@@ -37,9 +37,9 @@ class Conn implements Socket {
   }
 
   void write(Object? obj) async {
-  if (obj is! List<int>) {
-    throw "expected List<int> type in obj";
-  }
+    if (obj is! List<int>) {
+      throw "expected List<int> type in obj";
+    }
 
     List<int> p = obj;
     if (encryption!.enabled) {
@@ -355,8 +355,7 @@ class Conn implements Socket {
 
   @override
   Stream<Uint8List> where(bool Function(Uint8List event) test) {
-    // TODO: implement where
-    throw UnimplementedError();
+    return tcpConn.where(test);
   }
 
   @override
