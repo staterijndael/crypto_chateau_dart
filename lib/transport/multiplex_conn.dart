@@ -459,8 +459,8 @@ class MultiplexConnPool {
       final requestID = msg.requestID;
       final len = data.length;
       final header = Uint8List(2);
-      header[0] = requestID;
-      header[1] = len;
+      header[0] = (requestID >> 0) & 0xFF;
+      header[1] = (requestID >> 8) & 0xFF;
       final toSend = header.followedBy(data);
       conn.write(toSend.toList());
     }
