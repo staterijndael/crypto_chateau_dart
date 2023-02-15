@@ -43,7 +43,7 @@ class MessageController {
       final List<int> localBuf;
 
       if (isRawTCP) {
-        localBuf = await conn.tcpConn
+        localBuf = await conn.broadcastStream
             .where((data) => data != null)
             .firstWhere((data) => data.length > 0);
       } else {
