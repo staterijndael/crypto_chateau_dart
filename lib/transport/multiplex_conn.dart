@@ -1,75 +1,78 @@
 import 'dart:convert';
-import 'dart:async';
 import 'dart:io';
+import 'dart:async';
 import 'dart:typed_data';
-
-import 'package:crypto_chateau_dart/aes_256/aes_256.dart';
+import 'dart:collection';
+import 'package:async/async.dart';
+import 'package:crypto_chateau_dart/transport/conn.dart';
 import 'package:crypto_chateau_dart/transport/message.dart';
-import 'package:crypto_chateau_dart/transport/utils.dart';
 
-class Encryption {
-  bool enabled;
-  List<int> sharedKey;
+class MultiplexConn implements Conn {
+  final MultiplexConnPool pool;
+  final int _requestID;
+  final StreamController<Uint8List> _readController =
+      StreamController<Uint8List>();
+  final StreamController<void> _closeController = StreamController<void>();
+  bool _isClosed = false;
 
-  Encryption({this.enabled = false, required this.sharedKey});
-}
-
-class Conn implements Socket {
-  final Socket tcpConn;
   late Stream<List<int>> broadcastStream;
   late MessageController messageController;
   late Encryption encryption;
 
-  Conn(this.tcpConn) {
-    messageController = MessageController(
-        reservedData: List.filled(0, 0, growable: true), futurePacketLength: 0);
-    encryption = Encryption(sharedKey: List.empty());
-    broadcastStream = tcpConn.asBroadcastStream();
+  @override
+  late Encoding encoding;
+
+  MultiplexConn._(
+    this.pool,
+    this._requestID,
+  );
+
+  @override
+  Future<Uint8List> get read async {
+    final completer = Completer<Uint8List>();
+    StreamSubscription<Uint8List>? subscription;
+
+    subscription ??= _readController.stream.listen((data) {
+      completer.complete(data);
+      subscription!.cancel();
+    });
+
+    return completer.future;
   }
 
-  Future<void> enableEncryption(List<int> sharedKey) async {
-    if (encryption.enabled) {
-      throw Exception("encryption already enabled");
+  Stream<void> get onClose => _closeController.stream;
+
+  void addRead(Uint8List data) => _readController.add(data);
+
+  void _addRead(Uint8List data) {
+    if (!_isClosed) {
+      _readController.add(data);
     }
-    var sharedKeyHash = getSha256FromBytes(sharedKey);
-    encryption.enabled = true;
-    encryption.sharedKey = sharedKeyHash;
   }
 
-  void write(Object? obj) async {
-  if (obj is! List<int>) {
-    throw "expected List<int> type in obj";
-  }
-
-    List<int> p = obj;
-    if (encryption!.enabled) {
-      var encryptedData = Encrypt(
-          Uint8List.fromList(p), Uint8List.fromList(encryption!.sharedKey));
-      p = encryptedData;
+  Future<void> close() {
+    if (!_isClosed) {
+      _isClosed = true;
+      _readController.close();
+      _closeController.add(null);
+      _closeController.close();
+      pool._removeConn(_requestID);
     }
-    var dataWithLength = List.filled(p.length + 2, 0);
-    var convertedLength = p.length;
-    dataWithLength[0] = convertedLength & 0xff;
-    dataWithLength[1] = (convertedLength & 0xff00) >> 8;
-    dataWithLength.setRange(2, dataWithLength.length, p);
-    tcpConn.add(dataWithLength);
-  }
-
-  Future<List<int>> get read async {
-    var fullMsg =
-        await messageController.getFullMessage(this, 4096, isRawTCP: true);
-    List<int> decryptedData;
-    if (encryption!.enabled) {
-      decryptedData = await Decrypt(Uint8List.fromList(fullMsg),
-          Uint8List.fromList(encryption.sharedKey));
-    } else {
-      decryptedData = fullMsg;
-    }
-    return decryptedData;
+    return Future.value();
   }
 
   @override
-  late Encoding encoding;
+  void write(Object? obj) {
+    if (obj is! List<int>) {
+      throw "expected List<int> type in obj";
+    }
+
+    List<int> data = obj;
+    pool._toWriteQueue.add(_ToWriteMsg(_requestID, Uint8List.fromList(data)));
+  }
+
+  @override
+  String toString() => 'MultiplexConn($_requestID)';
 
   @override
   void add(List<int> data) {
@@ -101,7 +104,8 @@ class Conn implements Socket {
   Stream<Uint8List> asBroadcastStream(
       {void Function(StreamSubscription<Uint8List> subscription)? onListen,
       void Function(StreamSubscription<Uint8List> subscription)? onCancel}) {
-    return tcpConn.asBroadcastStream(onListen: onListen, onCancel: onCancel);
+    // TODO: implement asBroadcastStream
+    throw UnimplementedError();
   }
 
   @override
@@ -119,12 +123,6 @@ class Conn implements Socket {
   @override
   Stream<R> cast<R>() {
     // TODO: implement cast
-    throw UnimplementedError();
-  }
-
-  @override
-  Future close() {
-    // TODO: implement close
     throw UnimplementedError();
   }
 
@@ -163,6 +161,12 @@ class Conn implements Socket {
   }
 
   @override
+  Future<void> enableEncryption(List<int> sharedKey) {
+    // TODO: implement enableEncryption
+    throw UnimplementedError();
+  }
+
+  @override
   Future<bool> every(bool Function(Uint8List element) test) {
     // TODO: implement every
     throw UnimplementedError();
@@ -175,12 +179,14 @@ class Conn implements Socket {
   }
 
   @override
-  Future<Uint8List> get first => tcpConn.first;
+  // TODO: implement first
+  Future<Uint8List> get first => throw UnimplementedError();
 
   @override
   Future<Uint8List> firstWhere(bool Function(Uint8List element) test,
       {Uint8List Function()? orElse}) {
-    return tcpConn.firstWhere(test, orElse: orElse);
+    // TODO: implement firstWhere
+    throw UnimplementedError();
   }
 
   @override
@@ -329,6 +335,10 @@ class Conn implements Socket {
   }
 
   @override
+  // TODO: implement tcpConn
+  Socket get tcpConn => throw UnimplementedError();
+
+  @override
   Stream<Uint8List> timeout(Duration timeLimit,
       {void Function(EventSink<Uint8List> sink)? onTimeout}) {
     // TODO: implement timeout
@@ -373,4 +383,107 @@ class Conn implements Socket {
   void writeln([Object? object = ""]) {
     // TODO: implement writeln
   }
+}
+
+class MultiplexConnPool {
+  final Conn conn;
+  final StreamController<MultiplexConn> _listenClients =
+      StreamController<MultiplexConn>();
+  final Map<int, MultiplexConn> _multiplexConnByRequestID = {};
+  final ListQueue<_ToWriteMsg> _toWriteQueue = ListQueue<_ToWriteMsg>();
+  final Completer<void> _terminateCh = Completer();
+  final bool _isClient;
+
+  int _currentRequestID = 0;
+
+  MultiplexConnPool(this.conn, this._isClient);
+
+  int get currentRequestID => _currentRequestID;
+
+  MultiplexConn newMultiplexConn() {
+    final requestID = ++_currentRequestID;
+    final newMultiplexConn = MultiplexConn._(
+      this,
+      requestID,
+    );
+    _multiplexConnByRequestID[requestID] = newMultiplexConn;
+    if (!_isClient) {
+      _listenClients.add(newMultiplexConn);
+    }
+    return newMultiplexConn;
+  }
+
+  void close() => _terminateCh.complete();
+
+  Stream<MultiplexConn> listenClients() => _listenClients.stream;
+
+  void run() {
+    _listenToTCP();
+    _writeToTCP();
+  }
+
+  void _removeConn(int requestID) {
+    _multiplexConnByRequestID.remove(requestID);
+  }
+
+  void _listenToTCP() async {
+    final completer = Completer<void>();
+    final buffer = Uint8List(4096);
+    Uint8List data = Uint8List.fromList(await conn.read);
+    buffer.setRange(0, data.length, data);
+    var requestID = (buffer[0] & 0xff) | ((buffer[1] & 0xff) << 8);
+    if (_multiplexConnByRequestID.containsKey(requestID)) {
+      var conn = _multiplexConnByRequestID[requestID];
+      conn!._addRead(buffer.sublist(2, data.length));
+    } else {
+      print('Unknown request ID: $requestID');
+    }
+  }
+
+  void closeAllConns() {
+    var conns = _multiplexConnByRequestID.values.toList();
+    for (var conn in conns) {
+      conn.close();
+    }
+    _listenClients.close();
+  }
+
+  void _writeToTCP() {
+    if (_terminateCh.isCompleted) {
+      return;
+    }
+
+    if (_toWriteQueue.isNotEmpty) {
+      final msg = _toWriteQueue.removeFirst();
+      final data = msg.data;
+      final requestID = msg.requestID;
+      final len = data.length;
+      final header = Uint8List(2);
+      header[0] = requestID;
+      header[1] = len;
+      final toSend = header.followedBy(data);
+      conn.write(toSend.toList());
+    }
+
+    Future.delayed(Duration(milliseconds: 50)).then((_) => _writeToTCP());
+  }
+
+  void _closeTCP() {
+    conn.destroy();
+  }
+
+  void _closeAllConns() {
+    var conns = _multiplexConnByRequestID.values.toList();
+    for (var conn in conns) {
+      conn.close();
+    }
+    _listenClients.close();
+  }
+}
+
+class _ToWriteMsg {
+  final int requestID;
+  final Uint8List data;
+
+  _ToWriteMsg(this.requestID, this.data);
 }

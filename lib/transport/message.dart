@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:crypto_chateau_dart/client/models.dart';
 import 'package:crypto_chateau_dart/transport/conn.dart';
+import 'package:crypto_chateau_dart/transport/multiplex_conn.dart';
 
 class MessageController {
   List<int> reservedData;
@@ -10,7 +11,7 @@ class MessageController {
   MessageController(
       {required this.reservedData, required this.futurePacketLength});
 
-  Future<List<int>> getFullMessage(Conn tcpConn, int bufSize,
+  Future<List<int>> getFullMessage(Conn conn, int bufSize,
       {bool isRawTCP = false}) async {
     if (bufSize == 0) {
       bufSize = 1024;
@@ -42,11 +43,11 @@ class MessageController {
       final List<int> localBuf;
 
       if (isRawTCP) {
-        localBuf = await tcpConn.broadcastStream
+        localBuf = await conn.tcpConn
             .where((data) => data != null)
             .firstWhere((data) => data.length > 0);
       } else {
-        localBuf = await tcpConn.read(bufSize);
+        localBuf = await conn.read;
       }
 
       buf.addAll(localBuf);

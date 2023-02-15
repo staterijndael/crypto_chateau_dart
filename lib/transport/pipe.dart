@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:crypto_chateau_dart/transport/conn.dart';
 import 'package:crypto_chateau_dart/transport/message.dart';
+import 'package:crypto_chateau_dart/transport/multiplex_conn.dart';
+import 'package:flutter/foundation.dart';
 
 class Pipe {
   Conn tcpConn;
@@ -18,7 +20,7 @@ class Pipe {
     dataWithLength[0] = convertedLength & 0xff;
     dataWithLength[1] = (convertedLength & 0xff00) >> 8;
     dataWithLength.setRange(2, dataWithLength.length, p);
-    tcpConn.write(dataWithLength);
+    tcpConn.write(Uint8List.fromList(dataWithLength));
   }
 
   Future<List<int>> read({int bufSize = 1024}) async {
