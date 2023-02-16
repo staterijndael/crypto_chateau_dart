@@ -32,16 +32,8 @@ class MultiplexConn implements Conn {
   }
 
   @override
-  Future<Uint8List> get read async {
-    final completer = Completer<Uint8List>();
-    StreamSubscription<Uint8List>? subscription;
-
-    subscription ??= _readController.stream.listen((data) {
-      completer.complete(data);
-      subscription!.cancel();
-    });
-
-    return completer.future;
+  Future<Uint8List> get read {
+    return _readController.stream.first;
   }
 
   Stream<void> get onClose => _closeController.stream;
@@ -431,16 +423,18 @@ class MultiplexConnPool {
   }
 
   void _listenToTCP() async {
-    final completer = Completer<void>();
-    final buffer = Uint8List(4096);
-    Uint8List data = Uint8List.fromList(await conn.read);
-    buffer.setRange(0, data.length, data);
-    var requestID = (buffer[0] & 0xff) | ((buffer[1] & 0xff) << 8);
-    if (_multiplexConnByRequestID.containsKey(requestID)) {
-      var conn = _multiplexConnByRequestID[requestID];
-      conn!._addRead(buffer.sublist(2, data.length));
-    } else {
-      print('Unknown request ID: $requestID');
+    while (true) {
+      final completer = Completer<void>();
+      final buffer = Uint8List(4096);
+      Uint8List data = Uint8List.fromList(await conn.read);
+      buffer.setRange(0, data.length, data);
+      var requestID = (buffer[0] & 0xff) | ((buffer[1] & 0xff) << 8);
+      if (_multiplexConnByRequestID.containsKey(requestID)) {
+        var conn = _multiplexConnByRequestID[requestID];
+        conn!._addRead(buffer.sublist(2, data.length));
+      } else {
+        print('Unknown request ID: $requestID');
+      }
     }
   }
 
