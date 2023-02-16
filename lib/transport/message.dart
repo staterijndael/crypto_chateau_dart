@@ -44,11 +44,7 @@ class MessageController {
       final List<int> localBuf;
 
       if (isRawTCP) {
-        if (await conn.streamIterator.moveNext()) {
-          localBuf = conn.streamIterator.current;
-        } else {
-          throw ("something went wrong during get new data from tcp");
-        }
+        localBuf = await conn.broadcastStream.first;
       } else {
         localBuf = await conn.read;
       }
