@@ -10,9 +10,8 @@ void main() async {
   final client = Client(
     connectParams: kConnectParams,
   );
-  await client.connected;
 
   // await Future.delayed(const Duration(milliseconds: 1000));
-  final response = await client.reverseString(ReverseStringReq(Str: 'alice'));
-  print(response.Res);
+  final response = await client.reverseString(const ReverseStringRequestAlt(str: 'alice'));
+  print(response.res);
 }

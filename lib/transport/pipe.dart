@@ -1,18 +1,12 @@
 import 'dart:typed_data';
 
-import 'package:crypto_chateau_dart/transport/connection.dart';
-import 'package:crypto_chateau_dart/transport/message.dart';
+import 'package:crypto_chateau_dart/transport/connection/connection.dart';
+import 'package:crypto_chateau_dart/transport/socket_packager.dart';
 
 class Pipe implements Connection {
   final Connection _connection;
 
   const Pipe(this._connection);
-
-  @override
-  Uint8List? get encryptionKey => _connection.encryptionKey;
-
-  @override
-  set encryptionKey(Uint8List? encryptionKey) => _connection.encryptionKey = encryptionKey;
 
   @override
   Stream<Uint8List> get read => _connection.read.pack();

@@ -2,12 +2,12 @@ import 'dart:async';
 import 'dart:typed_data';
 import 'package:crypto_chateau_dart/client/models.dart';
 import 'package:crypto_chateau_dart/client/conv.dart';
-import 'package:crypto_chateau_dart/transport/connection.dart';
-import 'package:crypto_chateau_dart/transport/peer.dart';
+import 'package:crypto_chateau_dart/transport/connection/connection.dart';
+import 'package:crypto_chateau_dart/transport/multiplex_request_loop.dart';
 import 'package:crypto_chateau_dart/transport/pipe.dart';
 import 'dart:io';
 import 'package:crypto_chateau_dart/client/binary_iterator.dart';
-import 'package:crypto_chateau_dart/transport/multiplex_conn.dart';
+import 'package:crypto_chateau_dart/transport/multiplex_connection.dart';
 import 'package:crypto_chateau_dart/transport/handler.dart';
 
 var handlerHashMap = {
@@ -73,37 +73,94 @@ class ConnectParams {
 }
 
 class Client {
-  ConnectParams connectParams;
-  late Peer peer;
-  late MultiplexConnectionPool pool;
-  Completer<void>? _completer;
+  final ConnectParams connectParams;
+  final MultiplexRequestLoop _pool;
 
-  Client({required this.connectParams}) {
-    _completer = _createCompleter();
+  const Client._({
+    required this.connectParams,
+    required MultiplexRequestLoop pool,
+  }) : _pool = pool;
+
+  factory Client({
+    required ConnectParams connectParams,
+  }) {
+    final encryption = Encryption();
+
+    return Client._(
+      connectParams: connectParams,
+      pool: MultiplexRequestLoop(
+        MultiplexConnection(
+          Pipe(
+            Connection.handshake(
+              Pipe(
+                Connection.cipher(
+                  Pipe(
+                    ConnectionLogger(
+                      Connection.root(connectParams),
+                    ),
+                  ),
+                  encryption,
+                ),
+              ),
+              encryption,
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
-  Completer<void> _createCompleter() {
-    _connect();
-    return Completer<void>();
+  Future<ReverseStringResponseAlt> reverseString(ReverseStringRequestAlt request) => _pool.sendRequest(request);
+}
+
+class ReverseStringRequestAlt implements Request<ReverseStringResponseAlt> {
+  static final _handlerHash = HandlerHash(hash: [0x86, 0xC, 0xAA, 0x80]);
+  final String str;
+
+  const ReverseStringRequestAlt({
+    required this.str,
+  });
+
+  @override
+  HandlerHash get handlerHash => _handlerHash;
+
+  @override
+  Uint8List marshal() {
+    List<int> b = [];
+
+    List<int> size = ConvertSizeToBytes(0);
+    b.addAll(size);
+    b.addAll(ConvertSizeToBytes(str.codeUnits.length));
+    b.addAll(ConvertStringToBytes(str));
+    size = ConvertSizeToBytes(b.length - size.length);
+    for (int i = 0; i < size.length; i++) {
+      b[i] = size[i];
+    }
+
+    return Uint8List.fromList(b);
   }
 
-  Future<void> _connect() async {
-    final socket = await Socket.connect(connectParams.host, connectParams.port);
-    final connection = Connection(socket);
-    pool = MultiplexConnectionPool(connection);
-    _completer!.complete();
+  @override
+  ReverseStringResponseAlt unmarshal(Uint8List bytes) {
+    final b = BinaryIterator(bytes);
+    BinaryCtx binaryCtx = BinaryCtx();
+
+    binaryCtx.size = b.nextSize();
+    binaryCtx.buf = b.slice(binaryCtx.size);
+    final res = ConvertBytesToString(binaryCtx.buf);
+
+    return ReverseStringResponseAlt(
+      res: res,
+    );
   }
+}
 
-  Future<void> get connected => _completer!.future;
+class ReverseStringResponseAlt implements Response {
+  final String res;
 
-  Future<ReverseStringResponse> reverseString(ReverseStringReq request) async {
-    final multiplexConn = pool.newMultiplexConnection();
-    final peer = Peer(Pipe(multiplexConn));
-
-    final resp = await peer.sendRequest(HandlerHash(hash: [0x86, 0xC, 0xAA, 0x80]), request, ReverseStringResponse(Res: ""));
-
-    return resp;
-  }
+  const ReverseStringResponseAlt({
+    required this.res,
+  });
 }
 
 class ReverseStringReq implements Message {
