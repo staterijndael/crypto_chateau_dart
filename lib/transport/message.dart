@@ -1,73 +1,51 @@
-import 'dart:io';
+import 'dart:async';
+import 'dart:typed_data';
 
-import 'package:crypto_chateau_dart/client/models.dart';
-import 'package:crypto_chateau_dart/transport/conn.dart';
-import 'package:crypto_chateau_dart/transport/multiplex_conn.dart';
+class SocketPackager extends StreamTransformerBase<Uint8List, Uint8List> {
+  const SocketPackager();
 
-class MessageController {
-  List<int> reservedData;
-  int futurePacketLength;
-  int messageCount = 0;
+  @override
+  Stream<Uint8List> bind(Stream<Uint8List> stream) {
+    var reservedData = Uint8List(0);
+    var futurePacketLength = 0;
+    final controller = StreamController<Uint8List>(sync: true);
+    final subscription = stream.listen(
+      (event) {
+        Uint8List buffer;
 
-  MessageController(
-      {required this.reservedData, required this.futurePacketLength});
+        if (reservedData.isEmpty) {
+          buffer = reservedData = event;
+        } else {
+          buffer = reservedData..addAll(event);
+        }
 
-  Future<List<int>> getFullMessage(Conn conn, int bufSize,
-      {bool isRawTCP = false}) async {
-    if (bufSize == 0) {
-      bufSize = 1024;
-    }
-
-    var buf = List.filled(0, 0, growable: true);
-
-    while (true) {
-      if (reservedData.isNotEmpty) {
         if (futurePacketLength == 0) {
-          final packetLength = reservedData[0] | reservedData[1] << 8;
-          futurePacketLength = packetLength;
-          reservedData = reservedData.sublist(2);
+          futurePacketLength = buffer[0] | buffer[1] << 8;
+          buffer = buffer.sublist(2);
         }
 
-        buf.addAll(reservedData);
-        reservedData = List.filled(0, 0, growable: true);
-
-        if (buf.length >= futurePacketLength) {
-          int oldFuturePacketLength = futurePacketLength;
-          futurePacketLength = 0;
-          if (oldFuturePacketLength != buf.length) {
-            reservedData = buf.sublist(oldFuturePacketLength);
-          }
-          return buf.sublist(0, oldFuturePacketLength);
+        if (buffer.length == futurePacketLength) {
+          controller.add(buffer);
+          reservedData = Uint8List(0);
         }
-      }
 
-      final List<int> localBuf;
-
-      if (isRawTCP) {
-        localBuf = await conn.broadcastStream.first;
-      } else {
-        localBuf = await conn.read;
-      }
-
-      buf.addAll(localBuf);
-
-      if (buf.isEmpty) {
-        throw "EOF";
-      }
-
-      if (futurePacketLength == 0) {
-        futurePacketLength = buf[0] | buf[1] << 8;
-        buf = buf.sublist(2);
-      }
-
-      if (buf.length >= futurePacketLength) {
-        int oldFuturePacketLength = futurePacketLength;
-        futurePacketLength = 0;
-        if (oldFuturePacketLength != buf.length) {
-          reservedData = buf.sublist(oldFuturePacketLength);
+        if (buffer.length > futurePacketLength) {
+          controller.add(buffer.sublist(0, futurePacketLength));
+          reservedData = buffer.sublist(futurePacketLength);
         }
-        return buf.sublist(0, oldFuturePacketLength);
-      }
-    }
+      },
+      onError: controller.addError,
+      onDone: controller.close,
+    );
+    controller
+      ..onResume = subscription.resume
+      ..onPause = subscription.pause
+      ..onCancel = subscription.cancel;
+
+    return controller.stream;
   }
+}
+
+extension SocketDataReaderX on Stream<Uint8List> {
+  Stream<Uint8List> pack() => transform(const SocketPackager());
 }

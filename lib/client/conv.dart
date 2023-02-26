@@ -40,7 +40,7 @@ Uint8List ConvertInt8ToBytes(int num) {
 }
 
 Uint8List ConvertInt16ToBytes(int num) {
-  var list = new Uint8List(2);
+  var list = Uint8List(2);
 
   list[0] = num >> 8;
   list[1] = num;
@@ -105,7 +105,7 @@ int ConvertBytesToUint16(BinaryIterator b) {
 }
 
 Uint8List ConvertUint16ToBytes(int num) {
-  var list = new Uint8List(2);
+  var list = Uint8List(2);
 
   list[0] = num >> 8;
   list[1] = num;
@@ -114,7 +114,7 @@ Uint8List ConvertUint16ToBytes(int num) {
 }
 
 Uint8List ConvertByteToBytes(int byte) {
-  var list = new Uint8List(1);
+  var list = Uint8List(1);
   list[0] = byte;
 
   return list;

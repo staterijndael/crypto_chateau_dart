@@ -1,83 +1,190 @@
-import 'dart:io';
+import 'dart:collection';
+import 'dart:typed_data';
+
 import 'package:crypto_chateau_dart/client/binary_iterator.dart';
 import 'package:crypto_chateau_dart/client/conv.dart';
 import 'package:crypto_chateau_dart/client/models.dart';
-import 'package:crypto_chateau_dart/transport/conn.dart';
+import 'package:crypto_chateau_dart/transport/connection.dart';
 import 'package:crypto_chateau_dart/transport/handler.dart';
-import 'package:crypto_chateau_dart/transport/handshake.dart';
 import 'package:crypto_chateau_dart/transport/meta.dart';
-import 'package:crypto_chateau_dart/transport/pipe.dart';
+import 'package:crypto_chateau_dart/transport/multiplex_conn.dart';
 import 'package:crypto_chateau_dart/version/version.dart';
+import 'dart:async';
+import 'dart:math';
+
+import 'package:x25519/x25519.dart';
 
 class Peer {
-  final Pipe pipe;
-
   static const int errByte = 0x2F;
   static const int okByte = 0x20;
+  final Connection _connection;
+  final _responseQueue = Queue<_Response>();
+  late final StreamSubscription<Uint8List> _subscription;
+  Future<void>? _handshake;
 
-  Peer(this.pipe);
-
-  Future<void> establishSecureConn() async {
-    final securedConnect = await ServerHandshake(pipe.tcpConn);
-    pipe.tcpConn = securedConnect;
+  Peer(this._connection) {
+    _subscription = _connection.read.listen(_handleRead);
   }
 
-  Future<void> sendRequestClient(HandlerHash handlerHash, Message msg) async {
-    List<int> resp = [];
+  Future<void> close() => _subscription.cancel();
 
-    resp.add(newProtocolByte());
-    resp.addAll(handlerHash.hash);
-    resp.addAll(msg.Marshal());
+  Future<T> sendRequest<T extends Message>(
+    HandlerHash handlerHash,
+    Message requestMessage,
+    T responseMessage,
+  ) async {
+    if (_handshake == null) {
+      final completer = Completer<void>();
 
-    pipe.write(resp);
+      try {
+        await _doHandshake();
+        completer.complete();
+      } on Object catch (e, st) {
+        completer.completeError(e, st);
+      }
+    }
+
+    await _handshake;
+
+    return _sendRequest(
+        (BytesBuilder(copy: false)
+              ..addByte(newProtocolByte())
+              ..add(handlerHash.hash)
+              ..add(requestMessage.Marshal()))
+            .takeBytes(),
+        responseMessage);
   }
 
-  Future<void> writeResponse(Message msg) async {
-    List<int> resp = [];
+  Future<T> _sendRequest<T extends Message>(
+    Uint8List request,
+    T response,
+  ) async {
+    final $response = _Response(response);
+    _responseQueue.add($response);
+    _connection.write(request);
 
-    resp.add(newProtocolByte());
-    resp.add(okByte);
-    resp.addAll(msg.Marshal());
-
-    pipe.write(resp);
+    return $response.future;
   }
 
-  Future<Message> readMessage(Message msg) async {
-    final msgRaw = await pipe.read();
-
-    final serverRespMetaInfo = getServerRespMetaInfo(msgRaw);
+  void _handleRead(Uint8List bytes) {
+    final response = _responseQueue.removeFirst();
+    final serverRespMetaInfo = getServerRespMetaInfo(bytes);
     final offset = serverRespMetaInfo.payloadOffset;
 
-    if (msgRaw[offset] == errByte) {
-      throw Exception(
-          'chateau rpc: status = error, description = ${String.fromCharCodes(msgRaw.sublist(2))}');
+    if (bytes[offset] == errByte) {
+      response.completeError(ChateauRPCError(bytes));
     }
 
-    if (offset + 1 + msgRaw.length < objectBytesPrefixLength) {
-      throw Exception('not enough for size and message');
+    if (offset + 1 + bytes.length < objectBytesPrefixLength) {
+      response.completeError(const ChateauSizeError());
     }
 
-    msg.Unmarshal(
-        BinaryIterator(msgRaw.sublist(offset + 1 + objectBytesPrefixLength)));
+    try {
+      response.message.Unmarshal(BinaryIterator(bytes.sublist(offset + 1 + objectBytesPrefixLength)));
+    } on Object catch (e, st) {
+      response.completeError(e, st);
+    }
 
-    return msg;
+    response.complete();
   }
 
-  Future<void> writeError(Object error) async {
-    List<int> resp = [];
+  Future<void> _doHandshake() async {
+    final publicKey = (await _sendRequest(
+      Uint8List.fromList([104, 97, 110, 100, 115, 104, 97, 107, 101]),
+      PublicKeyResponse(publicKey: Uint8List(0)),
+    ))
+        .publicKey;
+    var privateKey = Uint8List(32);
+    var secureRandom = Random.secure();
+    for (var i = 0; i < privateKey.length; i++) {
+      privateKey[i] = secureRandom.nextInt(256);
+    }
 
-    resp.add(newProtocolByte());
-    resp.add(errByte);
-    resp.addAll(error.toString().codeUnits);
+    privateKey[0] &= 248;
+    privateKey[31] &= 63;
+    privateKey[31] |= 64;
 
-    pipe.write(resp);
+    final message = (await _sendRequest(
+      X25519(privateKey, basePoint),
+      HandshakeResponse(message: Uint8List(0)),
+    ))
+        .message;
+
+    if (message[0] != 49) {
+      throw Exception('expected success handshake message from server');
+    }
+
+    _connection.encryptionKey = X25519(privateKey, publicKey);
   }
+}
 
-  Future<void> write(List<int> data) async {
-    pipe.write(data);
-  }
+class _Response<T extends Message> {
+  final T message;
+  final _completer = Completer<T>();
 
-  Future<List<int>> read() async {
-    return await pipe.read();
-  }
+  _Response(this.message);
+
+  Future<T> get future => _completer.future;
+
+  void complete() => _completer.complete(message);
+
+  void completeError(Object error, [StackTrace? stackTrace]) => _completer.completeError(error, stackTrace);
+}
+
+class PublicKeyResponse implements Message {
+  Uint8List publicKey;
+
+  PublicKeyResponse({
+    required this.publicKey,
+  });
+
+  @override
+  Uint8List Marshal() => publicKey;
+
+  @override
+  void Unmarshal(BinaryIterator b) => publicKey = Uint8List.fromList(b.bytes);
+}
+
+class HandshakeRequest implements Message {
+  Uint8List publicKey;
+
+  HandshakeRequest({
+    required this.publicKey,
+  });
+
+  @override
+  Uint8List Marshal() => publicKey;
+
+  @override
+  void Unmarshal(BinaryIterator b) {}
+}
+
+class HandshakeResponse implements Message {
+  Uint8List message;
+
+  HandshakeResponse({
+    required this.message,
+  });
+
+  @override
+  Uint8List Marshal() => message;
+
+  @override
+  void Unmarshal(BinaryIterator b) => message = Uint8List.fromList(b.bytes);
+}
+
+class ChateauRPCError implements Exception {
+  final Uint8List bytes;
+
+  const ChateauRPCError(this.bytes);
+
+  @override
+  String toString() => '$runtimeType: status = error, description = ${String.fromCharCodes(bytes.sublist(2))}';
+}
+
+class ChateauSizeError implements Exception {
+  const ChateauSizeError();
+
+  @override
+  String toString() => '$runtimeType: not enough for size and message';
 }

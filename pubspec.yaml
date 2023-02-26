@@ -11,11 +11,8 @@ dependencies:
   bloc: ^8.0.3
   crypto: ^3.0.2
   ed25519_edwards: ^0.3.1
-  flutter:
-    sdk: flutter
-  flutter_bloc: ^8.0.1
   x25519: ^0.1.1
-  pointycastle: ^3.6.2
+  convert: ^3.1.1
 
 dev_dependencies:
   flutter_test:

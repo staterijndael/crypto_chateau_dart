@@ -1,36 +1,29 @@
-import 'dart:io';
+import 'dart:typed_data';
 
-import 'package:crypto_chateau_dart/transport/conn.dart';
+import 'package:crypto_chateau_dart/transport/connection.dart';
 import 'package:crypto_chateau_dart/transport/message.dart';
-import 'package:crypto_chateau_dart/transport/multiplex_conn.dart';
-import 'package:flutter/foundation.dart';
 
-class Pipe {
-  Conn tcpConn;
-  late MessageController messageController;
+class Pipe implements Connection {
+  final Connection _connection;
 
-  Pipe(this.tcpConn) {
-    messageController = MessageController(
-        reservedData: List.filled(0, 0, growable: true), futurePacketLength: 0);
-  }
+  const Pipe(this._connection);
 
-  void write(List<int> p) async {
-    var dataWithLength = List.filled(p.length + 2, 0);
-    var convertedLength = p.length;
+  @override
+  Uint8List? get encryptionKey => _connection.encryptionKey;
+
+  @override
+  set encryptionKey(Uint8List? encryptionKey) => _connection.encryptionKey = encryptionKey;
+
+  @override
+  Stream<Uint8List> get read => _connection.read.pack();
+
+  @override
+  void write(Uint8List bytes) async {
+    var dataWithLength = Uint8List(bytes.length + 2);
+    var convertedLength = bytes.length;
     dataWithLength[0] = convertedLength & 0xff;
     dataWithLength[1] = (convertedLength & 0xff00) >> 8;
-    dataWithLength.setRange(2, dataWithLength.length, p);
-    tcpConn.write(Uint8List.fromList(dataWithLength));
-  }
-
-  Future<List<int>> read({int bufSize = 1024}) async {
-    if (bufSize == 0) {
-      bufSize = 1024;
-    }
-
-    List<int> msg =
-        await messageController.getFullMessage(tcpConn, bufSize + 2);
-
-    return msg;
+    dataWithLength.setRange(2, dataWithLength.length, bytes);
+    _connection.write(dataWithLength);
   }
 }
