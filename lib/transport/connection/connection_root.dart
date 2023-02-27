@@ -2,7 +2,7 @@ part of connection;
 
 class ConnectionRoot implements Connection {
   final ConnectParams connectParams;
-  late final _controller = StreamController<Uint8List>(sync: true);
+  late final _controller = StreamController<r.BytesBuffer>(sync: true);
   StreamSubscription<Uint8List>? _subscription;
   Completer<Socket>? _socket;
   var _closed = false;
@@ -19,11 +19,11 @@ class ConnectionRoot implements Connection {
   }
 
   @override
-  Stream<Uint8List> get read => _controller.stream;
+  Stream<r.BytesBuffer> get read => _controller.stream;
 
   @override
-  void write(Uint8List bytes) => _initSocket().then(
-        (socket) => socket.add(bytes),
+  void write(w.BytesBuffer bytes) => _initSocket().then(
+        (socket) => socket.add(bytes.toBytes()),
         onError: _controller.addError,
       );
 
@@ -40,7 +40,9 @@ class ConnectionRoot implements Connection {
 
         completer.complete(socket);
         _subscription?.cancel();
-        _subscription = socket.listen(_controller.add);
+        _subscription = socket.listen(
+          (event) => _controller.add(r.BytesBuffer(event)),
+        );
       },
       onError: (Object e, StackTrace st) {
         _socket!.completeError(e, st);

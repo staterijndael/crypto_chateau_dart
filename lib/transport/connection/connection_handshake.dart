@@ -32,7 +32,7 @@ extension HandshakeStatusX on HandshakeStatus {
 class ConnectionHandshake implements Connection {
   final Connection _connection;
   final Encryption _encryption;
-  final _buffer = List<Uint8List>.empty(growable: true);
+  final _buffer = List<w.BytesBuffer>.empty(growable: true);
   var _handshakeStatus = HandshakeStatus.none;
   late Uint8List _publicKey;
   late Uint8List _privateKey;
@@ -40,19 +40,20 @@ class ConnectionHandshake implements Connection {
   ConnectionHandshake(this._connection, this._encryption);
 
   @override
-  Stream<Uint8List> get read {
-    final controller = StreamController<Uint8List>(sync: true);
+  Stream<r.BytesBuffer> get read {
+    final controller = StreamController<r.BytesBuffer>(sync: true);
     final subscription = _connection.read.listen(
       (bytes) => _handshakeStatus.when(
         none: () {},
         firstRequest: () {
-          _publicKey = bytes;
+          _publicKey = bytes.bytes;
           _privateKey = _createPrivateKey();
           _handshakeStatus = HandshakeStatus.secondRequest;
-          _connection.write(X25519(_privateKey, basePoint));
+          final data = w.Data(X25519(_privateKey, basePoint));
+          _connection.write(w.BytesBuffer()..add(data));
         },
         secondRequest: () {
-          if (bytes.first != 49) {
+          if (bytes.bytes.first != 49) {
             controller.addError(const ConnectionHandshakeError(), StackTrace.current);
             _buffer.clear();
 
@@ -85,12 +86,13 @@ class ConnectionHandshake implements Connection {
   }
 
   @override
-  void write(Uint8List bytes) {
+  void write(w.BytesBuffer bytes) {
     switch (_handshakeStatus) {
       case HandshakeStatus.none:
         _buffer.add(bytes);
         _handshakeStatus = HandshakeStatus.firstRequest;
-        _connection.write(Uint8List.fromList([104, 97, 110, 100, 115, 104, 97, 107, 101]));
+        final data = w.Data(Uint8List.fromList([104, 97, 110, 100, 115, 104, 97, 107, 101]));
+        _connection.write(w.BytesBuffer()..add(data));
         break;
       case HandshakeStatus.firstRequest:
       case HandshakeStatus.secondRequest:

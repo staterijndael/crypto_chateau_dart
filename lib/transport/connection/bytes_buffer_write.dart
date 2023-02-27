@@ -1,11 +1,14 @@
+import 'dart:collection';
 import 'dart:typed_data';
 
 import 'package:crypto_chateau_dart/aes_256/aes_256.dart' as aes;
 
-class BytesBufferWrite {
+class BytesBuffer {
   final _properties = List<Property>.empty(growable: true);
 
-  BytesBufferWrite();
+  BytesBuffer();
+
+  UnmodifiableListView<Property> get properties => UnmodifiableListView(_properties);
 
   void add(Property property) => _properties.add(property);
 
@@ -18,10 +21,22 @@ class BytesBufferWrite {
 
     return builder.toBytes();
   }
+
+  @override
+  String toString() => toBytes().toString();
 }
 
 abstract class Property {
   void apply(BytesBuilder builder);
+}
+
+class RequestId implements Property {
+  final int id;
+
+  const RequestId(this.id);
+
+  @override
+  void apply(BytesBuilder builder) {}
 }
 
 class Data implements Property {

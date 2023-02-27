@@ -7,22 +7,18 @@ class ConnectionCipher implements Connection {
   const ConnectionCipher(this._connection, this._encryption);
 
   @override
-  Stream<Uint8List> get read => _connection.read.map(_decrypt);
+  Stream<r.BytesBuffer> get read => _connection.read.map(_decrypt);
 
   @override
-  void write(Uint8List bytes) => _connection.write(_encrypt(bytes));
+  void write(w.BytesBuffer bytes) => _connection.write(_encrypt(bytes));
 
-  Uint8List _decrypt(Uint8List bytes) => _encryption.key.when(
+  r.BytesBuffer _decrypt(r.BytesBuffer bytes) => _encryption.key.when(
         isNull: () => bytes,
-        isNotNull: (sharedKey) => Decrypt(bytes, sharedKey),
+        isNotNull: (sharedKey) => bytes..add(r.DecryptApplier(sharedKey)),
       );
 
-  Uint8List _encrypt(Uint8List bytes) {
-    print('Before encrypt: $bytes');
-
-    return _encryption.key.when(
-      isNull: () => bytes,
-      isNotNull: (sharedKey) => Encrypt(bytes, sharedKey),
-    );
-  }
+  w.BytesBuffer _encrypt(w.BytesBuffer bytes) => _encryption.key.when(
+    isNull: () => bytes,
+    isNotNull: (sharedKey) => bytes..add(w.Encrypt(sharedKey)),
+  );
 }

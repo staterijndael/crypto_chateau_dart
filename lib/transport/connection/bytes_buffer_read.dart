@@ -3,13 +3,17 @@ import 'dart:typed_data';
 
 import 'package:crypto_chateau_dart/aes_256/aes_256.dart' as aes;
 
-class BytesBufferRead {
+class BytesBuffer {
   final Uint8List _rawBytes;
   final _properties = List<Property>.empty(growable: true);
 
-  BytesBufferRead(this._rawBytes);
+  BytesBuffer(this._rawBytes);
 
   UnmodifiableListView<Property> get properties => UnmodifiableListView(_properties);
+
+  int get length => _rawBytes.length;
+
+  Uint8List get bytes => Uint8List.fromList(_rawBytes);
 
   T add<T extends Property>(PropertyApplier<T> applier) {
     final property = applier.apply(_rawBytes);
@@ -17,6 +21,9 @@ class BytesBufferRead {
 
     return property;
   }
+
+  @override
+  String toString() => _rawBytes.toString();
 }
 
 abstract class Property {}
@@ -28,7 +35,7 @@ abstract class PropertyApplier<T extends Property> {
 class DataApplier implements PropertyApplier<Data> {
   final int? length;
 
-  const DataApplier(this.length);
+  const DataApplier([this.length]);
 
   @override
   Data apply(Uint8List bytes) {

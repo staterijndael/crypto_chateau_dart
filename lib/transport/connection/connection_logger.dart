@@ -6,12 +6,12 @@ class ConnectionLogger implements Connection {
   const ConnectionLogger(this._connection);
 
   @override
-  Stream<Uint8List> get read => _connection.read.doOnData(
+  Stream<r.BytesBuffer> get read => _connection.read.doOnData(
         (event) => print('Receive(${DateTime.now()}): $event'),
   );
 
   @override
-  void write(Uint8List bytes) {
+  void write(w.BytesBuffer bytes) {
     print('Send(${DateTime.now()}): $bytes');
     _connection.write(bytes);
   }

@@ -3,11 +3,7 @@ import 'dart:typed_data';
 import 'package:crypto_chateau_dart/client/models.dart';
 import 'package:crypto_chateau_dart/client/conv.dart';
 import 'package:crypto_chateau_dart/transport/connection/connection.dart';
-import 'package:crypto_chateau_dart/transport/multiplex_request_loop.dart';
-import 'package:crypto_chateau_dart/transport/pipe.dart';
-import 'dart:io';
 import 'package:crypto_chateau_dart/client/binary_iterator.dart';
-import 'package:crypto_chateau_dart/transport/multiplex_connection.dart';
 import 'package:crypto_chateau_dart/transport/handler.dart';
 
 var handlerHashMap = {
@@ -89,12 +85,12 @@ class Client {
     return Client._(
       connectParams: connectParams,
       pool: MultiplexRequestLoop(
-        MultiplexConnection(
-          Pipe(
+        Connection.pipe(
+          Connection.multiplex(
             Connection.handshake(
-              Pipe(
+              Connection.pipe(
                 Connection.cipher(
-                  Pipe(
+                  Connection.pipe(
                     ConnectionLogger(
                       Connection.root(connectParams),
                     ),

@@ -1,18 +1,11 @@
-import 'dart:async';
-import 'dart:typed_data';
-
-import 'package:crypto_chateau_dart/client/conv.dart';
-import 'package:crypto_chateau_dart/transport/connection/connection.dart';
-import 'package:crypto_chateau_dart/transport/handler.dart';
-import 'package:crypto_chateau_dart/transport/meta.dart';
-import 'package:crypto_chateau_dart/transport/multiplex_connection.dart';
+part of connection;
 
 class MultiplexRequestLoop {
   static const int errByte = 0x2F;
   static const int okByte = 0x20;
-  final MultiplexConnection _connection;
+  final Connection _connection;
   final _requests = <int, _RequestCompleter>{};
-  late final StreamSubscription<MultiplexMessage> _subscription;
+  late final StreamSubscription<r.BytesBuffer> _subscription;
   var _lastRequestId = 0;
 
   MultiplexRequestLoop(this._connection) {
@@ -28,15 +21,20 @@ class MultiplexRequestLoop {
     final requestCompleter = _RequestCompleter(request);
     final id = ++_lastRequestId;
     _requests[id] = requestCompleter;
-    print('PEER: ${MultiplexMessage(id, request.marshal()).toBytes()}');
-    _connection.write(MultiplexMessage(id, request.marshal()));
+    final data = w.Data(request.marshal());
+    final bytes = w.BytesBuffer()
+      ..add(w.RequestId(id))
+      ..add(data);
+    print('PEER: ${data.data}');
+    _connection.write(bytes);
 
     return requestCompleter.future;
   }
 
-  void _handleRead(MultiplexMessage message) {
-    final bytes = message.bytes;
-    final request = _requests.remove(message.requestId)!;
+  void _handleRead(r.BytesBuffer message) {
+    final bytes = message.add(const r.DataApplier()).data;
+    final requestId = message.properties.whereType<r.Multiplex>().first.requestId;
+    final request = _requests.remove(requestId)!;
     final serverRespMetaInfo = getServerRespMetaInfo(bytes);
     final offset = serverRespMetaInfo.payloadOffset;
 

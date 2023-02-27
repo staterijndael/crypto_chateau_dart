@@ -6,10 +6,15 @@ import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:crypto_chateau_dart/extensions.dart';
-import 'package:crypto_chateau_dart/aes_256/aes_256.dart';
 import 'package:crypto_chateau_dart/gen_definitions.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:x25519/x25519.dart';
+import 'package:crypto_chateau_dart/client/conv.dart';
+import 'package:crypto_chateau_dart/transport/handler.dart';
+import 'package:crypto_chateau_dart/transport/meta.dart';
+
+import 'bytes_buffer_write.dart' as w;
+import 'bytes_buffer_read.dart' as r;
 
 part 'connection_root.dart';
 part 'connection_cipher.dart';
@@ -17,6 +22,9 @@ part 'connection_handshake.dart';
 part 'connection_logger.dart';
 part 'encryption.dart';
 part 'error.dart';
+part 'pipe.dart';
+part 'multiplex_connection.dart';
+part 'multiplex_request_loop.dart';
 
 abstract class Connection {
   static ConnectionRoot root(ConnectParams connectParams) => ConnectionRoot(connectParams);
@@ -25,9 +33,13 @@ abstract class Connection {
 
   factory Connection.handshake(Connection connection, Encryption encryption) = ConnectionHandshake;
 
+  factory Connection.pipe(Connection connection) = ConnectionPipe;
+
+  factory Connection.multiplex(Connection connection) = MultiplexConnection;
+
   factory Connection.logger(Connection connection) = ConnectionLogger;
 
-  Stream<Uint8List> get read;
+  Stream<r.BytesBuffer> get read;
 
-  void write(Uint8List bytes);
+  void write(w.BytesBuffer bytes);
 }
