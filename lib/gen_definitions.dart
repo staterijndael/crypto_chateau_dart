@@ -5,6 +5,7 @@ import 'package:crypto_chateau_dart/client/conv.dart';
 import 'package:crypto_chateau_dart/transport/connection/connection.dart';
 import 'package:crypto_chateau_dart/client/binary_iterator.dart';
 import 'package:crypto_chateau_dart/transport/handler.dart';
+import 'package:crypto_chateau_dart/version/version.dart';
 
 var handlerHashMap = {
   "UserEndpoint": {
@@ -81,28 +82,12 @@ class Client {
     required ConnectParams connectParams,
   }) {
     final encryption = Encryption();
+    final connection =
+        Connection.root(connectParams).logger().pipe().cipher(encryption).handshake(encryption).multiplex().pipe();
 
     return Client._(
       connectParams: connectParams,
-      pool: MultiplexRequestLoop(
-        Connection.pipe(
-          Connection.multiplex(
-            Connection.handshake(
-              Connection.pipe(
-                Connection.cipher(
-                  Connection.pipe(
-                    ConnectionLogger(
-                      Connection.root(connectParams),
-                    ),
-                  ),
-                  encryption,
-                ),
-              ),
-              encryption,
-            ),
-          ),
-        ),
-      ),
+      pool: MultiplexRequestLoop(connection),
     );
   }
 
@@ -122,18 +107,24 @@ class ReverseStringRequestAlt implements Request<ReverseStringResponseAlt> {
 
   @override
   Uint8List marshal() {
-    List<int> b = [];
+    final builder = BytesBuilder(copy: false);
 
-    List<int> size = ConvertSizeToBytes(0);
-    b.addAll(size);
-    b.addAll(ConvertSizeToBytes(str.codeUnits.length));
-    b.addAll(ConvertStringToBytes(str));
-    size = ConvertSizeToBytes(b.length - size.length);
+    var size = ConvertSizeToBytes(0);
+    builder.add(size);
+    builder.add(ConvertSizeToBytes(str.codeUnits.length));
+    builder.add(ConvertStringToBytes(str));
+    size = ConvertSizeToBytes(builder.length - size.length);
+    final bytes = builder.takeBytes();
+
     for (int i = 0; i < size.length; i++) {
-      b[i] = size[i];
+      bytes[i] = size[i];
     }
 
-    return Uint8List.fromList(b);
+    builder.addByte(newProtocolByte());
+    builder.add(_handlerHash.hash);
+    builder.add(bytes);
+
+    return builder.toBytes();
   }
 
   @override

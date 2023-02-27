@@ -25,7 +25,6 @@ class MultiplexRequestLoop {
     final bytes = w.BytesBuffer()
       ..add(w.RequestId(id))
       ..add(data);
-    print('PEER: ${data.data}');
     _connection.write(bytes);
 
     return requestCompleter.future;
@@ -50,6 +49,9 @@ class MultiplexRequestLoop {
   }
 
   void _handleReadError(Object error, StackTrace stackTrace) {
+    print(error);
+    print(stackTrace);
+
     if (error is ConnectionErrorFatal) {
       for (var request in _requests.values) {
         request.completeError(error, stackTrace);

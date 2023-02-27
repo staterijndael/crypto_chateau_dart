@@ -18,7 +18,7 @@ class ConnectionCipher implements Connection {
       );
 
   w.BytesBuffer _encrypt(w.BytesBuffer bytes) => _encryption.key.when(
-    isNull: () => bytes,
-    isNotNull: (sharedKey) => bytes..add(w.Encrypt(sharedKey)),
-  );
+        isNull: () => bytes,
+        isNotNull: (sharedKey) => bytes..add(w.Encrypt(sharedKey)),
+      );
 }

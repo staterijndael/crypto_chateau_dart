@@ -2,6 +2,7 @@ import 'dart:collection';
 import 'dart:typed_data';
 
 import 'package:crypto_chateau_dart/aes_256/aes_256.dart' as aes;
+import 'package:crypto_chateau_dart/transport/bytes_writer.dart';
 
 class BytesBuffer {
   final _properties = List<Property>.empty(growable: true);
@@ -13,13 +14,13 @@ class BytesBuffer {
   void add(Property property) => _properties.add(property);
 
   Uint8List toBytes() {
-    final builder = BytesBuilder();
+    final writer = BytesWriter();
 
     for (var property in _properties) {
-      property.apply(builder);
+      property.apply(writer);
     }
 
-    return builder.toBytes();
+    return writer.toBytes();
   }
 
   @override
@@ -27,7 +28,7 @@ class BytesBuffer {
 }
 
 abstract class Property {
-  void apply(BytesBuilder builder);
+  void apply(BytesWriter writer);
 }
 
 class RequestId implements Property {
@@ -36,7 +37,7 @@ class RequestId implements Property {
   const RequestId(this.id);
 
   @override
-  void apply(BytesBuilder builder) {}
+  void apply(BytesWriter writer) {}
 }
 
 class Data implements Property {
@@ -45,19 +46,19 @@ class Data implements Property {
   const Data(this.data);
 
   @override
-  void apply(BytesBuilder builder) => builder.add(data);
+  void apply(BytesWriter writer) => writer.addFirst(data);
 }
 
 class Length implements Property {
   const Length();
 
   @override
-  void apply(BytesBuilder builder) {
-    final length = builder.length;
+  void apply(BytesWriter writer) {
+    final length = writer.length;
     final bytes = Uint8List(2)
       ..[0] = length & 0xff
       ..[1] = (length & 0xff00) >> 8;
-    builder.add(bytes);
+    writer.addFirst(bytes);
   }
 }
 
@@ -67,11 +68,11 @@ class Multiplex implements Property {
   const Multiplex(this.requestId);
 
   @override
-  void apply(BytesBuilder builder) {
+  void apply(BytesWriter writer) {
     final bytes = Uint8List(2)
       ..[0] = (requestId >> 0) & 0xFF
       ..[1] = (requestId >> 8) & 0xFF;
-    builder.add(bytes);
+    writer.addFirst(bytes);
   }
 }
 
@@ -81,8 +82,9 @@ class Encrypt implements Property {
   const Encrypt(this.sharedKey);
 
   @override
-  void apply(BytesBuilder builder) {
-    final bytes = builder.takeBytes();
-    builder.add(aes.Encrypt(bytes, sharedKey));
+  void apply(BytesWriter writer) {
+    final bytes = writer.takeBytes();
+    final newBytes = aes.Encrypt(bytes, sharedKey);
+    writer.addFirst(newBytes);
   }
 }

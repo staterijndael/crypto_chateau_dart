@@ -11,7 +11,8 @@ void main() async {
     connectParams: kConnectParams,
   );
 
-  // await Future.delayed(const Duration(milliseconds: 1000));
-  final response = await client.reverseString(const ReverseStringRequestAlt(str: 'alice'));
-  print(response.res);
+  Future.wait([
+    for (var i = 0; i < 10; i++)
+      client.reverseString(ReverseStringRequestAlt(str: 'alice$i')).then((value) => print('$i: ${value.res}'))
+  ]);
 }

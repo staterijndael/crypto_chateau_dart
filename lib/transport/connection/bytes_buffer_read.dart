@@ -2,34 +2,35 @@ import 'dart:collection';
 import 'dart:typed_data';
 
 import 'package:crypto_chateau_dart/aes_256/aes_256.dart' as aes;
+import 'package:crypto_chateau_dart/transport/bytes_reader.dart';
 
 class BytesBuffer {
-  final Uint8List _rawBytes;
+  final BytesReader _reader;
   final _properties = List<Property>.empty(growable: true);
 
-  BytesBuffer(this._rawBytes);
+  BytesBuffer(Uint8List bytes) : _reader = BytesReader(bytes);
 
   UnmodifiableListView<Property> get properties => UnmodifiableListView(_properties);
 
-  int get length => _rawBytes.length;
+  int get length => _reader.length;
 
-  Uint8List get bytes => Uint8List.fromList(_rawBytes);
+  Uint8List get bytes => _reader.bytes;
 
   T add<T extends Property>(PropertyApplier<T> applier) {
-    final property = applier.apply(_rawBytes);
+    final property = applier.apply(_reader);
     _properties.add(property);
 
     return property;
   }
 
   @override
-  String toString() => _rawBytes.toString();
+  String toString() => _reader.toString();
 }
 
 abstract class Property {}
 
 abstract class PropertyApplier<T extends Property> {
-  T apply(Uint8List bytes);
+  T apply(BytesReader reader);
 }
 
 class DataApplier implements PropertyApplier<Data> {
@@ -38,16 +39,16 @@ class DataApplier implements PropertyApplier<Data> {
   const DataApplier([this.length]);
 
   @override
-  Data apply(Uint8List bytes) {
+  Data apply(BytesReader reader) {
     if (length == null) {
-      final data = Uint8List.fromList(bytes);
-      bytes.clear();
+      final data = reader.bytes;
+      reader.clear();
 
       return Data(data);
     }
 
-    final data = bytes.sublist(0, length!);
-    bytes.removeRange(0, length!);
+    final data = reader.bytes.sublist(0, length!);
+    reader.removeLeft(length!);
 
     return Data(data);
   }
@@ -63,9 +64,10 @@ class LengthApplier implements PropertyApplier<Length> {
   const LengthApplier();
 
   @override
-  Length apply(Uint8List bytes) {
+  Length apply(BytesReader reader) {
+    final bytes = reader.bytes;
     final length = bytes[0] | bytes[1] << 8;
-    bytes.removeRange(0, 1);
+    reader.removeLeft(2);
 
     return Length(length);
   }
@@ -81,9 +83,10 @@ class MultiplexApplier implements PropertyApplier<Multiplex> {
   const MultiplexApplier();
 
   @override
-  Multiplex apply(Uint8List bytes) {
+  Multiplex apply(BytesReader reader) {
+    final bytes = reader.bytes;
     final requestId = (bytes[0] & 0xff) | ((bytes[1] & 0xff) << 8);
-    bytes.removeRange(0, 1);
+    reader.removeLeft(2);
 
     return Multiplex(requestId);
   }
@@ -101,10 +104,9 @@ class DecryptApplier implements PropertyApplier<Decrypt> {
   const DecryptApplier(this.sharedKey);
 
   @override
-  Decrypt apply(Uint8List bytes) {
-    final newBytes = aes.Decrypt(bytes, sharedKey);
-    bytes.clear();
-    bytes.addAll(newBytes);
+  Decrypt apply(BytesReader reader) {
+    final newBytes = aes.Decrypt(reader.bytes, sharedKey);
+    reader.rewrite(newBytes);
 
     return const Decrypt();
   }

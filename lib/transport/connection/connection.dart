@@ -7,6 +7,7 @@ import 'dart:typed_data';
 
 import 'package:crypto_chateau_dart/extensions.dart';
 import 'package:crypto_chateau_dart/gen_definitions.dart';
+import 'package:crypto_chateau_dart/transport/utils.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:x25519/x25519.dart';
 import 'package:crypto_chateau_dart/client/conv.dart';
@@ -37,9 +38,21 @@ abstract class Connection {
 
   factory Connection.multiplex(Connection connection) = MultiplexConnection;
 
-  factory Connection.logger(Connection connection) = ConnectionLogger;
+  factory Connection.logger(Connection connection, [String name]) = ConnectionLogger;
 
   Stream<r.BytesBuffer> get read;
 
   void write(w.BytesBuffer bytes);
+}
+
+extension ConnectionX on Connection {
+  Connection cipher(Encryption encryption) => Connection.cipher(this, encryption);
+
+  Connection handshake(Encryption encryption) => Connection.handshake(this, encryption);
+
+  Connection pipe() => Connection.pipe(this);
+
+  Connection multiplex() => Connection.multiplex(this);
+
+  Connection logger([String? name]) => Connection.logger(this);
 }
