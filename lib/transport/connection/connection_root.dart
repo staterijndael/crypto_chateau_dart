@@ -1,9 +1,21 @@
 part of connection;
 
+class ConnectParams {
+  final String host;
+  final int port;
+  final bool isEncryptionEnabled;
+
+  ConnectParams({
+    required this.host,
+    required this.port,
+    required this.isEncryptionEnabled,
+  });
+}
+
 class ConnectionRoot implements Connection {
   final ConnectParams connectParams;
-  late final _controller = StreamController<r.BytesBuffer>(sync: true);
-  StreamSubscription<Uint8List>? _subscription;
+  final _readController = StreamController<r.BytesBuffer>(sync: true);
+  StreamSubscription<Uint8List>? _socketSubscription;
   Completer<Socket>? _socket;
   var _closed = false;
 
@@ -13,18 +25,18 @@ class ConnectionRoot implements Connection {
     if (_closed) return;
 
     _closed = true;
-    await _subscription?.cancel();
-    await _controller.close();
+    await _socketSubscription?.cancel();
+    await _readController.close();
     (await _socket?.future)?.destroy();
   }
 
   @override
-  Stream<r.BytesBuffer> get read => _controller.stream;
+  Stream<r.BytesBuffer> get read => _readController.stream;
 
   @override
   void write(w.BytesBuffer bytes) => _initSocket().then(
         (socket) => socket.add(bytes.toBytes()),
-        onError: _controller.addError,
+        onError: _readController.addError,
       );
 
   Future<Socket> _initSocket() {
@@ -39,9 +51,9 @@ class ConnectionRoot implements Connection {
         if (_closed) socket.destroy();
 
         completer.complete(socket);
-        _subscription?.cancel();
-        _subscription = socket.listen(
-          (event) => _controller.add(r.BytesBuffer(event)),
+        _socketSubscription?.cancel();
+        _socketSubscription = socket.listen(
+          (event) => _readController.add(r.BytesBuffer(event)),
         );
       },
       onError: (Object e, StackTrace st) {

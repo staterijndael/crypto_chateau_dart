@@ -6,7 +6,6 @@ import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:crypto_chateau_dart/extensions.dart';
-import 'package:crypto_chateau_dart/gen_definitions.dart';
 import 'package:crypto_chateau_dart/transport/utils.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:x25519/x25519.dart';
@@ -23,7 +22,7 @@ part 'connection_handshake.dart';
 part 'connection_logger.dart';
 part 'encryption.dart';
 part 'error.dart';
-part 'pipe.dart';
+part 'connection_pipe.dart';
 part 'multiplex_connection.dart';
 part 'multiplex_request_loop.dart';
 
