@@ -2,10 +2,10 @@ import 'dart:typed_data';
 
 import 'package:crypto_chateau_dart/aes_256/aes_256.dart' as aes;
 
-class BytesWriteBuffer {
+class BytesBufferWrite {
   final _properties = List<Property>.empty(growable: true);
 
-  BytesWriteBuffer();
+  BytesBufferWrite();
 
   void add(Property property) => _properties.add(property);
 
@@ -22,6 +22,15 @@ class BytesWriteBuffer {
 
 abstract class Property {
   void apply(BytesBuilder builder);
+}
+
+class Data implements Property {
+  final Uint8List data;
+
+  const Data(this.data);
+
+  @override
+  void apply(BytesBuilder builder) => builder.add(data);
 }
 
 class Length implements Property {
