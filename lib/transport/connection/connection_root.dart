@@ -5,7 +5,7 @@ class ConnectParams {
   final int port;
   final bool isEncryptionEnabled;
 
-  ConnectParams({
+  const ConnectParams({
     required this.host,
     required this.port,
     required this.isEncryptionEnabled,

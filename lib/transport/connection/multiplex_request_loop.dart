@@ -17,11 +17,17 @@ class MultiplexRequestLoop {
 
   Future<void> close() => _subscription.cancel();
 
-  Future<T> sendRequest<T extends Response>(Request<T> request) async {
-    final requestCompleter = _RequestCompleter(request);
+  Future<T> sendRequest<T extends Message>(HandlerHash hash, Message request, T response) async {
+    final builder = BytesBuilder(copy: false);
+    builder.addByte(newProtocolByte());
+    builder.add(hash.hash);
+    builder.add(request.Marshal());
+
+    final requestCompleter = _RequestCompleter(response);
     final id = ++_lastRequestId;
     _requests[id] = requestCompleter;
-    final data = w.Data(request.marshal());
+
+    final data = w.Data(builder.toBytes());
     final bytes = w.BytesBuffer()
       ..add(w.RequestId(id))
       ..add(data);
@@ -49,9 +55,6 @@ class MultiplexRequestLoop {
   }
 
   void _handleReadError(Object error, StackTrace stackTrace) {
-    print(error);
-    print(stackTrace);
-
     if (error is ConnectionErrorFatal) {
       for (var request in _requests.values) {
         request.completeError(error, stackTrace);
@@ -62,17 +65,17 @@ class MultiplexRequestLoop {
   }
 }
 
-class _RequestCompleter<T extends Response> {
-  final Request<T> request;
+class _RequestCompleter<T extends Message> {
+  final T response;
   final _completer = Completer<T>();
 
-  _RequestCompleter(this.request);
+  _RequestCompleter(this.response);
 
   Future<T> get future => _completer.future;
 
   void unmarshal(Uint8List bytes) {
     try {
-      final response = request.unmarshal(bytes);
+      response.Unmarshal(BinaryIterator(bytes));
       _completer.complete(response);
     } on Object catch (e, st) {
       completeError(e, st);
