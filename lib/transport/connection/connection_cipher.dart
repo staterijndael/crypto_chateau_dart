@@ -1,42 +1,21 @@
 part of connection;
 
-class ConnectionCipher implements Connection {
-  final Connection _connection;
+class ConnectionCipher extends ConnectionBase {
   final Encryption _encryption;
-  late final StreamController<r.BytesBuffer> _controller;
   late _State _state;
-  bool _listenConnection = false;
 
-  ConnectionCipher(this._connection, this._encryption) {
+  ConnectionCipher(super._connection, this._encryption) {
     _state = _encryption.key.when(
       isNull: () => _StateNone(this),
       isNotNull: (_) => _StateIdle(this),
     );
-    _controller = StreamController<r.BytesBuffer>(sync: true)
-      ..onListen = _startListenConnection;
   }
 
   @override
-  Stream<r.BytesBuffer> get read => _controller.stream;
-
-  @override
-  void write(w.BytesBuffer buffer) {
-    _startListenConnection();
-    _state.write(buffer);
-  }
-
-  void _startListenConnection() {
-    if (_listenConnection) return;
-
-    final subscription = _connection.read.listen(_read);
-    _controller
-      ..onResume = subscription.resume
-      ..onPause = subscription.pause
-      ..onCancel = subscription.cancel;
-    _listenConnection = true;
-  }
-
   void _read(r.BytesBuffer buffer) => _state.read(buffer);
+
+  @override
+  void write(w.BytesBuffer buffer) => _state.write(buffer);
 }
 
 abstract class _State {
@@ -65,20 +44,24 @@ class _StateInProgress implements _State {
   final ConnectionCipher _context;
   late _StateInProgressState _state;
   final _buffer = List<w.BytesBuffer>.empty(growable: true);
+  late final Pipe _pipe;
 
   _StateInProgress(this._context) {
+    _pipe = Pipe(
+      onRead: (buffer) => _state.read(buffer),
+      onWrite: _context._connection.write,
+    );
     _state = _StateInProgressStateFirstRequest(this);
   }
 
   @override
-  void read(r.BytesBuffer buffer) => _state.read(buffer..add(const r.LengthApplier()));
+  void read(r.BytesBuffer buffer) => _pipe.read(buffer);
 
   @override
   void write(w.BytesBuffer buffer) => _buffer.add(buffer);
 
-  Connection get _connection => _context._connection;
-
-  void _write(w.BytesBuffer buffer) => _connection.write(buffer..add(const w.Length()));
+  /// метод отправки данных для состояний (обёрнут в Pipe)
+  void _write(w.BytesBuffer buffer) => _pipe.write(buffer);
 
   void _toIdle(Uint8List encryptionKey) {
     _context._encryption.key = encryptionKey;

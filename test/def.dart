@@ -75,7 +75,7 @@ class Client {
   }) {
     final encryption = Encryption();
     final connection =
-    Connection.root(connectParams).pipe().cipher(encryption).multiplex().pipe();
+    Connection.root(connectParams).logger().pipe().cipher(encryption).multiplex().pipe();
 
     return Client._(
       connectParams: connectParams,

@@ -17,6 +17,7 @@ import 'bytes_buffer_write.dart' as w;
 import 'bytes_buffer_read.dart' as r;
 
 part 'connection_root.dart';
+part 'connection_base.dart';
 part 'connection_cipher.dart';
 part 'connection_logger.dart';
 part 'encryption.dart';

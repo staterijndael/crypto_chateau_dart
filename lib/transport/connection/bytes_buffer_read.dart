@@ -23,6 +23,8 @@ class BytesBuffer {
     return property;
   }
 
+  void merge(BytesBuffer buffer) => _reader.rewrite(Uint8List.fromList(_reader.bytes + buffer.bytes));
+
   @override
   String toString() => _reader.toString();
 }

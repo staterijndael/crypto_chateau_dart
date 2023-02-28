@@ -1,18 +1,14 @@
 part of connection;
 
-class MultiplexConnection implements Connection {
-  final Connection _connection;
-
-  MultiplexConnection(this._connection);
+class MultiplexConnection extends ConnectionBase {
+  MultiplexConnection(super._connection);
 
   @override
-  Stream<r.BytesBuffer> get read => _connection.read.map(
-        (event) => event..add(const r.MultiplexApplier()),
-      );
+  void _read(r.BytesBuffer buffer) => _controller.add(buffer..add(const r.MultiplexApplier()));
 
   @override
-  void write(w.BytesBuffer bytes) {
-    final requestId = bytes.properties.first as w.RequestId;
-    _connection.write(bytes..add(w.Multiplex(requestId.id)));
+  void write(w.BytesBuffer buffer) {
+    final requestId = buffer.properties.first as w.RequestId;
+    super.write(buffer..add(w.Multiplex(requestId.id)));
   }
 }
