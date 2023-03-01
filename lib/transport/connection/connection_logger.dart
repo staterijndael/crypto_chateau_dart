@@ -1,4 +1,7 @@
-part of connection;
+import 'dart:async';
+import 'bytes_buffer_write.dart' as w;
+import 'bytes_buffer_read.dart' as r;
+import 'connection_base.dart';
 
 class ConnectionLogger extends ConnectionBase {
   final String? name;

@@ -1,4 +1,10 @@
-part of connection;
+import 'dart:async';
+import 'dart:typed_data';
+import 'package:crypto_chateau_dart/crypto_chateau_dart.dart';
+import 'package:crypto_chateau_dart/version/version.dart';
+import 'package:crypto_chateau_dart/transport/meta.dart';
+import 'bytes_buffer_write.dart' as w;
+import 'bytes_buffer_read.dart' as r;
 
 class MultiplexRequestLoop {
   static const int errByte = 0x2F;

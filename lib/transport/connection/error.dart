@@ -1,4 +1,4 @@
-part of connection;
+import 'dart:typed_data';
 
 abstract class ConnectionError implements Exception {}
 

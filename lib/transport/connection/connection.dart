@@ -1,29 +1,24 @@
 library connection;
 
 import 'dart:async';
-import 'dart:io';
-import 'dart:math';
-import 'dart:typed_data';
-
-import 'package:crypto_chateau_dart/crypto_chateau_dart.dart';
-import 'package:crypto_chateau_dart/extensions.dart';
-import 'package:crypto_chateau_dart/transport/utils.dart';
-import 'package:crypto_chateau_dart/version/version.dart';
-import 'package:x25519/x25519.dart';
-import 'package:crypto_chateau_dart/transport/meta.dart';
-
 import 'bytes_buffer_write.dart' as w;
 import 'bytes_buffer_read.dart' as r;
+import 'connection_root.dart';
+import 'connection_cipher.dart';
+import 'connection_logger.dart';
+import 'connection_pipe.dart';
+import 'multiplex_connection.dart';
+import 'encryption.dart';
 
-part 'connection_root.dart';
-part 'connection_base.dart';
-part 'connection_cipher.dart';
-part 'connection_logger.dart';
-part 'encryption.dart';
-part 'error.dart';
-part 'connection_pipe.dart';
-part 'multiplex_connection.dart';
-part 'multiplex_request_loop.dart';
+export 'connection_base.dart';
+export 'connection_root.dart';
+export 'connection_cipher.dart';
+export 'connection_logger.dart';
+export 'connection_pipe.dart';
+export 'multiplex_connection.dart';
+export 'multiplex_request_loop.dart';
+export 'error.dart';
+export 'encryption.dart';
 
 abstract class Connection {
   static ConnectionRoot root(ConnectParams connectParams) => ConnectionRoot(connectParams);

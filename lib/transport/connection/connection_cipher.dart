@@ -1,4 +1,15 @@
-part of connection;
+import 'dart:math';
+import 'dart:typed_data';
+
+import 'package:crypto_chateau_dart/extensions.dart';
+import 'package:crypto_chateau_dart/transport/connection/connection_pipe.dart';
+import 'package:crypto_chateau_dart/transport/connection/encryption.dart';
+import 'package:crypto_chateau_dart/transport/connection/error.dart';
+import 'package:crypto_chateau_dart/transport/utils.dart';
+import 'package:x25519/x25519.dart';
+import 'connection_base.dart';
+import 'bytes_buffer_write.dart' as w;
+import 'bytes_buffer_read.dart' as r;
 
 class ConnectionCipher extends ConnectionBase {
   final Encryption _encryption;

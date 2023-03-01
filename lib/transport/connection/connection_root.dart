@@ -1,4 +1,9 @@
-part of connection;
+import 'dart:async';
+import 'dart:io';
+import 'dart:typed_data';
+import 'package:crypto_chateau_dart/crypto_chateau_dart.dart';
+import 'bytes_buffer_write.dart' as w;
+import 'bytes_buffer_read.dart' as r;
 
 class ConnectParams {
   final String host;
