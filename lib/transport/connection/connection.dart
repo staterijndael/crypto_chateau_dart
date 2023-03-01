@@ -9,7 +9,6 @@ import 'package:crypto_chateau_dart/crypto_chateau_dart.dart';
 import 'package:crypto_chateau_dart/extensions.dart';
 import 'package:crypto_chateau_dart/transport/utils.dart';
 import 'package:crypto_chateau_dart/version/version.dart';
-import 'package:rxdart/rxdart.dart';
 import 'package:x25519/x25519.dart';
 import 'package:crypto_chateau_dart/transport/meta.dart';
 
@@ -35,7 +34,7 @@ abstract class Connection {
 
   factory Connection.multiplex(Connection connection) = MultiplexConnection;
 
-  factory Connection.logger(Connection connection, [String name]) = ConnectionLogger;
+  factory Connection.logger(Connection connection, [String? name]) = ConnectionLogger;
 
   Stream<r.BytesBuffer> get read;
 
@@ -49,5 +48,5 @@ extension ConnectionX on Connection {
 
   Connection multiplex() => Connection.multiplex(this);
 
-  Connection logger([String? name]) => Connection.logger(this);
+  Connection logger([String? name]) => Connection.logger(this, name);
 }

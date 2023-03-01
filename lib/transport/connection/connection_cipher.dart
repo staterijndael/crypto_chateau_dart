@@ -12,14 +12,16 @@ class ConnectionCipher extends ConnectionBase {
   }
 
   @override
-  void _read(r.BytesBuffer buffer) => _state.read(buffer);
+  Stream<r.BytesBuffer> get read => super.read.asyncExpand((buffer) => _state.read(buffer));
 
   @override
   void write(w.BytesBuffer buffer) => _state.write(buffer);
+
+  void Function(w.BytesBuffer buffer) get _write => super.write;
 }
 
 abstract class _State {
-  void read(r.BytesBuffer buffer);
+  Stream<r.BytesBuffer> read(r.BytesBuffer event);
 
   void write(w.BytesBuffer buffer);
 }
@@ -32,7 +34,7 @@ class _StateNone implements _State {
   _StateNone(this._context);
 
   @override
-  void read(r.BytesBuffer buffer) {}
+  Stream<r.BytesBuffer> read(r.BytesBuffer event) => Stream.empty();
 
   @override
   void write(w.BytesBuffer buffer) => _context._state = _StateInProgress(_context)..write(buffer);
@@ -44,24 +46,25 @@ class _StateInProgress implements _State {
   final ConnectionCipher _context;
   late _StateInProgressState _state;
   final _buffer = List<w.BytesBuffer>.empty(growable: true);
-  late final Pipe _pipe;
+  final _pipe = Pipe();
 
   _StateInProgress(this._context) {
-    _pipe = Pipe(
-      onRead: (buffer) => _state.read(buffer),
-      onWrite: _context._connection.write,
-    );
     _state = _StateInProgressStateFirstRequest(this);
   }
 
+  /// Преобразует байты через Pipe, затем оборачивает StreamSink
+  /// в _RedirectSink, чтоб перенаправить вызов чтения Pipe в [_state]
   @override
-  void read(r.BytesBuffer buffer) => _pipe.read(buffer);
+  Stream<r.BytesBuffer> read(r.BytesBuffer buffer) => _pipe.read(buffer).asyncExpand((buffer) => _state.read(buffer));
 
   @override
   void write(w.BytesBuffer buffer) => _buffer.add(buffer);
 
-  /// метод отправки данных для состояний (обёрнут в Pipe)
-  void _write(w.BytesBuffer buffer) => _pipe.write(buffer);
+  /// Метод отправки данных для состояний (обёрнут в Pipe)
+  void _write(w.BytesBuffer buffer) {
+    _pipe.write(buffer);
+    _context._write(buffer);
+  }
 
   void _toIdle(Uint8List encryptionKey) {
     _context._encryption.key = encryptionKey;
@@ -77,14 +80,10 @@ class _StateIdle implements _State {
   _StateIdle(this._context);
 
   @override
-  void read(r.BytesBuffer buffer) => _controller.add(_decrypt(buffer));
+  Stream<r.BytesBuffer> read(r.BytesBuffer buffer) => Stream.value(_decrypt(buffer));
 
   @override
-  void write(w.BytesBuffer buffer) => _connection.write(_encrypt(buffer));
-
-  StreamController<r.BytesBuffer> get _controller => _context._controller;
-
-  Connection get _connection => _context._connection;
+  void write(w.BytesBuffer buffer) => _context._write(_encrypt(buffer));
 
   Encryption get _encryption => _context._encryption;
 
@@ -100,7 +99,7 @@ class _StateIdle implements _State {
 }
 
 abstract class _StateInProgressState {
-  void read(r.BytesBuffer buffer);
+  Stream<r.BytesBuffer> read(r.BytesBuffer buffer);
 }
 
 /// При создании отправляет на сервер первый ключ для рукопожатия
@@ -114,7 +113,7 @@ class _StateInProgressStateFirstRequest implements _StateInProgressState {
   }
 
   @override
-  void read(r.BytesBuffer buffer) {
+  Stream<r.BytesBuffer> read(r.BytesBuffer buffer) async* {
     final publicKey = buffer.bytes;
     final privateKey = _createPrivateKey();
     _context._state = _StateInProgressStateSecondRequest(_context, privateKey, publicKey);
@@ -149,7 +148,7 @@ class _StateInProgressStateSecondRequest implements _StateInProgressState {
   }
 
   @override
-  void read(r.BytesBuffer buffer) {
+  Stream<r.BytesBuffer> read(r.BytesBuffer buffer) async* {
     if (buffer.bytes.first != 49) {
       throw ConnectionHandshakeError(buffer.bytes);
     }

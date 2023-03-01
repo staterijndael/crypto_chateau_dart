@@ -3,8 +3,9 @@ part of connection;
 class MultiplexConnection extends ConnectionBase {
   MultiplexConnection(super._connection);
 
-  @override
-  void _read(r.BytesBuffer buffer) => _controller.add(buffer..add(const r.MultiplexApplier()));
+  Stream<r.BytesBuffer> get read => super.read.map(
+        (buffer) => buffer..add(const r.MultiplexApplier()),
+      );
 
   @override
   void write(w.BytesBuffer buffer) {

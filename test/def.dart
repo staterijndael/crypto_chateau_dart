@@ -136,13 +136,13 @@ class UpdateFcmTokenReq implements Message {
     List<int> size = ConvertSizeToBytes(0);
     b.addAll(size);
     List<int> arrBufSessionToken = [];
-    for (var elSessionToken in SessionToken!) {
+    for (var elSessionToken in SessionToken) {
       arrBufSessionToken.addAll(ConvertByteToBytes(elSessionToken));
     }
     b.addAll(ConvertSizeToBytes(arrBufSessionToken.length));
     b.addAll(arrBufSessionToken);
-    b.addAll(ConvertSizeToBytes(FcmToken!.codeUnits.length));
-    b.addAll(ConvertStringToBytes(FcmToken!));
+    b.addAll(ConvertSizeToBytes(FcmToken.codeUnits.length));
+    b.addAll(ConvertStringToBytes(FcmToken));
     size = ConvertSizeToBytes(b.length - size.length);
     for (int i = 0; i < size.length; i++) {
       b[i] = size[i];
@@ -171,7 +171,7 @@ class UpdateFcmTokenReq implements Message {
       elSessionToken = ConvertBytesToByte(binaryCtx.buf);
 
 
-      SessionToken![binaryCtx.pos] = elSessionToken;
+      SessionToken[binaryCtx.pos] = elSessionToken;
       binaryCtx.pos++;
     }
 
@@ -231,22 +231,22 @@ class GroupMessage implements Message {
     List<int> size = ConvertSizeToBytes(0);
     b.addAll(size);
     List<int> arrBufGroupIK = [];
-    for (var elGroupIK in GroupIK!) {
+    for (var elGroupIK in GroupIK) {
       arrBufGroupIK.addAll(ConvertByteToBytes(elGroupIK));
     }
     b.addAll(ConvertSizeToBytes(arrBufGroupIK.length));
     b.addAll(arrBufGroupIK);
-    b.addAll(ConvertUint32ToBytes(MessageID!));
-    b.addAll(ConvertSizeToBytes(MessageType!.codeUnits.length));
-    b.addAll(ConvertStringToBytes(MessageType!));
+    b.addAll(ConvertUint32ToBytes(MessageID));
+    b.addAll(ConvertSizeToBytes(MessageType.codeUnits.length));
+    b.addAll(ConvertStringToBytes(MessageType));
     List<int> arrBufContent = [];
-    for (var elContent in Content!) {
+    for (var elContent in Content) {
       arrBufContent.addAll(ConvertByteToBytes(elContent));
     }
     b.addAll(ConvertSizeToBytes(arrBufContent.length));
     b.addAll(arrBufContent);
     List<int> arrBufAttachments = [];
-    for (var elAttachments in Attachments!) {
+    for (var elAttachments in Attachments) {
       arrBufAttachments.addAll(elAttachments.Marshal());
     }
     b.addAll(ConvertSizeToBytes(arrBufAttachments.length));
@@ -279,7 +279,7 @@ class GroupMessage implements Message {
       elGroupIK = ConvertBytesToByte(binaryCtx.buf);
 
 
-      GroupIK![binaryCtx.pos] = elGroupIK;
+      GroupIK[binaryCtx.pos] = elGroupIK;
       binaryCtx.pos++;
     }
 
@@ -311,7 +311,7 @@ class GroupMessage implements Message {
       elContent = ConvertBytesToByte(binaryCtx.buf);
 
 
-      Content![binaryCtx.pos] = elContent;
+      Content[binaryCtx.pos] = elContent;
       binaryCtx.pos++;
     }
     binaryCtx.size = b.nextSize();
@@ -327,10 +327,10 @@ class GroupMessage implements Message {
 
       binaryCtx.size = binaryCtx.arrBuf.nextSize();
       binaryCtx.buf = binaryCtx.arrBuf.slice(binaryCtx.size);
-      elAttachments!.Unmarshal(binaryCtx.buf);
+      elAttachments.Unmarshal(binaryCtx.buf);
 
 
-      Attachments![binaryCtx.pos] = elAttachments;
+      Attachments[binaryCtx.pos] = elAttachments;
       binaryCtx.pos++;
     }
   }
@@ -357,28 +357,28 @@ class SendMessageGroupReq implements Message {
 
     List<int> size = ConvertSizeToBytes(0);
     b.addAll(size);
-    b.addAll(ConvertSizeToBytes(MessageType!.codeUnits.length));
-    b.addAll(ConvertStringToBytes(MessageType!));
+    b.addAll(ConvertSizeToBytes(MessageType.codeUnits.length));
+    b.addAll(ConvertStringToBytes(MessageType));
     List<int> arrBufGroupIK = [];
-    for (var elGroupIK in GroupIK!) {
+    for (var elGroupIK in GroupIK) {
       arrBufGroupIK.addAll(ConvertByteToBytes(elGroupIK));
     }
     b.addAll(ConvertSizeToBytes(arrBufGroupIK.length));
     b.addAll(arrBufGroupIK);
     List<int> arrBufContent = [];
-    for (var elContent in Content!) {
+    for (var elContent in Content) {
       arrBufContent.addAll(ConvertByteToBytes(elContent));
     }
     b.addAll(ConvertSizeToBytes(arrBufContent.length));
     b.addAll(arrBufContent);
     List<int> arrBufAttachments = [];
-    for (var elAttachments in Attachments!) {
+    for (var elAttachments in Attachments) {
       arrBufAttachments.addAll(elAttachments.Marshal());
     }
     b.addAll(ConvertSizeToBytes(arrBufAttachments.length));
     b.addAll(arrBufAttachments);
     List<int> arrBufSessionToken = [];
-    for (var elSessionToken in SessionToken!) {
+    for (var elSessionToken in SessionToken) {
       arrBufSessionToken.addAll(ConvertByteToBytes(elSessionToken));
     }
     b.addAll(ConvertSizeToBytes(arrBufSessionToken.length));
@@ -418,7 +418,7 @@ class SendMessageGroupReq implements Message {
       elGroupIK = ConvertBytesToByte(binaryCtx.buf);
 
 
-      GroupIK![binaryCtx.pos] = elGroupIK;
+      GroupIK[binaryCtx.pos] = elGroupIK;
       binaryCtx.pos++;
     }
     binaryCtx.size = b.nextSize();
@@ -437,7 +437,7 @@ class SendMessageGroupReq implements Message {
       elContent = ConvertBytesToByte(binaryCtx.buf);
 
 
-      Content![binaryCtx.pos] = elContent;
+      Content[binaryCtx.pos] = elContent;
       binaryCtx.pos++;
     }
     binaryCtx.size = b.nextSize();
@@ -453,10 +453,10 @@ class SendMessageGroupReq implements Message {
 
       binaryCtx.size = binaryCtx.arrBuf.nextSize();
       binaryCtx.buf = binaryCtx.arrBuf.slice(binaryCtx.size);
-      elAttachments!.Unmarshal(binaryCtx.buf);
+      elAttachments.Unmarshal(binaryCtx.buf);
 
 
-      Attachments![binaryCtx.pos] = elAttachments;
+      Attachments[binaryCtx.pos] = elAttachments;
       binaryCtx.pos++;
     }
     binaryCtx.size = b.nextSize();
@@ -475,7 +475,7 @@ class SendMessageGroupReq implements Message {
       elSessionToken = ConvertBytesToByte(binaryCtx.buf);
 
 
-      SessionToken![binaryCtx.pos] = elSessionToken;
+      SessionToken[binaryCtx.pos] = elSessionToken;
       binaryCtx.pos++;
     }
   }
@@ -528,23 +528,23 @@ class CreateGroupReq implements Message {
     List<int> size = ConvertSizeToBytes(0);
     b.addAll(size);
     List<int> arrBufSessionToken = [];
-    for (var elSessionToken in SessionToken!) {
+    for (var elSessionToken in SessionToken) {
       arrBufSessionToken.addAll(ConvertByteToBytes(elSessionToken));
     }
     b.addAll(ConvertSizeToBytes(arrBufSessionToken.length));
     b.addAll(arrBufSessionToken);
     List<int> arrBufIdentityKey = [];
-    for (var elIdentityKey in IdentityKey!) {
+    for (var elIdentityKey in IdentityKey) {
       arrBufIdentityKey.addAll(ConvertByteToBytes(elIdentityKey));
     }
     b.addAll(ConvertSizeToBytes(arrBufIdentityKey.length));
     b.addAll(arrBufIdentityKey);
-    b.addAll(ConvertSizeToBytes(Name!.codeUnits.length));
-    b.addAll(ConvertStringToBytes(Name!));
-    b.addAll(ConvertSizeToBytes(Status!.codeUnits.length));
-    b.addAll(ConvertStringToBytes(Status!));
-    b.addAll(ConvertSizeToBytes(PictureID!.codeUnits.length));
-    b.addAll(ConvertStringToBytes(PictureID!));
+    b.addAll(ConvertSizeToBytes(Name.codeUnits.length));
+    b.addAll(ConvertStringToBytes(Name));
+    b.addAll(ConvertSizeToBytes(Status.codeUnits.length));
+    b.addAll(ConvertStringToBytes(Status));
+    b.addAll(ConvertSizeToBytes(PictureID.codeUnits.length));
+    b.addAll(ConvertStringToBytes(PictureID));
     size = ConvertSizeToBytes(b.length - size.length);
     for (int i = 0; i < size.length; i++) {
       b[i] = size[i];
@@ -573,7 +573,7 @@ class CreateGroupReq implements Message {
       elSessionToken = ConvertBytesToByte(binaryCtx.buf);
 
 
-      SessionToken![binaryCtx.pos] = elSessionToken;
+      SessionToken[binaryCtx.pos] = elSessionToken;
       binaryCtx.pos++;
     }
     binaryCtx.size = b.nextSize();
@@ -592,7 +592,7 @@ class CreateGroupReq implements Message {
       elIdentityKey = ConvertBytesToByte(binaryCtx.buf);
 
 
-      IdentityKey![binaryCtx.pos] = elIdentityKey;
+      IdentityKey[binaryCtx.pos] = elIdentityKey;
       binaryCtx.pos++;
     }
 
@@ -657,8 +657,8 @@ class ReverseStringReq implements Message {
 
     List<int> size = ConvertSizeToBytes(0);
     b.addAll(size);
-    b.addAll(ConvertSizeToBytes(Str!.codeUnits.length));
-    b.addAll(ConvertStringToBytes(Str!));
+    b.addAll(ConvertSizeToBytes(Str.codeUnits.length));
+    b.addAll(ConvertStringToBytes(Str));
     size = ConvertSizeToBytes(b.length - size.length);
     for (int i = 0; i < size.length; i++) {
       b[i] = size[i];
@@ -694,8 +694,8 @@ class ReverseStringResponse implements Message {
 
     List<int> size = ConvertSizeToBytes(0);
     b.addAll(size);
-    b.addAll(ConvertSizeToBytes(Res!.codeUnits.length));
-    b.addAll(ConvertStringToBytes(Res!));
+    b.addAll(ConvertSizeToBytes(Res.codeUnits.length));
+    b.addAll(ConvertStringToBytes(Res));
     size = ConvertSizeToBytes(b.length - size.length);
     for (int i = 0; i < size.length; i++) {
       b[i] = size[i];
@@ -731,8 +731,8 @@ class SendCodeRequest implements Message {
 
     List<int> size = ConvertSizeToBytes(0);
     b.addAll(size);
-    b.addAll(ConvertSizeToBytes(Phone!.codeUnits.length));
-    b.addAll(ConvertStringToBytes(Phone!));
+    b.addAll(ConvertSizeToBytes(Phone.codeUnits.length));
+    b.addAll(ConvertStringToBytes(Phone));
     size = ConvertSizeToBytes(b.length - size.length);
     for (int i = 0; i < size.length; i++) {
       b[i] = size[i];
@@ -795,9 +795,9 @@ class HandleCodeRequest implements Message {
 
     List<int> size = ConvertSizeToBytes(0);
     b.addAll(size);
-    b.addAll(ConvertSizeToBytes(Phone!.codeUnits.length));
-    b.addAll(ConvertStringToBytes(Phone!));
-    b.addAll(ConvertIntToBytes(Code!));
+    b.addAll(ConvertSizeToBytes(Phone.codeUnits.length));
+    b.addAll(ConvertStringToBytes(Phone));
+    b.addAll(ConvertIntToBytes(Code));
     size = ConvertSizeToBytes(b.length - size.length);
     for (int i = 0; i < size.length; i++) {
       b[i] = size[i];
@@ -862,7 +862,7 @@ class RequiredOPKRequest implements Message {
     List<int> size = ConvertSizeToBytes(0);
     b.addAll(size);
     List<int> arrBufSessionToken = [];
-    for (var elSessionToken in SessionToken!) {
+    for (var elSessionToken in SessionToken) {
       arrBufSessionToken.addAll(ConvertByteToBytes(elSessionToken));
     }
     b.addAll(ConvertSizeToBytes(arrBufSessionToken.length));
@@ -895,7 +895,7 @@ class RequiredOPKRequest implements Message {
       elSessionToken = ConvertBytesToByte(binaryCtx.buf);
 
 
-      SessionToken![binaryCtx.pos] = elSessionToken;
+      SessionToken[binaryCtx.pos] = elSessionToken;
       binaryCtx.pos++;
     }
   }
@@ -914,7 +914,7 @@ class RequiredOPKResponse implements Message {
 
     List<int> size = ConvertSizeToBytes(0);
     b.addAll(size);
-    b.addAll(ConvertUint16ToBytes(Count!));
+    b.addAll(ConvertUint16ToBytes(Count));
     size = ConvertSizeToBytes(b.length - size.length);
     for (int i = 0; i < size.length; i++) {
       b[i] = size[i];
@@ -952,13 +952,13 @@ class LoadOPKRequest implements Message {
     List<int> size = ConvertSizeToBytes(0);
     b.addAll(size);
     List<int> arrBufSessionToken = [];
-    for (var elSessionToken in SessionToken!) {
+    for (var elSessionToken in SessionToken) {
       arrBufSessionToken.addAll(ConvertByteToBytes(elSessionToken));
     }
     b.addAll(ConvertSizeToBytes(arrBufSessionToken.length));
     b.addAll(arrBufSessionToken);
     List<int> arrBufOPK = [];
-    for (var elOPK in OPK!) {
+    for (var elOPK in OPK) {
       arrBufOPK.addAll(elOPK.Marshal());
     }
     b.addAll(ConvertSizeToBytes(arrBufOPK.length));
@@ -991,7 +991,7 @@ class LoadOPKRequest implements Message {
       elSessionToken = ConvertBytesToByte(binaryCtx.buf);
 
 
-      SessionToken![binaryCtx.pos] = elSessionToken;
+      SessionToken[binaryCtx.pos] = elSessionToken;
       binaryCtx.pos++;
     }
     binaryCtx.size = b.nextSize();
@@ -1007,10 +1007,10 @@ class LoadOPKRequest implements Message {
 
       binaryCtx.size = binaryCtx.arrBuf.nextSize();
       binaryCtx.buf = binaryCtx.arrBuf.slice(binaryCtx.size);
-      elOPK!.Unmarshal(binaryCtx.buf);
+      elOPK.Unmarshal(binaryCtx.buf);
 
 
-      OPK![binaryCtx.pos] = elOPK;
+      OPK[binaryCtx.pos] = elOPK;
       binaryCtx.pos++;
     }
   }
@@ -1031,9 +1031,9 @@ class OPKPair implements Message {
 
     List<int> size = ConvertSizeToBytes(0);
     b.addAll(size);
-    b.addAll(ConvertUint32ToBytes(OPKId!));
+    b.addAll(ConvertUint32ToBytes(OPKId));
     List<int> arrBufOPK = [];
-    for (var elOPK in OPK!) {
+    for (var elOPK in OPK) {
       arrBufOPK.addAll(ConvertByteToBytes(elOPK));
     }
     b.addAll(ConvertSizeToBytes(arrBufOPK.length));
@@ -1072,7 +1072,7 @@ class OPKPair implements Message {
       elOPK = ConvertBytesToByte(binaryCtx.buf);
 
 
-      OPK![binaryCtx.pos] = elOPK;
+      OPK[binaryCtx.pos] = elOPK;
       binaryCtx.pos++;
     }
   }
@@ -1119,13 +1119,13 @@ class FindUsersByPartNicknameRequest implements Message {
     List<int> size = ConvertSizeToBytes(0);
     b.addAll(size);
     List<int> arrBufSessionToken = [];
-    for (var elSessionToken in SessionToken!) {
+    for (var elSessionToken in SessionToken) {
       arrBufSessionToken.addAll(ConvertByteToBytes(elSessionToken));
     }
     b.addAll(ConvertSizeToBytes(arrBufSessionToken.length));
     b.addAll(arrBufSessionToken);
-    b.addAll(ConvertSizeToBytes(PartNickname!.codeUnits.length));
-    b.addAll(ConvertStringToBytes(PartNickname!));
+    b.addAll(ConvertSizeToBytes(PartNickname.codeUnits.length));
+    b.addAll(ConvertStringToBytes(PartNickname));
     size = ConvertSizeToBytes(b.length - size.length);
     for (int i = 0; i < size.length; i++) {
       b[i] = size[i];
@@ -1154,7 +1154,7 @@ class FindUsersByPartNicknameRequest implements Message {
       elSessionToken = ConvertBytesToByte(binaryCtx.buf);
 
 
-      SessionToken![binaryCtx.pos] = elSessionToken;
+      SessionToken[binaryCtx.pos] = elSessionToken;
       binaryCtx.pos++;
     }
 
@@ -1181,7 +1181,7 @@ class FindUsersByPartNicknameResponse implements Message {
     List<int> size = ConvertSizeToBytes(0);
     b.addAll(size);
     List<int> arrBufUsers = [];
-    for (var elUsers in Users!) {
+    for (var elUsers in Users) {
       arrBufUsers.addAll(elUsers.Marshal());
     }
     b.addAll(ConvertSizeToBytes(arrBufUsers.length));
@@ -1211,10 +1211,10 @@ class FindUsersByPartNicknameResponse implements Message {
 
       binaryCtx.size = binaryCtx.arrBuf.nextSize();
       binaryCtx.buf = binaryCtx.arrBuf.slice(binaryCtx.size);
-      elUsers!.Unmarshal(binaryCtx.buf);
+      elUsers.Unmarshal(binaryCtx.buf);
 
 
-      Users![binaryCtx.pos] = elUsers;
+      Users[binaryCtx.pos] = elUsers;
       binaryCtx.pos++;
     }
   }
@@ -1240,17 +1240,17 @@ class PresentUser implements Message {
     List<int> size = ConvertSizeToBytes(0);
     b.addAll(size);
     List<int> arrBufIdentityKey = [];
-    for (var elIdentityKey in IdentityKey!) {
+    for (var elIdentityKey in IdentityKey) {
       arrBufIdentityKey.addAll(ConvertByteToBytes(elIdentityKey));
     }
     b.addAll(ConvertSizeToBytes(arrBufIdentityKey.length));
     b.addAll(arrBufIdentityKey);
-    b.addAll(ConvertSizeToBytes(Nickname!.codeUnits.length));
-    b.addAll(ConvertStringToBytes(Nickname!));
-    b.addAll(ConvertSizeToBytes(PictureID!.codeUnits.length));
-    b.addAll(ConvertStringToBytes(PictureID!));
-    b.addAll(ConvertSizeToBytes(Status!.codeUnits.length));
-    b.addAll(ConvertStringToBytes(Status!));
+    b.addAll(ConvertSizeToBytes(Nickname.codeUnits.length));
+    b.addAll(ConvertStringToBytes(Nickname));
+    b.addAll(ConvertSizeToBytes(PictureID.codeUnits.length));
+    b.addAll(ConvertStringToBytes(PictureID));
+    b.addAll(ConvertSizeToBytes(Status.codeUnits.length));
+    b.addAll(ConvertStringToBytes(Status));
     size = ConvertSizeToBytes(b.length - size.length);
     for (int i = 0; i < size.length; i++) {
       b[i] = size[i];
@@ -1279,7 +1279,7 @@ class PresentUser implements Message {
       elIdentityKey = ConvertBytesToByte(binaryCtx.buf);
 
 
-      IdentityKey![binaryCtx.pos] = elIdentityKey;
+      IdentityKey[binaryCtx.pos] = elIdentityKey;
       binaryCtx.pos++;
     }
 
@@ -1322,13 +1322,13 @@ class GetInitMsgKeysRequest implements Message {
     List<int> size = ConvertSizeToBytes(0);
     b.addAll(size);
     List<int> arrBufSessionToken = [];
-    for (var elSessionToken in SessionToken!) {
+    for (var elSessionToken in SessionToken) {
       arrBufSessionToken.addAll(ConvertByteToBytes(elSessionToken));
     }
     b.addAll(ConvertSizeToBytes(arrBufSessionToken.length));
     b.addAll(arrBufSessionToken);
     List<int> arrBufIdentityKey = [];
-    for (var elIdentityKey in IdentityKey!) {
+    for (var elIdentityKey in IdentityKey) {
       arrBufIdentityKey.addAll(ConvertByteToBytes(elIdentityKey));
     }
     b.addAll(ConvertSizeToBytes(arrBufIdentityKey.length));
@@ -1361,7 +1361,7 @@ class GetInitMsgKeysRequest implements Message {
       elSessionToken = ConvertBytesToByte(binaryCtx.buf);
 
 
-      SessionToken![binaryCtx.pos] = elSessionToken;
+      SessionToken[binaryCtx.pos] = elSessionToken;
       binaryCtx.pos++;
     }
     binaryCtx.size = b.nextSize();
@@ -1380,7 +1380,7 @@ class GetInitMsgKeysRequest implements Message {
       elIdentityKey = ConvertBytesToByte(binaryCtx.buf);
 
 
-      IdentityKey![binaryCtx.pos] = elIdentityKey;
+      IdentityKey[binaryCtx.pos] = elIdentityKey;
       binaryCtx.pos++;
     }
   }
@@ -1405,21 +1405,21 @@ class GetInitMsgKeysResponse implements Message {
 
     List<int> size = ConvertSizeToBytes(0);
     b.addAll(size);
-    b.addAll(ConvertUint32ToBytes(OPKId!));
+    b.addAll(ConvertUint32ToBytes(OPKId));
     List<int> arrBufOPK = [];
-    for (var elOPK in OPK!) {
+    for (var elOPK in OPK) {
       arrBufOPK.addAll(ConvertByteToBytes(elOPK));
     }
     b.addAll(ConvertSizeToBytes(arrBufOPK.length));
     b.addAll(arrBufOPK);
     List<int> arrBufSignedLTPK = [];
-    for (var elSignedLTPK in SignedLTPK!) {
+    for (var elSignedLTPK in SignedLTPK) {
       arrBufSignedLTPK.addAll(ConvertByteToBytes(elSignedLTPK));
     }
     b.addAll(ConvertSizeToBytes(arrBufSignedLTPK.length));
     b.addAll(arrBufSignedLTPK);
     List<int> arrBufSignature = [];
-    for (var elSignature in Signature!) {
+    for (var elSignature in Signature) {
       arrBufSignature.addAll(ConvertByteToBytes(elSignature));
     }
     b.addAll(ConvertSizeToBytes(arrBufSignature.length));
@@ -1458,7 +1458,7 @@ class GetInitMsgKeysResponse implements Message {
       elOPK = ConvertBytesToByte(binaryCtx.buf);
 
 
-      OPK![binaryCtx.pos] = elOPK;
+      OPK[binaryCtx.pos] = elOPK;
       binaryCtx.pos++;
     }
     binaryCtx.size = b.nextSize();
@@ -1477,7 +1477,7 @@ class GetInitMsgKeysResponse implements Message {
       elSignedLTPK = ConvertBytesToByte(binaryCtx.buf);
 
 
-      SignedLTPK![binaryCtx.pos] = elSignedLTPK;
+      SignedLTPK[binaryCtx.pos] = elSignedLTPK;
       binaryCtx.pos++;
     }
     binaryCtx.size = b.nextSize();
@@ -1496,7 +1496,7 @@ class GetInitMsgKeysResponse implements Message {
       elSignature = ConvertBytesToByte(binaryCtx.buf);
 
 
-      Signature![binaryCtx.pos] = elSignature;
+      Signature[binaryCtx.pos] = elSignature;
       binaryCtx.pos++;
     }
   }
@@ -1533,33 +1533,33 @@ class RegisterRequest implements Message {
 
     List<int> size = ConvertSizeToBytes(0);
     b.addAll(size);
-    b.addAll(ConvertSizeToBytes(Phone!.codeUnits.length));
-    b.addAll(ConvertStringToBytes(Phone!));
-    b.addAll(ConvertIntToBytes(Code!));
-    b.addAll(ConvertSizeToBytes(Nickname!.codeUnits.length));
-    b.addAll(ConvertStringToBytes(Nickname!));
-    b.addAll(ConvertSizeToBytes(PassHash!.codeUnits.length));
-    b.addAll(ConvertStringToBytes(PassHash!));
-    b.addAll(ConvertSizeToBytes(DeviceID!.codeUnits.length));
-    b.addAll(ConvertStringToBytes(DeviceID!));
-    b.addAll(ConvertSizeToBytes(DeviceName!.codeUnits.length));
-    b.addAll(ConvertStringToBytes(DeviceName!));
-    b.addAll(ConvertSizeToBytes(FcmToken!.codeUnits.length));
-    b.addAll(ConvertStringToBytes(FcmToken!));
+    b.addAll(ConvertSizeToBytes(Phone.codeUnits.length));
+    b.addAll(ConvertStringToBytes(Phone));
+    b.addAll(ConvertIntToBytes(Code));
+    b.addAll(ConvertSizeToBytes(Nickname.codeUnits.length));
+    b.addAll(ConvertStringToBytes(Nickname));
+    b.addAll(ConvertSizeToBytes(PassHash.codeUnits.length));
+    b.addAll(ConvertStringToBytes(PassHash));
+    b.addAll(ConvertSizeToBytes(DeviceID.codeUnits.length));
+    b.addAll(ConvertStringToBytes(DeviceID));
+    b.addAll(ConvertSizeToBytes(DeviceName.codeUnits.length));
+    b.addAll(ConvertStringToBytes(DeviceName));
+    b.addAll(ConvertSizeToBytes(FcmToken.codeUnits.length));
+    b.addAll(ConvertStringToBytes(FcmToken));
     List<int> arrBufLTPK = [];
-    for (var elLTPK in LTPK!) {
+    for (var elLTPK in LTPK) {
       arrBufLTPK.addAll(ConvertByteToBytes(elLTPK));
     }
     b.addAll(ConvertSizeToBytes(arrBufLTPK.length));
     b.addAll(arrBufLTPK);
     List<int> arrBufLTPKSignature = [];
-    for (var elLTPKSignature in LTPKSignature!) {
+    for (var elLTPKSignature in LTPKSignature) {
       arrBufLTPKSignature.addAll(ConvertByteToBytes(elLTPKSignature));
     }
     b.addAll(ConvertSizeToBytes(arrBufLTPKSignature.length));
     b.addAll(arrBufLTPKSignature);
     List<int> arrBufIdentityKey = [];
-    for (var elIdentityKey in IdentityKey!) {
+    for (var elIdentityKey in IdentityKey) {
       arrBufIdentityKey.addAll(ConvertByteToBytes(elIdentityKey));
     }
     b.addAll(ConvertSizeToBytes(arrBufIdentityKey.length));
@@ -1637,7 +1637,7 @@ class RegisterRequest implements Message {
       elLTPK = ConvertBytesToByte(binaryCtx.buf);
 
 
-      LTPK![binaryCtx.pos] = elLTPK;
+      LTPK[binaryCtx.pos] = elLTPK;
       binaryCtx.pos++;
     }
     binaryCtx.size = b.nextSize();
@@ -1656,7 +1656,7 @@ class RegisterRequest implements Message {
       elLTPKSignature = ConvertBytesToByte(binaryCtx.buf);
 
 
-      LTPKSignature![binaryCtx.pos] = elLTPKSignature;
+      LTPKSignature[binaryCtx.pos] = elLTPKSignature;
       binaryCtx.pos++;
     }
     binaryCtx.size = b.nextSize();
@@ -1675,7 +1675,7 @@ class RegisterRequest implements Message {
       elIdentityKey = ConvertBytesToByte(binaryCtx.buf);
 
 
-      IdentityKey![binaryCtx.pos] = elIdentityKey;
+      IdentityKey[binaryCtx.pos] = elIdentityKey;
       binaryCtx.pos++;
     }
   }
@@ -1695,7 +1695,7 @@ class RegisterResponse implements Message {
     List<int> size = ConvertSizeToBytes(0);
     b.addAll(size);
     List<int> arrBufSessionToken = [];
-    for (var elSessionToken in SessionToken!) {
+    for (var elSessionToken in SessionToken) {
       arrBufSessionToken.addAll(ConvertByteToBytes(elSessionToken));
     }
     b.addAll(ConvertSizeToBytes(arrBufSessionToken.length));
@@ -1728,7 +1728,7 @@ class RegisterResponse implements Message {
       elSessionToken = ConvertBytesToByte(binaryCtx.buf);
 
 
-      SessionToken![binaryCtx.pos] = elSessionToken;
+      SessionToken[binaryCtx.pos] = elSessionToken;
       binaryCtx.pos++;
     }
   }
@@ -1748,7 +1748,7 @@ class AuthTokenRequest implements Message {
     List<int> size = ConvertSizeToBytes(0);
     b.addAll(size);
     List<int> arrBufSessionToken = [];
-    for (var elSessionToken in SessionToken!) {
+    for (var elSessionToken in SessionToken) {
       arrBufSessionToken.addAll(ConvertByteToBytes(elSessionToken));
     }
     b.addAll(ConvertSizeToBytes(arrBufSessionToken.length));
@@ -1781,7 +1781,7 @@ class AuthTokenRequest implements Message {
       elSessionToken = ConvertBytesToByte(binaryCtx.buf);
 
 
-      SessionToken![binaryCtx.pos] = elSessionToken;
+      SessionToken[binaryCtx.pos] = elSessionToken;
       binaryCtx.pos++;
     }
   }
@@ -1801,7 +1801,7 @@ class AuthTokenResponse implements Message {
     List<int> size = ConvertSizeToBytes(0);
     b.addAll(size);
     List<int> arrBufSessionToken = [];
-    for (var elSessionToken in SessionToken!) {
+    for (var elSessionToken in SessionToken) {
       arrBufSessionToken.addAll(ConvertByteToBytes(elSessionToken));
     }
     b.addAll(ConvertSizeToBytes(arrBufSessionToken.length));
@@ -1834,7 +1834,7 @@ class AuthTokenResponse implements Message {
       elSessionToken = ConvertBytesToByte(binaryCtx.buf);
 
 
-      SessionToken![binaryCtx.pos] = elSessionToken;
+      SessionToken[binaryCtx.pos] = elSessionToken;
       binaryCtx.pos++;
     }
   }
@@ -1859,14 +1859,14 @@ class AuthCredentialsRequest implements Message {
 
     List<int> size = ConvertSizeToBytes(0);
     b.addAll(size);
-    b.addAll(ConvertSizeToBytes(Phone!.codeUnits.length));
-    b.addAll(ConvertStringToBytes(Phone!));
-    b.addAll(ConvertSizeToBytes(PassHash!.codeUnits.length));
-    b.addAll(ConvertStringToBytes(PassHash!));
-    b.addAll(ConvertSizeToBytes(DeviceID!.codeUnits.length));
-    b.addAll(ConvertStringToBytes(DeviceID!));
-    b.addAll(ConvertSizeToBytes(DeviceName!.codeUnits.length));
-    b.addAll(ConvertStringToBytes(DeviceName!));
+    b.addAll(ConvertSizeToBytes(Phone.codeUnits.length));
+    b.addAll(ConvertStringToBytes(Phone));
+    b.addAll(ConvertSizeToBytes(PassHash.codeUnits.length));
+    b.addAll(ConvertStringToBytes(PassHash));
+    b.addAll(ConvertSizeToBytes(DeviceID.codeUnits.length));
+    b.addAll(ConvertStringToBytes(DeviceID));
+    b.addAll(ConvertSizeToBytes(DeviceName.codeUnits.length));
+    b.addAll(ConvertStringToBytes(DeviceName));
     size = ConvertSizeToBytes(b.length - size.length);
     for (int i = 0; i < size.length; i++) {
       b[i] = size[i];
@@ -1924,7 +1924,7 @@ class AuthCredentialsResponse implements Message {
     List<int> size = ConvertSizeToBytes(0);
     b.addAll(size);
     List<int> arrBufSessionToken = [];
-    for (var elSessionToken in SessionToken!) {
+    for (var elSessionToken in SessionToken) {
       arrBufSessionToken.addAll(ConvertByteToBytes(elSessionToken));
     }
     b.addAll(ConvertSizeToBytes(arrBufSessionToken.length));
@@ -1957,7 +1957,7 @@ class AuthCredentialsResponse implements Message {
       elSessionToken = ConvertBytesToByte(binaryCtx.buf);
 
 
-      SessionToken![binaryCtx.pos] = elSessionToken;
+      SessionToken[binaryCtx.pos] = elSessionToken;
       binaryCtx.pos++;
     }
   }
@@ -1978,10 +1978,10 @@ class Attachment implements Message {
 
     List<int> size = ConvertSizeToBytes(0);
     b.addAll(size);
-    b.addAll(ConvertSizeToBytes(Type!.codeUnits.length));
-    b.addAll(ConvertStringToBytes(Type!));
+    b.addAll(ConvertSizeToBytes(Type.codeUnits.length));
+    b.addAll(ConvertStringToBytes(Type));
     List<int> arrBufPayload = [];
-    for (var elPayload in Payload!) {
+    for (var elPayload in Payload) {
       arrBufPayload.addAll(ConvertByteToBytes(elPayload));
     }
     b.addAll(ConvertSizeToBytes(arrBufPayload.length));
@@ -2021,7 +2021,7 @@ class Attachment implements Message {
       elPayload = ConvertBytesToByte(binaryCtx.buf);
 
 
-      Payload![binaryCtx.pos] = elPayload;
+      Payload[binaryCtx.pos] = elPayload;
       binaryCtx.pos++;
     }
   }
@@ -2050,34 +2050,34 @@ class SendMessagePMRequest implements Message {
 
     List<int> size = ConvertSizeToBytes(0);
     b.addAll(size);
-    b.addAll(ConvertSizeToBytes(MessageType!.codeUnits.length));
-    b.addAll(ConvertStringToBytes(MessageType!));
+    b.addAll(ConvertSizeToBytes(MessageType.codeUnits.length));
+    b.addAll(ConvertStringToBytes(MessageType));
     List<int> arrBufReceiverIK = [];
-    for (var elReceiverIK in ReceiverIK!) {
+    for (var elReceiverIK in ReceiverIK) {
       arrBufReceiverIK.addAll(ConvertByteToBytes(elReceiverIK));
     }
     b.addAll(ConvertSizeToBytes(arrBufReceiverIK.length));
     b.addAll(arrBufReceiverIK);
     List<int> arrBufRSPK = [];
-    for (var elRSPK in RSPK!) {
+    for (var elRSPK in RSPK) {
       arrBufRSPK.addAll(ConvertByteToBytes(elRSPK));
     }
     b.addAll(ConvertSizeToBytes(arrBufRSPK.length));
     b.addAll(arrBufRSPK);
     List<int> arrBufContent = [];
-    for (var elContent in Content!) {
+    for (var elContent in Content) {
       arrBufContent.addAll(ConvertByteToBytes(elContent));
     }
     b.addAll(ConvertSizeToBytes(arrBufContent.length));
     b.addAll(arrBufContent);
     List<int> arrBufAttachments = [];
-    for (var elAttachments in Attachments!) {
+    for (var elAttachments in Attachments) {
       arrBufAttachments.addAll(elAttachments.Marshal());
     }
     b.addAll(ConvertSizeToBytes(arrBufAttachments.length));
     b.addAll(arrBufAttachments);
     List<int> arrBufSessionToken = [];
-    for (var elSessionToken in SessionToken!) {
+    for (var elSessionToken in SessionToken) {
       arrBufSessionToken.addAll(ConvertByteToBytes(elSessionToken));
     }
     b.addAll(ConvertSizeToBytes(arrBufSessionToken.length));
@@ -2117,7 +2117,7 @@ class SendMessagePMRequest implements Message {
       elReceiverIK = ConvertBytesToByte(binaryCtx.buf);
 
 
-      ReceiverIK![binaryCtx.pos] = elReceiverIK;
+      ReceiverIK[binaryCtx.pos] = elReceiverIK;
       binaryCtx.pos++;
     }
     binaryCtx.size = b.nextSize();
@@ -2136,7 +2136,7 @@ class SendMessagePMRequest implements Message {
       elRSPK = ConvertBytesToByte(binaryCtx.buf);
 
 
-      RSPK![binaryCtx.pos] = elRSPK;
+      RSPK[binaryCtx.pos] = elRSPK;
       binaryCtx.pos++;
     }
     binaryCtx.size = b.nextSize();
@@ -2155,7 +2155,7 @@ class SendMessagePMRequest implements Message {
       elContent = ConvertBytesToByte(binaryCtx.buf);
 
 
-      Content![binaryCtx.pos] = elContent;
+      Content[binaryCtx.pos] = elContent;
       binaryCtx.pos++;
     }
     binaryCtx.size = b.nextSize();
@@ -2171,10 +2171,10 @@ class SendMessagePMRequest implements Message {
 
       binaryCtx.size = binaryCtx.arrBuf.nextSize();
       binaryCtx.buf = binaryCtx.arrBuf.slice(binaryCtx.size);
-      elAttachments!.Unmarshal(binaryCtx.buf);
+      elAttachments.Unmarshal(binaryCtx.buf);
 
 
-      Attachments![binaryCtx.pos] = elAttachments;
+      Attachments[binaryCtx.pos] = elAttachments;
       binaryCtx.pos++;
     }
     binaryCtx.size = b.nextSize();
@@ -2193,7 +2193,7 @@ class SendMessagePMRequest implements Message {
       elSessionToken = ConvertBytesToByte(binaryCtx.buf);
 
 
-      SessionToken![binaryCtx.pos] = elSessionToken;
+      SessionToken[binaryCtx.pos] = elSessionToken;
       binaryCtx.pos++;
     }
   }
@@ -2212,7 +2212,7 @@ class SendMessagePMResponse implements Message {
 
     List<int> size = ConvertSizeToBytes(0);
     b.addAll(size);
-    b.addAll(ConvertUint32ToBytes(MessageID!));
+    b.addAll(ConvertUint32ToBytes(MessageID));
     size = ConvertSizeToBytes(b.length - size.length);
     for (int i = 0; i < size.length; i++) {
       b[i] = size[i];
@@ -2253,16 +2253,16 @@ class PresentEvent implements Message {
 
     List<int> size = ConvertSizeToBytes(0);
     b.addAll(size);
-    b.addAll(ConvertUint64ToBytes(MonotonicEventID!));
-    b.addAll(ConvertSizeToBytes(Type!.codeUnits.length));
-    b.addAll(ConvertStringToBytes(Type!));
+    b.addAll(ConvertUint64ToBytes(MonotonicEventID));
+    b.addAll(ConvertSizeToBytes(Type.codeUnits.length));
+    b.addAll(ConvertStringToBytes(Type));
     List<int> arrBufPayload = [];
-    for (var elPayload in Payload!) {
+    for (var elPayload in Payload) {
       arrBufPayload.addAll(ConvertByteToBytes(elPayload));
     }
     b.addAll(ConvertSizeToBytes(arrBufPayload.length));
     b.addAll(arrBufPayload);
-    b.addAll(ConvertInt64ToBytes(CreatedAt!));
+    b.addAll(ConvertInt64ToBytes(CreatedAt));
     size = ConvertSizeToBytes(b.length - size.length);
     for (int i = 0; i < size.length; i++) {
       b[i] = size[i];
@@ -2304,7 +2304,7 @@ class PresentEvent implements Message {
       elPayload = ConvertBytesToByte(binaryCtx.buf);
 
 
-      Payload![binaryCtx.pos] = elPayload;
+      Payload[binaryCtx.pos] = elPayload;
       binaryCtx.pos++;
     }
 
@@ -2340,28 +2340,28 @@ class PmMessage implements Message {
     List<int> size = ConvertSizeToBytes(0);
     b.addAll(size);
     List<int> arrBufRemoteIK = [];
-    for (var elRemoteIK in RemoteIK!) {
+    for (var elRemoteIK in RemoteIK) {
       arrBufRemoteIK.addAll(ConvertByteToBytes(elRemoteIK));
     }
     b.addAll(ConvertSizeToBytes(arrBufRemoteIK.length));
     b.addAll(arrBufRemoteIK);
     List<int> arrBufRSPK = [];
-    for (var elRSPK in RSPK!) {
+    for (var elRSPK in RSPK) {
       arrBufRSPK.addAll(ConvertByteToBytes(elRSPK));
     }
     b.addAll(ConvertSizeToBytes(arrBufRSPK.length));
     b.addAll(arrBufRSPK);
-    b.addAll(ConvertUint32ToBytes(MessageID!));
-    b.addAll(ConvertSizeToBytes(MessageType!.codeUnits.length));
-    b.addAll(ConvertStringToBytes(MessageType!));
+    b.addAll(ConvertUint32ToBytes(MessageID));
+    b.addAll(ConvertSizeToBytes(MessageType.codeUnits.length));
+    b.addAll(ConvertStringToBytes(MessageType));
     List<int> arrBufContent = [];
-    for (var elContent in Content!) {
+    for (var elContent in Content) {
       arrBufContent.addAll(ConvertByteToBytes(elContent));
     }
     b.addAll(ConvertSizeToBytes(arrBufContent.length));
     b.addAll(arrBufContent);
     List<int> arrBufAttachments = [];
-    for (var elAttachments in Attachments!) {
+    for (var elAttachments in Attachments) {
       arrBufAttachments.addAll(elAttachments.Marshal());
     }
     b.addAll(ConvertSizeToBytes(arrBufAttachments.length));
@@ -2394,7 +2394,7 @@ class PmMessage implements Message {
       elRemoteIK = ConvertBytesToByte(binaryCtx.buf);
 
 
-      RemoteIK![binaryCtx.pos] = elRemoteIK;
+      RemoteIK[binaryCtx.pos] = elRemoteIK;
       binaryCtx.pos++;
     }
     binaryCtx.size = b.nextSize();
@@ -2413,7 +2413,7 @@ class PmMessage implements Message {
       elRSPK = ConvertBytesToByte(binaryCtx.buf);
 
 
-      RSPK![binaryCtx.pos] = elRSPK;
+      RSPK[binaryCtx.pos] = elRSPK;
       binaryCtx.pos++;
     }
 
@@ -2445,7 +2445,7 @@ class PmMessage implements Message {
       elContent = ConvertBytesToByte(binaryCtx.buf);
 
 
-      Content![binaryCtx.pos] = elContent;
+      Content[binaryCtx.pos] = elContent;
       binaryCtx.pos++;
     }
     binaryCtx.size = b.nextSize();
@@ -2461,10 +2461,10 @@ class PmMessage implements Message {
 
       binaryCtx.size = binaryCtx.arrBuf.nextSize();
       binaryCtx.buf = binaryCtx.arrBuf.slice(binaryCtx.size);
-      elAttachments!.Unmarshal(binaryCtx.buf);
+      elAttachments.Unmarshal(binaryCtx.buf);
 
 
-      Attachments![binaryCtx.pos] = elAttachments;
+      Attachments[binaryCtx.pos] = elAttachments;
       binaryCtx.pos++;
     }
   }
@@ -2488,18 +2488,18 @@ class PmInitMessage implements Message {
     List<int> size = ConvertSizeToBytes(0);
     b.addAll(size);
     List<int> arrBufRemoteIK = [];
-    for (var elRemoteIK in RemoteIK!) {
+    for (var elRemoteIK in RemoteIK) {
       arrBufRemoteIK.addAll(ConvertByteToBytes(elRemoteIK));
     }
     b.addAll(ConvertSizeToBytes(arrBufRemoteIK.length));
     b.addAll(arrBufRemoteIK);
     List<int> arrBufRemoteEK = [];
-    for (var elRemoteEK in RemoteEK!) {
+    for (var elRemoteEK in RemoteEK) {
       arrBufRemoteEK.addAll(ConvertByteToBytes(elRemoteEK));
     }
     b.addAll(ConvertSizeToBytes(arrBufRemoteEK.length));
     b.addAll(arrBufRemoteEK);
-    b.addAll(ConvertIntToBytes(UsedOPKMarkID!));
+    b.addAll(ConvertIntToBytes(UsedOPKMarkID));
     size = ConvertSizeToBytes(b.length - size.length);
     for (int i = 0; i < size.length; i++) {
       b[i] = size[i];
@@ -2528,7 +2528,7 @@ class PmInitMessage implements Message {
       elRemoteIK = ConvertBytesToByte(binaryCtx.buf);
 
 
-      RemoteIK![binaryCtx.pos] = elRemoteIK;
+      RemoteIK[binaryCtx.pos] = elRemoteIK;
       binaryCtx.pos++;
     }
     binaryCtx.size = b.nextSize();
@@ -2547,7 +2547,7 @@ class PmInitMessage implements Message {
       elRemoteEK = ConvertBytesToByte(binaryCtx.buf);
 
 
-      RemoteEK![binaryCtx.pos] = elRemoteEK;
+      RemoteEK[binaryCtx.pos] = elRemoteEK;
       binaryCtx.pos++;
     }
 
@@ -2576,24 +2576,24 @@ class SendInitMessagePMRequest implements Message {
     List<int> size = ConvertSizeToBytes(0);
     b.addAll(size);
     List<int> arrBufSessionToken = [];
-    for (var elSessionToken in SessionToken!) {
+    for (var elSessionToken in SessionToken) {
       arrBufSessionToken.addAll(ConvertByteToBytes(elSessionToken));
     }
     b.addAll(ConvertSizeToBytes(arrBufSessionToken.length));
     b.addAll(arrBufSessionToken);
     List<int> arrBufReceiverIK = [];
-    for (var elReceiverIK in ReceiverIK!) {
+    for (var elReceiverIK in ReceiverIK) {
       arrBufReceiverIK.addAll(ConvertByteToBytes(elReceiverIK));
     }
     b.addAll(ConvertSizeToBytes(arrBufReceiverIK.length));
     b.addAll(arrBufReceiverIK);
     List<int> arrBufSelfEK = [];
-    for (var elSelfEK in SelfEK!) {
+    for (var elSelfEK in SelfEK) {
       arrBufSelfEK.addAll(ConvertByteToBytes(elSelfEK));
     }
     b.addAll(ConvertSizeToBytes(arrBufSelfEK.length));
     b.addAll(arrBufSelfEK);
-    b.addAll(ConvertIntToBytes(UsedOPKMarkID!));
+    b.addAll(ConvertIntToBytes(UsedOPKMarkID));
     size = ConvertSizeToBytes(b.length - size.length);
     for (int i = 0; i < size.length; i++) {
       b[i] = size[i];
@@ -2622,7 +2622,7 @@ class SendInitMessagePMRequest implements Message {
       elSessionToken = ConvertBytesToByte(binaryCtx.buf);
 
 
-      SessionToken![binaryCtx.pos] = elSessionToken;
+      SessionToken[binaryCtx.pos] = elSessionToken;
       binaryCtx.pos++;
     }
     binaryCtx.size = b.nextSize();
@@ -2641,7 +2641,7 @@ class SendInitMessagePMRequest implements Message {
       elReceiverIK = ConvertBytesToByte(binaryCtx.buf);
 
 
-      ReceiverIK![binaryCtx.pos] = elReceiverIK;
+      ReceiverIK[binaryCtx.pos] = elReceiverIK;
       binaryCtx.pos++;
     }
     binaryCtx.size = b.nextSize();
@@ -2660,7 +2660,7 @@ class SendInitMessagePMRequest implements Message {
       elSelfEK = ConvertBytesToByte(binaryCtx.buf);
 
 
-      SelfEK![binaryCtx.pos] = elSelfEK;
+      SelfEK[binaryCtx.pos] = elSelfEK;
       binaryCtx.pos++;
     }
 
@@ -2710,12 +2710,12 @@ class ListenUpdatesReq implements Message {
     List<int> size = ConvertSizeToBytes(0);
     b.addAll(size);
     List<int> arrBufSessionToken = [];
-    for (var elSessionToken in SessionToken!) {
+    for (var elSessionToken in SessionToken) {
       arrBufSessionToken.addAll(ConvertByteToBytes(elSessionToken));
     }
     b.addAll(ConvertSizeToBytes(arrBufSessionToken.length));
     b.addAll(arrBufSessionToken);
-    b.addAll(ConvertIntToBytes(MonotonicIdOffset!));
+    b.addAll(ConvertIntToBytes(MonotonicIdOffset));
     size = ConvertSizeToBytes(b.length - size.length);
     for (int i = 0; i < size.length; i++) {
       b[i] = size[i];
@@ -2744,7 +2744,7 @@ class ListenUpdatesReq implements Message {
       elSessionToken = ConvertBytesToByte(binaryCtx.buf);
 
 
-      SessionToken![binaryCtx.pos] = elSessionToken;
+      SessionToken[binaryCtx.pos] = elSessionToken;
       binaryCtx.pos++;
     }
 

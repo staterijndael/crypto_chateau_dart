@@ -1,33 +1,26 @@
 part of connection;
 
 class ConnectionPipe extends ConnectionBase {
-  late final Pipe _pipe;
+  final _pipe = Pipe();
 
-  ConnectionPipe(super._connection) {
-    _pipe = Pipe(
-      onRead: _controller.add,
-      onWrite: super.write,
-    );
+  ConnectionPipe(super._connection);
+
+  @override
+  Stream<r.BytesBuffer> get read => super.read.asyncExpand(_pipe.read);
+
+  @override
+  void write(w.BytesBuffer buffer) {
+    _pipe.write(buffer);
+    super.write(buffer);
   }
-
-  @override
-  void _read(r.BytesBuffer buffer) => _pipe.read(buffer);
-
-  @override
-  void write(w.BytesBuffer buffer) => _pipe.write(buffer);
 }
 
 class Pipe {
-  void Function(r.BytesBuffer buffer) onRead;
-  void Function(w.BytesBuffer buffer) onWrite;
   r.BytesBuffer? _reserved;
 
-  Pipe({
-    required this.onRead,
-    required this.onWrite,
-  });
+  Pipe();
 
-  void read(r.BytesBuffer buffer) {
+  Stream<r.BytesBuffer> read(r.BytesBuffer buffer) async* {
     final r.BytesBuffer current;
     final r.Length length;
 
@@ -40,13 +33,10 @@ class Pipe {
     }
 
     if (buffer.length == length.length) {
-      onRead?.call(buffer);
+      yield buffer;
       _reserved = null;
     }
   }
 
-  void write(w.BytesBuffer buffer) {
-    buffer.add(const w.Length());
-    onWrite?.call(buffer);
-  }
+  w.BytesBuffer write(w.BytesBuffer buffer) => buffer..add(const w.Length());
 }

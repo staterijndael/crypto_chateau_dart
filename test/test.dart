@@ -9,10 +9,24 @@ void main() async {
     isEncryptionEnabled: true,
   );
 
+  final _results = <String>[];
+
+  // await Future.wait([
+  //   for (var i = 0; i < 100; i++)
+  //     Client(connectParams: kConnectParams)
+  //         .reverseString(ReverseStringReq(Str: 'alice$i'))
+  //         .then((value) => print(value.Res.split('').reversed.join()))
+  // ]);
+
   final client = Client(
     connectParams: kConnectParams,
   );
 
-  var resp = await client.reverseString(ReverseStringReq(Str: 'alice1'));
-  print(resp.Res);
+  final resp = await client.reverseString(ReverseStringReq(Str: 'alice')).then((value) => print(value.Res.split('').reversed.join()));
+
+
+  // await Future.wait([
+  //   for (var i = 0; i < 10; i++)
+  //     client.reverseString(ReverseStringReq(Str: 'alice$i')).then((value) => print(value.Res.split('').reversed.join()))
+  // ]);
 }

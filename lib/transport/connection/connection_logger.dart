@@ -7,15 +7,17 @@ class ConnectionLogger extends ConnectionBase {
 
   String get _name => name != null ? '$name-' : '';
 
-  @override
-  void _read(r.BytesBuffer buffer) {
-    print('${_name}receive(${DateTime.now()}): $buffer');
-    _controller.add(buffer);
-  }
+  Stream<r.BytesBuffer> get read => super.read.map(
+        (buffer) {
+          print('${_name}receive(${DateTime.now()}): $buffer');
+
+          return buffer;
+        },
+      );
 
   @override
   void write(w.BytesBuffer buffer) {
     print('${_name}send(${DateTime.now()}): $buffer');
-    _connection.write(buffer);
+    super.write(buffer);
   }
 }

@@ -1,33 +1,13 @@
 part of connection;
 
-abstract class ConnectionBase implements Connection {
+class ConnectionBase implements Connection {
   final Connection _connection;
-  late final StreamController<r.BytesBuffer> _controller;
-  bool _listenConnection = false;
 
-  ConnectionBase(this._connection) {
-    _controller = StreamController<r.BytesBuffer>(sync: true)..onListen = _startListenConnection;
-  }
+  const ConnectionBase(this._connection);
 
   @override
-  Stream<r.BytesBuffer> get read => _controller.stream;
+  Stream<r.BytesBuffer> get read => _connection.read;
 
   @override
-  void write(w.BytesBuffer buffer) {
-    _startListenConnection();
-    _connection.write(buffer);
-  }
-
-  void _read(r.BytesBuffer buffer);
-
-  void _startListenConnection() {
-    if (_listenConnection) return;
-
-    final subscription = _connection.read.listen(_read);
-    _controller
-      ..onResume = subscription.resume
-      ..onPause = subscription.pause
-      ..onCancel = subscription.cancel;
-    _listenConnection = true;
-  }
+  void write(w.BytesBuffer buffer) => _connection.write(buffer);
 }
