@@ -20,101 +20,170 @@ class ConnectParams {
 class ConnectionRoot implements Connection {
   final ConnectParams connectParams;
   final _readController = StreamController<r.BytesBuffer>(sync: true);
-  StreamSubscription<Uint8List>? _socketSubscription;
-  Completer<Socket>? _socket;
-  var _closed = false;
+  late _State _state = _StateNone(this);
 
   ConnectionRoot(this.connectParams);
 
   Future<void> close() async {
-    if (_closed) return;
-
-    _closed = true;
-    await _socketSubscription?.cancel();
+    await _state.close();
     await _readController.close();
-    (await _socket?.future)?.destroy();
   }
 
   @override
   Stream<r.BytesBuffer> get read => _readController.stream;
 
   @override
-  void write(w.BytesBuffer bytes) => _initSocket().then(
-        (socket) => socket.add(bytes.toBytes()),
-        onError: _readController.addError,
-      );
+  void write(w.BytesBuffer buffer) => _state.write(buffer);
+}
 
-  Future<Socket> _initSocket() {
-    if (_socket != null) {
-      return _socket!.future;
-    }
+abstract class _State {
+  Future<void> close();
 
-    final completer = _socket = Completer<Socket>();
+  void write(w.BytesBuffer buffer);
+}
 
-    Socket.connect(connectParams.host, connectParams.port).then(
+class _StateNone implements _State {
+  final ConnectionRoot _context;
+
+  _StateNone(this._context);
+
+  Future<void> close() => Future.value();
+
+  @override
+  void write(w.BytesBuffer buffer) => _context._state = _StateInit(_context)..write(buffer);
+}
+
+class _StateInit implements _State {
+  final ConnectionRoot _context;
+  final _buffer = List<w.BytesBuffer>.empty(growable: true);
+
+  _StateInit(this._context) {
+    Socket.connect(
+      _connectParams.host,
+      _connectParams.port,
+    ).then(
       (socket) {
-        if (_closed) socket.destroy();
-        socket.flush();
-
-        completer.complete(socket);
-        _socketSubscription?.cancel();
-        _socketSubscription = socket.listen(
-          (event) => _readController.add(r.BytesBuffer(event)),
-        );
+        final state = _context._state = _StateIdle(_context, socket);
+        _buffer.forEach(state.write);
       },
       onError: (Object e, StackTrace st) {
-        _socket!.completeError(e, st);
-        _socket = null;
+        _context._readController.addError(e, st);
+
+        /// TODO: ретраи, фатальные ошибки
       },
     );
+  }
 
-    return completer.future;
+  ConnectParams get _connectParams => _context.connectParams;
+
+  Future<void> close() => Future.value();
+
+  @override
+  void write(w.BytesBuffer buffer) => _buffer.add(buffer);
+}
+
+class _StateIdle implements _State {
+  final ConnectionRoot _context;
+  final Socket _socket;
+  StreamController<w.BytesBuffer>? _writeController;
+  StreamSubscription<void>? _writeSubscription;
+  StreamSubscription<Uint8List>? _readSubscription;
+  var i = 0;
+
+  _StateIdle(this._context, this._socket) {
+    if (_readController.hasListener) {
+      _createReadSubscription();
+    } else {
+      _readController.onListen = _createReadSubscription;
+    }
+  }
+
+  StreamController<r.BytesBuffer> get _readController => _context._readController;
+
+  void _createReadSubscription() {
+    _readSubscription = _socket.listen(
+          (bytes) => _readController.add(r.BytesBuffer(bytes)),
+    );
+  }
+
+  Future<void> close() async {
+    await _writeController?.close();
+    await _writeSubscription?.cancel();
+    await _readSubscription?.cancel();
+  }
+
+  @override
+  void write(w.BytesBuffer buffer) => _getWriteController().add(buffer);
+
+  StreamController<w.BytesBuffer> _getWriteController() {
+    var writeController = _writeController;
+
+    if (writeController != null) return writeController;
+
+    writeController = _writeController = StreamController<w.BytesBuffer>();
+    _writeSubscription = writeController.stream.asyncMap(_handleWrite).listen(null);
+
+    return writeController;
+  }
+
+  Future<void> _handleWrite(w.BytesBuffer buffer) async {
+    final bytes = buffer.toBytes();
+    _socket.add(Uint8List.fromList([i++]));
+    // final watch = Stopwatch()..start();
+    // await _socket.flush();
+    // watch.stop();
+    print(i);
+    // await Future.delayed(const Duration(milliseconds: 5));
   }
 }
 
-// abstract class _State {
-//   void write(w.BytesBuffer buffer);
-// }
-//
-// class _StateNone implements _State {
-//   final ConnectionCipher _context;
-//
-//   _StateNone(this._context);
-//
-//   @override
-//   void write(w.BytesBuffer buffer) {
-//
-//     _context._state = _StateInProgress(_context)..write(buffer);
-//   }
-// }
-//
-// class _StateInProgress implements _State {
-//   final ConnectionCipher _context;
-//   late _StateInProgressState _state;
-//   final _buffer = List<w.BytesBuffer>.empty(growable: true);
-//   late final Pipe _pipe;
-//
-//   _StateInProgress(this._context) {
-//     _pipe = Pipe(
-//       onRead: (buffer) => _state.read(buffer),
-//       onWrite: _context._connection.write,
-//     );
-//     _state = _StateInProgressStateFirstRequest(this);
-//   }
-//
-//   @override
-//   void read(r.BytesBuffer buffer) => _pipe.read(buffer);
-//
-//   @override
-//   void write(w.BytesBuffer buffer) => _buffer.add(buffer);
-//
-//   /// метод отправки данных для состояний (обёрнут в Pipe)
-//   void _write(w.BytesBuffer buffer) => _pipe.write(buffer);
-//
-//   void _toIdle(Uint8List encryptionKey) {
-//     _context._encryption.key = encryptionKey;
-//     final newState = _context._state = _StateIdle(_context);
-//     _buffer.forEach(newState.write);
-//     _buffer.clear();
-//   }
-// }
+/*
+class _StateIdle implements _State {
+  final ConnectionRoot _context;
+  final Socket _socket;
+  StreamController<w.BytesBuffer>? _writeController;
+  StreamSubscription<Uint8List>? _readSubscription;
+
+  _StateIdle(this._context, this._socket) {
+    if (_readController.hasListener) {
+      _createReadSubscription();
+    } else {
+      _readController.onListen = _createReadSubscription;
+    }
+  }
+
+  StreamController<r.BytesBuffer> get _readController => _context._readController;
+
+  void _createReadSubscription() {
+    _readSubscription = _socket.listen(
+          (bytes) => _readController.add(r.BytesBuffer(bytes)),
+    );
+  }
+
+  Future<void> close() async {
+    await _writeController?.close();
+    await _readSubscription?.cancel();
+  }
+
+  @override
+  void write(w.BytesBuffer buffer) => _getWriteController().add(buffer);
+
+  StreamController<w.BytesBuffer> _getWriteController() {
+    var writeController = _writeController;
+
+    if (writeController != null) return writeController;
+
+    writeController = _writeController = StreamController<w.BytesBuffer>();
+    _socket.addStream(writeController.stream.asyncMap(_handleWrite));
+
+    return writeController;
+  }
+
+  Future<Uint8List> _handleWrite(w.BytesBuffer buffer) async {
+    final bytes = buffer.toBytes();
+    // await Future.delayed(const Duration(milliseconds: 6));
+
+    return bytes;
+  }
+}
+ */

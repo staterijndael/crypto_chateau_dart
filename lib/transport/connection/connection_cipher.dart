@@ -48,19 +48,19 @@ class _StateNone implements _State {
   Stream<r.BytesBuffer> read(r.BytesBuffer event) => Stream.empty();
 
   @override
-  void write(w.BytesBuffer buffer) => _context._state = _StateInProgress(_context)..write(buffer);
+  void write(w.BytesBuffer buffer) => _context._state = _StateInit(_context)..write(buffer);
 }
 
 /// Оборачивает шаги рукапожатия в Pipe
 /// Кеширует все запросы клиента в буффер до завершения рукопожатия
-class _StateInProgress implements _State {
+class _StateInit implements _State {
   final ConnectionCipher _context;
-  late _StateInProgressState _state;
+  late _StateInitState _state;
   final _buffer = List<w.BytesBuffer>.empty(growable: true);
   final _pipe = Pipe();
 
-  _StateInProgress(this._context) {
-    _state = _StateInProgressStateFirstRequest(this);
+  _StateInit(this._context) {
+    _state = _StateInitStateFirstRequest(this);
   }
 
   /// Преобразует байты через Pipe, затем оборачивает StreamSink
@@ -109,16 +109,16 @@ class _StateIdle implements _State {
       );
 }
 
-abstract class _StateInProgressState {
+abstract class _StateInitState {
   Stream<r.BytesBuffer> read(r.BytesBuffer buffer);
 }
 
 /// При создании отправляет на сервер первый ключ для рукопожатия
 /// Ждёт в ответ публичный ключ
-class _StateInProgressStateFirstRequest implements _StateInProgressState {
-  final _StateInProgress _context;
+class _StateInitStateFirstRequest implements _StateInitState {
+  final _StateInit _context;
 
-  _StateInProgressStateFirstRequest(this._context) {
+  _StateInitStateFirstRequest(this._context) {
     final key = Uint8List.fromList([104, 97, 110, 100, 115, 104, 97, 107, 101]);
     _context._write(w.BytesBuffer()..add(w.Data(key)));
   }
@@ -127,7 +127,7 @@ class _StateInProgressStateFirstRequest implements _StateInProgressState {
   Stream<r.BytesBuffer> read(r.BytesBuffer buffer) async* {
     final publicKey = buffer.bytes;
     final privateKey = _createPrivateKey();
-    _context._state = _StateInProgressStateSecondRequest(_context, privateKey, publicKey);
+    _context._state = _StateInitStateSecondRequest(_context, privateKey, publicKey);
   }
 
   Uint8List _createPrivateKey() {
@@ -148,12 +148,12 @@ class _StateInProgressStateFirstRequest implements _StateInProgressState {
 
 /// При создании отправляет на сервер второй ключ для рукопожатия
 /// Ждёт в ответ сообщение с подтверждением рукопожатия
-class _StateInProgressStateSecondRequest implements _StateInProgressState {
-  final _StateInProgress _context;
+class _StateInitStateSecondRequest implements _StateInitState {
+  final _StateInit _context;
   final Uint8List _publicKey;
   final Uint8List _privateKey;
 
-  _StateInProgressStateSecondRequest(this._context, this._privateKey, this._publicKey) {
+  _StateInitStateSecondRequest(this._context, this._privateKey, this._publicKey) {
     final data = w.Data(X25519(_privateKey, basePoint));
     _context._write(w.BytesBuffer()..add(data));
   }

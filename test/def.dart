@@ -73,7 +73,7 @@ class Client {
   factory Client({
     required ConnectParams connectParams,
   }) {
-    final encryption = Encryption();
+    final encryption = Encryption(Uint8List(32));
     final connection =
     Connection.root(connectParams).pipe().cipher(encryption).multiplex().pipe();
 
