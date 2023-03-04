@@ -85,7 +85,7 @@ class Client {
     );
   }
 
-// handlers
+  // handlers
 
   Future<SendCodeResponse> sendCode(SendCodeRequest request) => _peer
       .sendRequest(
@@ -192,7 +192,10 @@ class Client {
       )
       .then(SendMessageGroupResp.fromBytes);
 
-  // Stream<PresentEvent> listenUpdates() => ;
+  Stream<PresentEvent> listenUpdates(ListenUpdatesReq request) => _peer.sendStreamRequest(
+        HandlerHash(hash: [0x28, 0xDC, 0x9C, 0xE9]),
+        request,
+      ).map(PresentEvent.fromBytes);
 }
 
 class UpdateFcmTokenReq implements Message {
