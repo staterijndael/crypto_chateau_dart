@@ -22,7 +22,7 @@ class ConnectionRoot implements Connection {
   final _readController = StreamController<r.BytesBuffer>(sync: true);
   late _State _state = _StateNone(this);
 
-  ConnectionRoot(this.connectParams);
+  ConnectionRoot(this._connectParams);
 
   Future<void> close() async {
     await _state.close();
@@ -62,7 +62,7 @@ class _StateInit implements _State {
       _connectParams.host,
       _connectParams.port,
     ).then(
-      (socket) {
+          (socket) {
         final state = _context._state = _StateIdle(_context, socket);
         _buffer.forEach(state.write);
       },
@@ -74,7 +74,7 @@ class _StateInit implements _State {
     );
   }
 
-  ConnectParams get _connectParams => _context.connectParams;
+  ConnectParams get _connectParams => _context._connectParams;
 
   Future<void> close() => Future.value();
 
@@ -88,7 +88,6 @@ class _StateIdle implements _State {
   StreamController<w.BytesBuffer>? _writeController;
   StreamSubscription<void>? _writeSubscription;
   StreamSubscription<Uint8List>? _readSubscription;
-  var i = 0;
 
   _StateIdle(this._context, this._socket) {
     if (_readController.hasListener) {
@@ -101,6 +100,8 @@ class _StateIdle implements _State {
   StreamController<r.BytesBuffer> get _readController => _context._readController;
 
   void _createReadSubscription() {
+    if (_readSubscription != null) return;
+
     _readSubscription = _socket.listen(
           (bytes) => _readController.add(r.BytesBuffer(bytes)),
     );
