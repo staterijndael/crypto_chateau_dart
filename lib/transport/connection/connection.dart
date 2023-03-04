@@ -7,7 +7,6 @@ import 'connection_root.dart';
 import 'connection_cipher.dart';
 import 'connection_logger.dart';
 import 'connection_pipe.dart';
-import 'multiplex_connection.dart';
 import 'encryption.dart';
 
 export 'connection_base.dart';
