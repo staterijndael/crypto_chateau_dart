@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:crypto_chateau_dart/crypto_chateau_dart.dart';
-import 'bytes_buffer_write.dart' as w;
-import 'bytes_buffer_read.dart' as r;
+import 'bytes_writer.dart';
+import 'bytes_reader.dart';
 
 class ConnectionBase implements Connection {
   final Connection _connection;
@@ -9,8 +9,8 @@ class ConnectionBase implements Connection {
   const ConnectionBase(this._connection);
 
   @override
-  Stream<r.BytesBuffer> get read => _connection.read;
+  Stream<BytesReader> get read => _connection.read;
 
   @override
-  void write(w.BytesBuffer buffer) => _connection.write(buffer);
+  void write(BytesWriter buffer) => _connection.write(buffer);
 }

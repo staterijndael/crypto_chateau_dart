@@ -1,8 +1,9 @@
 import 'dart:async';
+import 'dart:typed_data';
 import 'package:crypto_chateau_dart/crypto_chateau_dart.dart';
-import 'bytes_buffer_write.dart' as w;
-import 'bytes_buffer_read.dart' as r;
-import 'connection_base.dart';
+import 'bytes_writer.dart';
+import 'bytes_reader.dart';
+import 'package:crypto_chateau_dart/transport/connection/connection_base.dart';
 
 class ConnectionPipe extends ConnectionBase {
   final _pipe = Pipe();
@@ -10,37 +11,50 @@ class ConnectionPipe extends ConnectionBase {
   ConnectionPipe(super._connection);
 
   @override
-  Stream<r.BytesBuffer> get read => super.read.asyncExpand(_pipe.read);
+  Stream<BytesReader> get read => super.read.asyncExpand(_pipe.read);
 
   @override
-  void write(w.BytesBuffer buffer) {
+  void write(BytesWriter buffer) {
     _pipe.write(buffer);
     super.write(buffer);
   }
 }
 
 class Pipe {
-  r.BytesBuffer? _reserved;
+  _BytesReaderWithLength? _reserved;
 
   Pipe();
 
-  Stream<r.BytesBuffer> read(r.BytesBuffer buffer) async* {
-    final r.BytesBuffer current;
-    final r.Length length;
+  Stream<BytesReader> read(BytesReader buffer) async* {
+    var current = _reserved ?? _BytesReaderWithLength(buffer.readLength());
 
-    if (_reserved != null) {
-      current = _reserved!..merge(buffer);
-      length = current.properties.first as r.Length;
-    } else {
-      current = buffer;
-      length = current.add(const r.LengthApplier());
-    }
+    while(true) {
+      final lengthNeed = current.length - current.builder.length;
 
-    if (buffer.length == length.length) {
-      yield buffer;
-      _reserved = null;
+      if (buffer.length > lengthNeed) {
+        current.builder.add(buffer.read(lengthNeed));
+        final bytes = current.builder.takeBytes();
+        yield BytesReader(bytes);
+        current = _reserved ?? _BytesReaderWithLength(buffer.readLength());
+        continue;
+      }
+
+      current.builder.add(buffer.read());
+
+      if (current.builder.length == current.length) {
+        final bytes = current.builder.takeBytes();
+        yield BytesReader(bytes);
+        break;
+      }
     }
   }
 
-  w.BytesBuffer write(w.BytesBuffer buffer) => buffer..add(const w.Length());
+  BytesWriter write(BytesWriter buffer) => buffer..writeLength();
+}
+
+class _BytesReaderWithLength {
+  final builder = BytesBuilder(copy: false);
+  final int length;
+
+  _BytesReaderWithLength(this.length);
 }

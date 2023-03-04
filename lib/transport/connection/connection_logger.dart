@@ -1,7 +1,7 @@
 import 'dart:async';
-import 'bytes_buffer_write.dart' as w;
-import 'bytes_buffer_read.dart' as r;
-import 'connection_base.dart';
+import 'bytes_writer.dart';
+import 'bytes_reader.dart';
+import 'package:crypto_chateau_dart/transport/connection/connection_base.dart';
 
 class ConnectionLogger extends ConnectionBase {
   final String? name;
@@ -10,7 +10,7 @@ class ConnectionLogger extends ConnectionBase {
 
   String get _name => name != null ? '$name-' : '';
 
-  Stream<r.BytesBuffer> get read => super.read.map(
+  Stream<BytesReader> get read => super.read.map(
         (buffer) {
           print('${_name}receive(${DateTime.now()}): $buffer');
 
@@ -19,7 +19,7 @@ class ConnectionLogger extends ConnectionBase {
       );
 
   @override
-  void write(w.BytesBuffer buffer) {
+  void write(BytesWriter buffer) {
     print('${_name}send(${DateTime.now()}): $buffer');
     super.write(buffer);
   }

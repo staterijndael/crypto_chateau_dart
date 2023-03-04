@@ -1,7 +1,7 @@
 import 'dart:collection';
 import 'dart:typed_data';
 
-class BytesWriter {
+class BytesBuilderQueue {
   int _length = 0;
   final _chunks = Queue<Uint8List>();
 
