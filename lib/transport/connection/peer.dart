@@ -44,7 +44,7 @@ class _Peer {
     final offset = serverRespMetaInfo.payloadOffset;
 
     if (response[offset] == errByte) {
-      throw MultiplexRequestLoopRPCError(bytes);
+      throw MultiplexRequestLoopRPCError(response.read());
     }
 
     if (offset + 1 + response.length < objectBytesPrefixLength) {
