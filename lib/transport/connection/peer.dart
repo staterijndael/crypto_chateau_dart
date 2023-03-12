@@ -47,7 +47,7 @@ class _Peer {
       throw MultiplexRequestLoopRPCError(response.read());
     }
 
-    if (offset + 1 + response.length < objectBytesPrefixLength) {
+    if (response.length < offset + 1 + objectBytesPrefixLength) {
       throw MultiplexRequestLoopSizeError();
     }
 
@@ -69,12 +69,12 @@ class _Peer {
         continue;
       }
 
-      if (response.length < objectBytesPrefixLength) {
+      if (response.length < offset + 1 + objectBytesPrefixLength) {
         yield* Stream.error(MultiplexRequestLoopSizeError(), StackTrace.current);
         continue;
       }
 
-      response.readIdle(objectBytesPrefixLength);
+      response.readIdle(offset + 1 + objectBytesPrefixLength);
 
       yield response.read();
     }

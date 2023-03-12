@@ -6,6 +6,8 @@ import 'package:crypto_chateau_dart/transport/connection/connection.dart';
 import 'package:crypto_chateau_dart/client/binary_iterator.dart';
 import 'package:crypto_chateau_dart/transport/handler.dart';
 
+export 'package:crypto_chateau_dart/transport/connection/connection.dart' show ConnectParams;
+
 var handlerHashMap = {
   "UserEndpoint": {
     "SendCode": [0x8D, 0x29, 0x10, 0xB8],
@@ -89,113 +91,115 @@ class Client {
 
   Future<SendCodeResponse> sendCode(SendCodeRequest request) => _peer
       .sendRequest(
-        HandlerHash(hash: [0x8D, 0x29, 0x10, 0xB8]),
-        request,
-      )
+    HandlerHash(hash: [0x8D, 0x29, 0x10, 0xB8]),
+    request,
+  )
       .then(SendCodeResponse.fromBytes);
 
   Future<HandleCodeResponse> handleCode(HandleCodeRequest request) => _peer
       .sendRequest(
-        HandlerHash(hash: [0xC8, 0x46, 0x91, 0xDA]),
-        request,
-      )
+    HandlerHash(hash: [0xC8, 0x46, 0x91, 0xDA]),
+    request,
+  )
       .then(HandleCodeResponse.fromBytes);
 
   Future<RequiredOPKResponse> requiredOPK(RequiredOPKRequest request) => _peer
       .sendRequest(
-        HandlerHash(hash: [0xE6, 0xF3, 0x96, 0x42]),
-        request,
-      )
+    HandlerHash(hash: [0xE6, 0xF3, 0x96, 0x42]),
+    request,
+  )
       .then(RequiredOPKResponse.fromBytes);
 
   Future<LoadOPKResponse> loadOPK(LoadOPKRequest request) => _peer
       .sendRequest(
-        HandlerHash(hash: [0x3, 0xB, 0x41, 0x2E]),
-        request,
-      )
+    HandlerHash(hash: [0x3, 0xB, 0x41, 0x2E]),
+    request,
+  )
       .then(LoadOPKResponse.fromBytes);
 
   Future<FindUsersByPartNicknameResponse> findUsersByPartNickname(FindUsersByPartNicknameRequest request) => _peer
       .sendRequest(
-        HandlerHash(hash: [0x50, 0x85, 0x5D, 0xE]),
-        request,
-      )
+    HandlerHash(hash: [0x50, 0x85, 0x5D, 0xE]),
+    request,
+  )
       .then(FindUsersByPartNicknameResponse.fromBytes);
 
   Future<GetInitMsgKeysResponse> getInitMsgKeys(GetInitMsgKeysRequest request) => _peer
       .sendRequest(
-        HandlerHash(hash: [0x12, 0x90, 0xA7, 0xFE]),
-        request,
-      )
+    HandlerHash(hash: [0x12, 0x90, 0xA7, 0xFE]),
+    request,
+  )
       .then(GetInitMsgKeysResponse.fromBytes);
 
   Future<RegisterResponse> register(RegisterRequest request) => _peer
       .sendRequest(
-        HandlerHash(hash: [0x7D, 0xCB, 0xAD, 0xA0]),
-        request,
-      )
+    HandlerHash(hash: [0x7D, 0xCB, 0xAD, 0xA0]),
+    request,
+  )
       .then(RegisterResponse.fromBytes);
 
   Future<AuthTokenResponse> authToken(AuthTokenRequest request) => _peer
       .sendRequest(
-        HandlerHash(hash: [0x98, 0xF1, 0xCE, 0x10]),
-        request,
-      )
+    HandlerHash(hash: [0x98, 0xF1, 0xCE, 0x10]),
+    request,
+  )
       .then(AuthTokenResponse.fromBytes);
 
   Future<AuthCredentialsResponse> authCredentials(AuthCredentialsRequest request) => _peer
       .sendRequest(
-        HandlerHash(hash: [0xA6, 0x7, 0x86, 0xA0]),
-        request,
-      )
+    HandlerHash(hash: [0xA6, 0x7, 0x86, 0xA0]),
+    request,
+  )
       .then(AuthCredentialsResponse.fromBytes);
 
   Future<SendMessagePMResponse> sendMessagePM(SendMessagePMRequest request) => _peer
       .sendRequest(
-        HandlerHash(hash: [0x92, 0x4E, 0xFD, 0x10]),
-        request,
-      )
+    HandlerHash(hash: [0x92, 0x4E, 0xFD, 0x10]),
+    request,
+  )
       .then(SendMessagePMResponse.fromBytes);
 
   Future<SendInitMessagePMResponse> sendInitMessagePM(SendInitMessagePMRequest request) => _peer
       .sendRequest(
-        HandlerHash(hash: [0x86, 0xC2, 0xB4, 0x1A]),
-        request,
-      )
+    HandlerHash(hash: [0x86, 0xC2, 0xB4, 0x1A]),
+    request,
+  )
       .then(SendInitMessagePMResponse.fromBytes);
 
   Future<ReverseStringResponse> reverseString(ReverseStringReq request) => _peer
       .sendRequest(
-        HandlerHash(hash: [0x86, 0xC, 0xAA, 0x80]),
-        request,
-      )
+    HandlerHash(hash: [0x86, 0xC, 0xAA, 0x80]),
+    request,
+  )
       .then(ReverseStringResponse.fromBytes);
 
   Future<UpdateFcmTokenResp> updateNotificationId(UpdateFcmTokenReq request) => _peer
       .sendRequest(
-        HandlerHash(hash: [0x79, 0xA4, 0x14, 0xEF]),
-        request,
-      )
+    HandlerHash(hash: [0x79, 0xA4, 0x14, 0xEF]),
+    request,
+  )
       .then(UpdateFcmTokenResp.fromBytes);
 
   Future<CreateGroupResponse> createGroup(CreateGroupReq request) => _peer
       .sendRequest(
-        HandlerHash(hash: [0x7C, 0x8, 0x95, 0xB1]),
-        request,
-      )
+    HandlerHash(hash: [0x7C, 0x8, 0x95, 0xB1]),
+    request,
+  )
       .then(CreateGroupResponse.fromBytes);
 
   Future<SendMessageGroupResp> sendMessageGroup(SendMessageGroupReq request) => _peer
       .sendRequest(
-        HandlerHash(hash: [0xDB, 0xE4, 0x60, 0x89]),
-        request,
-      )
+    HandlerHash(hash: [0xDB, 0xE4, 0x60, 0x89]),
+    request,
+  )
       .then(SendMessageGroupResp.fromBytes);
 
-  Stream<PresentEvent> listenUpdates(ListenUpdatesReq request) => _peer.sendStreamRequest(
-        HandlerHash(hash: [0x28, 0xDC, 0x9C, 0xE9]),
-        request,
-      ).map(PresentEvent.fromBytes);
+  Stream<PresentEvent> listenUpdates(ListenUpdatesReq request) => _peer
+      .sendStreamRequest(
+    HandlerHash(hash: [0x28, 0xDC, 0x9C, 0xE9]),
+    request,
+  )
+      .map(PresentEvent.fromBytes);
 }
 
 class UpdateFcmTokenReq implements Message {
@@ -208,9 +212,9 @@ class UpdateFcmTokenReq implements Message {
   });
 
   static UpdateFcmTokenReq fromBytes(Uint8List bytes) => UpdateFcmTokenReq(
-        SessionToken: List.filled(0, 0xff, growable: true),
-        FcmToken: "",
-      )..Unmarshal(BinaryIterator(bytes));
+    SessionToken: List.filled(0, 0xff, growable: true),
+    FcmToken: "",
+  )..Unmarshal(BinaryIterator(bytes));
 
   Uint8List Marshal() {
     List<int> b = [];
@@ -294,18 +298,18 @@ class GroupMessage implements Message {
   });
 
   static GroupMessage fromBytes(Uint8List bytes) => GroupMessage(
-        GroupIK: List.filled(0, 0xff, growable: true),
-        MessageID: 0,
-        MessageType: "",
-        Content: List.filled(0, 0xff, growable: true),
-        Attachments: List.filled(
-            0,
-            Attachment(
-              Type: "",
-              Payload: List.filled(0, 0xff, growable: true),
-            ),
-            growable: true),
-      )..Unmarshal(BinaryIterator(bytes));
+    GroupIK: List.filled(0, 0xff, growable: true),
+    MessageID: 0,
+    MessageType: "",
+    Content: List.filled(0, 0xff, growable: true),
+    Attachments: List.filled(
+        0,
+        Attachment(
+          Type: "",
+          Payload: List.filled(0, 0xff, growable: true),
+        ),
+        growable: true),
+  )..Unmarshal(BinaryIterator(bytes));
 
   Uint8List Marshal() {
     List<int> b = [];
@@ -416,13 +420,13 @@ class SendMessageGroupReq implements Message {
   });
 
   static SendMessageGroupReq fromBytes(Uint8List bytes) => SendMessageGroupReq(
-        MessageType: "",
-        GroupIK: List.filled(0, 0xff, growable: true),
-        Content: List.filled(0, 0xff, growable: true),
-        Attachments:
-            List.filled(0, Attachment(Type: "", Payload: List.filled(0, 0xff, growable: true)), growable: true),
-        SessionToken: List.filled(0, 0xff, growable: true),
-      )..Unmarshal(BinaryIterator(bytes));
+    MessageType: "",
+    GroupIK: List.filled(0, 0xff, growable: true),
+    Content: List.filled(0, 0xff, growable: true),
+    Attachments:
+    List.filled(0, Attachment(Type: "", Payload: List.filled(0, 0xff, growable: true)), growable: true),
+    SessionToken: List.filled(0, 0xff, growable: true),
+  )..Unmarshal(BinaryIterator(bytes));
 
   Uint8List Marshal() {
     List<int> b = [];
@@ -571,12 +575,12 @@ class CreateGroupReq implements Message {
   });
 
   static CreateGroupReq fromBytes(Uint8List bytes) => CreateGroupReq(
-        SessionToken: List.filled(0, 0xff, growable: true),
-        IdentityKey: List.filled(0, 0xff, growable: true),
-        Name: "",
-        Status: "",
-        PictureID: "",
-      )..Unmarshal(BinaryIterator(bytes));
+    SessionToken: List.filled(0, 0xff, growable: true),
+    IdentityKey: List.filled(0, 0xff, growable: true),
+    Name: "",
+    Status: "",
+    PictureID: "",
+  )..Unmarshal(BinaryIterator(bytes));
 
   Uint8List Marshal() {
     List<int> b = [];
@@ -808,9 +812,9 @@ class HandleCodeRequest implements Message {
   });
 
   static HandleCodeRequest fromBytes(Uint8List bytes) => HandleCodeRequest(
-        Phone: "",
-        Code: 0,
-      )..Unmarshal(BinaryIterator(bytes));
+    Phone: "",
+    Code: 0,
+  )..Unmarshal(BinaryIterator(bytes));
 
   Uint8List Marshal() {
     List<int> b = [];
@@ -866,8 +870,8 @@ class RequiredOPKRequest implements Message {
   });
 
   static RequiredOPKRequest fromBytes(Uint8List bytes) => RequiredOPKRequest(
-        SessionToken: List.filled(0, 0xff, growable: true),
-      )..Unmarshal(BinaryIterator(bytes));
+    SessionToken: List.filled(0, 0xff, growable: true),
+  )..Unmarshal(BinaryIterator(bytes));
 
   Uint8List Marshal() {
     List<int> b = [];
@@ -950,15 +954,15 @@ class LoadOPKRequest implements Message {
   });
 
   static LoadOPKRequest fromBytes(Uint8List bytes) => LoadOPKRequest(
-        SessionToken: List.filled(0, 0xff, growable: true),
-        OPK: List.filled(
-            0,
-            OPKPair(
-              OPKId: 0,
-              OPK: List.filled(0, 0xff, growable: true),
-            ),
-            growable: true),
-      )..Unmarshal(BinaryIterator(bytes));
+    SessionToken: List.filled(0, 0xff, growable: true),
+    OPK: List.filled(
+        0,
+        OPKPair(
+          OPKId: 0,
+          OPK: List.filled(0, 0xff, growable: true),
+        ),
+        growable: true),
+  )..Unmarshal(BinaryIterator(bytes));
 
   Uint8List Marshal() {
     List<int> b = [];
@@ -1031,9 +1035,9 @@ class OPKPair implements Message {
   });
 
   static OPKPair fromBytes(Uint8List bytes) => OPKPair(
-        OPKId: 0,
-        OPK: List.filled(0, 0xff, growable: true),
-      )..Unmarshal(BinaryIterator(bytes));
+    OPKId: 0,
+    OPK: List.filled(0, 0xff, growable: true),
+  )..Unmarshal(BinaryIterator(bytes));
 
   Uint8List Marshal() {
     List<int> b = [];
@@ -1110,9 +1114,9 @@ class FindUsersByPartNicknameRequest implements Message {
   });
 
   static FindUsersByPartNicknameRequest fromBytes(Uint8List bytes) => FindUsersByPartNicknameRequest(
-        SessionToken: List.filled(0, 0xff, growable: true),
-        PartNickname: "",
-      )..Unmarshal(BinaryIterator(bytes));
+    SessionToken: List.filled(0, 0xff, growable: true),
+    PartNickname: "",
+  )..Unmarshal(BinaryIterator(bytes));
 
   Uint8List Marshal() {
     List<int> b = [];
@@ -1167,16 +1171,16 @@ class FindUsersByPartNicknameResponse implements Message {
   });
 
   static FindUsersByPartNicknameResponse fromBytes(Uint8List bytes) => FindUsersByPartNicknameResponse(
-        Users: List.filled(
-            0,
-            PresentUser(
-              IdentityKey: List.filled(0, 0xff, growable: true),
-              Nickname: "",
-              PictureID: "",
-              Status: "",
-            ),
-            growable: true),
-      )..Unmarshal(BinaryIterator(bytes));
+    Users: List.filled(
+        0,
+        PresentUser(
+          IdentityKey: List.filled(0, 0xff, growable: true),
+          Nickname: "",
+          PictureID: "",
+          Status: "",
+        ),
+        growable: true),
+  )..Unmarshal(BinaryIterator(bytes));
 
   Uint8List Marshal() {
     List<int> b = [];
@@ -1208,7 +1212,7 @@ class FindUsersByPartNicknameResponse implements Message {
         PresentUser(IdentityKey: List.filled(0, 0xff, growable: true), Nickname: "", PictureID: "", Status: ""));
     while (binaryCtx.arrBuf.hasNext()) {
       PresentUser elUsers =
-          PresentUser(IdentityKey: List.filled(0, 0xff, growable: true), Nickname: "", PictureID: "", Status: "");
+      PresentUser(IdentityKey: List.filled(0, 0xff, growable: true), Nickname: "", PictureID: "", Status: "");
 
       binaryCtx.size = binaryCtx.arrBuf.nextSize();
       binaryCtx.buf = binaryCtx.arrBuf.slice(binaryCtx.size);
@@ -1234,11 +1238,11 @@ class PresentUser implements Message {
   });
 
   static PresentUser fromBytes(Uint8List bytes) => PresentUser(
-        IdentityKey: List.filled(0, 0xff, growable: true),
-        Nickname: "",
-        PictureID: "",
-        Status: "",
-      )..Unmarshal(BinaryIterator(bytes));
+    IdentityKey: List.filled(0, 0xff, growable: true),
+    Nickname: "",
+    PictureID: "",
+    Status: "",
+  )..Unmarshal(BinaryIterator(bytes));
 
   Uint8List Marshal() {
     List<int> b = [];
@@ -1307,9 +1311,9 @@ class GetInitMsgKeysRequest implements Message {
   });
 
   static GetInitMsgKeysRequest fromBytes(Uint8List bytes) => GetInitMsgKeysRequest(
-        SessionToken: List.filled(0, 0xff, growable: true),
-        IdentityKey: List.filled(0, 0xff, growable: true),
-      )..Unmarshal(BinaryIterator(bytes));
+    SessionToken: List.filled(0, 0xff, growable: true),
+    IdentityKey: List.filled(0, 0xff, growable: true),
+  )..Unmarshal(BinaryIterator(bytes));
 
   Uint8List Marshal() {
     List<int> b = [];
@@ -1385,11 +1389,11 @@ class GetInitMsgKeysResponse implements Message {
   });
 
   static GetInitMsgKeysResponse fromBytes(Uint8List bytes) => GetInitMsgKeysResponse(
-        OPKId: 0,
-        OPK: List.filled(0, 0xff, growable: true),
-        SignedLTPK: List.filled(0, 0xff, growable: true),
-        Signature: List.filled(0, 0xff, growable: true),
-      )..Unmarshal(BinaryIterator(bytes));
+    OPKId: 0,
+    OPK: List.filled(0, 0xff, growable: true),
+    SignedLTPK: List.filled(0, 0xff, growable: true),
+    Signature: List.filled(0, 0xff, growable: true),
+  )..Unmarshal(BinaryIterator(bytes));
 
   Uint8List Marshal() {
     List<int> b = [];
@@ -1481,7 +1485,7 @@ class RegisterRequest implements Message {
   String Phone;
   int Code;
   String Nickname;
-  String PassHash;
+  List<int> PassHash;
   String DeviceID;
   String DeviceName;
   String FcmToken;
@@ -1503,17 +1507,17 @@ class RegisterRequest implements Message {
   });
 
   static RegisterRequest fromBytes(Uint8List bytes) => RegisterRequest(
-        Phone: "",
-        Code: 0,
-        Nickname: "",
-        PassHash: "",
-        DeviceID: "",
-        DeviceName: "",
-        FcmToken: "",
-        LTPK: List.filled(0, 0xff, growable: true),
-        LTPKSignature: List.filled(0, 0xff, growable: true),
-        IdentityKey: List.filled(0, 0xff, growable: true),
-      )..Unmarshal(BinaryIterator(bytes));
+    Phone: "",
+    Code: 0,
+    Nickname: "",
+    PassHash: List.filled(0, 0xff, growable: true),
+    DeviceID: "",
+    DeviceName: "",
+    FcmToken: "",
+    LTPK: List.filled(0, 0xff, growable: true),
+    LTPKSignature: List.filled(0, 0xff, growable: true),
+    IdentityKey: List.filled(0, 0xff, growable: true),
+  )..Unmarshal(BinaryIterator(bytes));
 
   Uint8List Marshal() {
     List<int> b = [];
@@ -1525,8 +1529,12 @@ class RegisterRequest implements Message {
     b.addAll(ConvertIntToBytes(Code));
     b.addAll(ConvertSizeToBytes(Nickname.codeUnits.length));
     b.addAll(ConvertStringToBytes(Nickname));
-    b.addAll(ConvertSizeToBytes(PassHash.codeUnits.length));
-    b.addAll(ConvertStringToBytes(PassHash));
+    List<int> arrBufPassHash = [];
+    for (var elPassHash in PassHash) {
+      arrBufPassHash.addAll(ConvertByteToBytes(elPassHash));
+    }
+    b.addAll(ConvertSizeToBytes(arrBufPassHash.length));
+    b.addAll(arrBufPassHash);
     b.addAll(ConvertSizeToBytes(DeviceID.codeUnits.length));
     b.addAll(ConvertStringToBytes(DeviceID));
     b.addAll(ConvertSizeToBytes(DeviceName.codeUnits.length));
@@ -1571,8 +1579,20 @@ class RegisterRequest implements Message {
     Nickname = ConvertBytesToString(binaryCtx.buf);
 
     binaryCtx.size = b.nextSize();
-    binaryCtx.buf = b.slice(binaryCtx.size);
-    PassHash = ConvertBytesToString(binaryCtx.buf);
+
+    binaryCtx.arrBuf = b.slice(binaryCtx.size);
+    binaryCtx.pos = 0;
+
+    PassHash.extend(binaryCtx.size, 0xff);
+    while (binaryCtx.arrBuf.hasNext()) {
+      int elPassHash;
+
+      binaryCtx.buf = binaryCtx.arrBuf.slice(1);
+      elPassHash = ConvertBytesToByte(binaryCtx.buf);
+
+      PassHash[binaryCtx.pos] = elPassHash;
+      binaryCtx.pos++;
+    }
 
     binaryCtx.size = b.nextSize();
     binaryCtx.buf = b.slice(binaryCtx.size);
@@ -1642,8 +1662,8 @@ class RegisterResponse implements Message {
   });
 
   static RegisterResponse fromBytes(Uint8List bytes) => RegisterResponse(
-        SessionToken: List.filled(0, 0xff, growable: true),
-      )..Unmarshal(BinaryIterator(bytes));
+    SessionToken: List.filled(0, 0xff, growable: true),
+  )..Unmarshal(BinaryIterator(bytes));
 
   Uint8List Marshal() {
     List<int> b = [];
@@ -1692,8 +1712,8 @@ class AuthTokenRequest implements Message {
   });
 
   static AuthTokenRequest fromBytes(Uint8List bytes) => AuthTokenRequest(
-        SessionToken: List.filled(0, 0xff, growable: true),
-      )..Unmarshal(BinaryIterator(bytes));
+    SessionToken: List.filled(0, 0xff, growable: true),
+  )..Unmarshal(BinaryIterator(bytes));
 
   Uint8List Marshal() {
     List<int> b = [];
@@ -1742,8 +1762,8 @@ class AuthTokenResponse implements Message {
   });
 
   static AuthTokenResponse fromBytes(Uint8List bytes) => AuthTokenResponse(
-        SessionToken: List.filled(0, 0xff, growable: true),
-      )..Unmarshal(BinaryIterator(bytes));
+    SessionToken: List.filled(0, 0xff, growable: true),
+  )..Unmarshal(BinaryIterator(bytes));
 
   Uint8List Marshal() {
     List<int> b = [];
@@ -1798,11 +1818,11 @@ class AuthCredentialsRequest implements Message {
   });
 
   static AuthCredentialsRequest fromBytes(Uint8List bytes) => AuthCredentialsRequest(
-        Phone: "",
-        PassHash: "",
-        DeviceID: "",
-        DeviceName: "",
-      )..Unmarshal(BinaryIterator(bytes));
+    Phone: "",
+    PassHash: "",
+    DeviceID: "",
+    DeviceName: "",
+  )..Unmarshal(BinaryIterator(bytes));
 
   Uint8List Marshal() {
     List<int> b = [];
@@ -1854,8 +1874,8 @@ class AuthCredentialsResponse implements Message {
   });
 
   static AuthCredentialsResponse fromBytes(Uint8List bytes) => AuthCredentialsResponse(
-        SessionToken: List.filled(0, 0xff, growable: true),
-      )..Unmarshal(BinaryIterator(bytes));
+    SessionToken: List.filled(0, 0xff, growable: true),
+  )..Unmarshal(BinaryIterator(bytes));
 
   Uint8List Marshal() {
     List<int> b = [];
@@ -1906,9 +1926,9 @@ class Attachment implements Message {
   });
 
   static Attachment fromBytes(Uint8List bytes) => Attachment(
-        Type: "",
-        Payload: List.filled(0, 0xff, growable: true),
-      )..Unmarshal(BinaryIterator(bytes));
+    Type: "",
+    Payload: List.filled(0, 0xff, growable: true),
+  )..Unmarshal(BinaryIterator(bytes));
 
   Uint8List Marshal() {
     List<int> b = [];
@@ -1974,19 +1994,19 @@ class SendMessagePMRequest implements Message {
   });
 
   static SendMessagePMRequest fromBytes(Uint8List bytes) => SendMessagePMRequest(
-        MessageType: "",
-        ReceiverIK: List.filled(0, 0xff, growable: true),
-        RSPK: List.filled(0, 0xff, growable: true),
-        Content: List.filled(0, 0xff, growable: true),
-        Attachments: List.filled(
-            0,
-            Attachment(
-              Type: "",
-              Payload: List.filled(0, 0xff, growable: true),
-            ),
-            growable: true),
-        SessionToken: List.filled(0, 0xff, growable: true),
-      )..Unmarshal(BinaryIterator(bytes));
+    MessageType: "",
+    ReceiverIK: List.filled(0, 0xff, growable: true),
+    RSPK: List.filled(0, 0xff, growable: true),
+    Content: List.filled(0, 0xff, growable: true),
+    Attachments: List.filled(
+        0,
+        Attachment(
+          Type: "",
+          Payload: List.filled(0, 0xff, growable: true),
+        ),
+        growable: true),
+    SessionToken: List.filled(0, 0xff, growable: true),
+  )..Unmarshal(BinaryIterator(bytes));
 
   Uint8List Marshal() {
     List<int> b = [];
@@ -2165,11 +2185,11 @@ class PresentEvent implements Message {
   });
 
   static PresentEvent fromBytes(Uint8List bytes) => PresentEvent(
-        MonotonicEventID: 0,
-        Type: "",
-        Payload: List.filled(0, 0xff, growable: true),
-        CreatedAt: 0,
-      )..Unmarshal(BinaryIterator(bytes));
+    MonotonicEventID: 0,
+    Type: "",
+    Payload: List.filled(0, 0xff, growable: true),
+    CreatedAt: 0,
+  )..Unmarshal(BinaryIterator(bytes));
 
   Uint8List Marshal() {
     List<int> b = [];
@@ -2243,19 +2263,19 @@ class PmMessage implements Message {
   });
 
   static PmMessage fromBytes(Uint8List bytes) => PmMessage(
-        RemoteIK: List.filled(0, 0xff, growable: true),
-        RSPK: List.filled(0, 0xff, growable: true),
-        MessageID: 0,
-        MessageType: "",
-        Content: List.filled(0, 0xff, growable: true),
-        Attachments: List.filled(
-            0,
-            Attachment(
-              Type: "",
-              Payload: List.filled(0, 0xff, growable: true),
-            ),
-            growable: true),
-      )..Unmarshal(BinaryIterator(bytes));
+    RemoteIK: List.filled(0, 0xff, growable: true),
+    RSPK: List.filled(0, 0xff, growable: true),
+    MessageID: 0,
+    MessageType: "",
+    Content: List.filled(0, 0xff, growable: true),
+    Attachments: List.filled(
+        0,
+        Attachment(
+          Type: "",
+          Payload: List.filled(0, 0xff, growable: true),
+        ),
+        growable: true),
+  )..Unmarshal(BinaryIterator(bytes));
 
   Uint8List Marshal() {
     List<int> b = [];
@@ -2383,10 +2403,10 @@ class PmInitMessage implements Message {
   });
 
   static PmInitMessage fromBytes(Uint8List bytes) => PmInitMessage(
-        RemoteIK: List.filled(0, 0xff, growable: true),
-        RemoteEK: List.filled(0, 0xff, growable: true),
-        UsedOPKMarkID: 0,
-      )..Unmarshal(BinaryIterator(bytes));
+    RemoteIK: List.filled(0, 0xff, growable: true),
+    RemoteEK: List.filled(0, 0xff, growable: true),
+    UsedOPKMarkID: 0,
+  )..Unmarshal(BinaryIterator(bytes));
 
   Uint8List Marshal() {
     List<int> b = [];
@@ -2463,11 +2483,11 @@ class SendInitMessagePMRequest implements Message {
   });
 
   static SendInitMessagePMRequest fromBytes(Uint8List bytes) => SendInitMessagePMRequest(
-        SessionToken: List.filled(0, 0xff, growable: true),
-        ReceiverIK: List.filled(0, 0xff, growable: true),
-        SelfEK: List.filled(0, 0xff, growable: true),
-        UsedOPKMarkID: 0,
-      )..Unmarshal(BinaryIterator(bytes));
+    SessionToken: List.filled(0, 0xff, growable: true),
+    ReceiverIK: List.filled(0, 0xff, growable: true),
+    SelfEK: List.filled(0, 0xff, growable: true),
+    UsedOPKMarkID: 0,
+  )..Unmarshal(BinaryIterator(bytes));
 
   Uint8List Marshal() {
     List<int> b = [];
@@ -2583,9 +2603,9 @@ class ListenUpdatesReq implements Message {
   });
 
   static ListenUpdatesReq fromBytes(Uint8List bytes) => ListenUpdatesReq(
-        SessionToken: List.filled(0, 0xff, growable: true),
-        MonotonicIdOffset: 0,
-      )..Unmarshal(BinaryIterator(bytes));
+    SessionToken: List.filled(0, 0xff, growable: true),
+    MonotonicIdOffset: 0,
+  )..Unmarshal(BinaryIterator(bytes));
 
   Uint8List Marshal() {
     List<int> b = [];
