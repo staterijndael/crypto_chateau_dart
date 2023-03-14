@@ -14,17 +14,21 @@ void main() async {
   );
 
   await Future.wait([
-    for (var i = 0; i < 256; i++)
+    for (var i = 0; i < 2; i++)
       client.reverseString(ReverseStringReq(Str: '$i: DANIA CREATE FACTORIES!!!')).then((value) => print(value.Res.split('').reversed.join()))
   ]);
 
+  await Future.delayed(const Duration(seconds: 10));
+
   await Future.wait([
-    for (var i = 0; i < 256; i++)
+    for (var i = 0; i < 2; i++)
       client.reverseString(ReverseStringReq(Str: '$i: DANIA CREATE FACTORIES!!!')).then((value) => print(value.Res.split('').reversed.join()))
   ]);
 
+  await Future.delayed(const Duration(seconds: 10));
+
   await Future.wait([
-    for (var i = 0; i < 256; i++)
+    for (var i = 0; i < 2; i++)
       client.reverseString(ReverseStringReq(Str: '$i: DANIA CREATE FACTORIES!!!')).then((value) => print(value.Res.split('').reversed.join()))
   ]);
 }

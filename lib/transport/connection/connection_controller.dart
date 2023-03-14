@@ -6,11 +6,13 @@ import 'package:crypto_chateau_dart/transport/connection/connection.dart';
 
 class ConnectionController implements Connection {
   final _readController = StreamController<BytesReader>(sync: true);
+  final Stream<ConnectionState> connectionState;
   void Function(BytesWriter bytes)? onWrite;
   void Function()? onListen;
   FutureOr<void> Function()? onCancel;
 
   ConnectionController({
+    required this.connectionState,
     this.onWrite,
     this.onListen,
     this.onCancel,

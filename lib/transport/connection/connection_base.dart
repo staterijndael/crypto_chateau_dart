@@ -8,6 +8,8 @@ class ConnectionBase implements Connection {
 
   const ConnectionBase(this._connection);
 
+  Stream<ConnectionState> get connectionState => _connection.connectionState;
+
   @override
   Stream<BytesReader> get read => _connection.read;
 

@@ -37,6 +37,7 @@ class MultiplexConnection {
     final id = _getFreeId();
 
     return _connections[id] = ConnectionController(
+      connectionState: _connection.connectionState,
       onWrite: (buffer) => _onWrite(buffer, id),
       onListen: _startListenConnection,
       onCancel: () {

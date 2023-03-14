@@ -6,8 +6,6 @@ import 'package:crypto_chateau_dart/transport/connection/connection.dart';
 import 'package:crypto_chateau_dart/client/binary_iterator.dart';
 import 'package:crypto_chateau_dart/transport/handler.dart';
 
-export 'package:crypto_chateau_dart/transport/connection/connection.dart' show ConnectParams;
-
 var handlerHashMap = {
   "UserEndpoint": {
     "SendCode": [0x8D, 0x29, 0x10, 0xB8],
@@ -24,6 +22,7 @@ var handlerHashMap = {
     "ListenUpdates": [0x28, 0xDC, 0x9C, 0xE9],
     "ReverseString": [0x86, 0xC, 0xAA, 0x80],
     "UpdateNotificationId": [0x79, 0xA4, 0x14, 0xEF],
+    "UpdateLTPK": [0xAC, 0x95, 0x39, 0x68],
   },
   "GroupEndpoint": {
     "CreateGroup": [0x7C, 0x8, 0x95, 0xB1],
@@ -87,134 +86,109 @@ class Client {
     );
   }
 
-  // handlers
+// handlers
 
-  Future<SendCodeResponse> sendCode(SendCodeRequest request) => _peer
-      .sendRequest(
-    HandlerHash(hash: [0x8D, 0x29, 0x10, 0xB8]),
-    request,
-  )
-      .then(SendCodeResponse.fromBytes);
+  Future<SendCodeResponse> sendCode(SendCodeRequest request) =>
+      _peer.sendRequest(HandlerHash(hash: [0x8D, 0x29, 0x10, 0xB8]), request).then(SendCodeResponse.fromBytes);
 
-  Future<HandleCodeResponse> handleCode(HandleCodeRequest request) => _peer
-      .sendRequest(
-    HandlerHash(hash: [0xC8, 0x46, 0x91, 0xDA]),
-    request,
-  )
-      .then(HandleCodeResponse.fromBytes);
+  Future<HandleCodeResponse> handleCode(HandleCodeRequest request) =>
+      _peer.sendRequest(HandlerHash(hash: [0xC8, 0x46, 0x91, 0xDA]), request).then(HandleCodeResponse.fromBytes);
 
-  Future<RequiredOPKResponse> requiredOPK(RequiredOPKRequest request) => _peer
-      .sendRequest(
-    HandlerHash(hash: [0xE6, 0xF3, 0x96, 0x42]),
-    request,
-  )
-      .then(RequiredOPKResponse.fromBytes);
+  Future<RequiredOPKResponse> requiredOPK(RequiredOPKRequest request) =>
+      _peer.sendRequest(HandlerHash(hash: [0xE6, 0xF3, 0x96, 0x42]), request).then(RequiredOPKResponse.fromBytes);
 
-  Future<LoadOPKResponse> loadOPK(LoadOPKRequest request) => _peer
-      .sendRequest(
-    HandlerHash(hash: [0x3, 0xB, 0x41, 0x2E]),
-    request,
-  )
-      .then(LoadOPKResponse.fromBytes);
+  Future<LoadOPKResponse> loadOPK(LoadOPKRequest request) =>
+      _peer.sendRequest(HandlerHash(hash: [0x3, 0xB, 0x41, 0x2E]), request).then(LoadOPKResponse.fromBytes);
 
   Future<FindUsersByPartNicknameResponse> findUsersByPartNickname(FindUsersByPartNicknameRequest request) => _peer
-      .sendRequest(
-    HandlerHash(hash: [0x50, 0x85, 0x5D, 0xE]),
-    request,
-  )
+      .sendRequest(HandlerHash(hash: [0x50, 0x85, 0x5D, 0xE]), request)
       .then(FindUsersByPartNicknameResponse.fromBytes);
 
-  Future<GetInitMsgKeysResponse> getInitMsgKeys(GetInitMsgKeysRequest request) => _peer
-      .sendRequest(
-    HandlerHash(hash: [0x12, 0x90, 0xA7, 0xFE]),
-    request,
-  )
-      .then(GetInitMsgKeysResponse.fromBytes);
+  Future<GetInitMsgKeysResponse> getInitMsgKeys(GetInitMsgKeysRequest request) =>
+      _peer.sendRequest(HandlerHash(hash: [0x12, 0x90, 0xA7, 0xFE]), request).then(GetInitMsgKeysResponse.fromBytes);
 
-  Future<RegisterResponse> register(RegisterRequest request) => _peer
-      .sendRequest(
-    HandlerHash(hash: [0x7D, 0xCB, 0xAD, 0xA0]),
-    request,
-  )
-      .then(RegisterResponse.fromBytes);
+  Future<RegisterResponse> register(RegisterRequest request) =>
+      _peer.sendRequest(HandlerHash(hash: [0x7D, 0xCB, 0xAD, 0xA0]), request).then(RegisterResponse.fromBytes);
 
-  Future<AuthTokenResponse> authToken(AuthTokenRequest request) => _peer
-      .sendRequest(
-    HandlerHash(hash: [0x98, 0xF1, 0xCE, 0x10]),
-    request,
-  )
-      .then(AuthTokenResponse.fromBytes);
+  Future<AuthTokenResponse> authToken(AuthTokenRequest request) =>
+      _peer.sendRequest(HandlerHash(hash: [0x98, 0xF1, 0xCE, 0x10]), request).then(AuthTokenResponse.fromBytes);
 
-  Future<AuthCredentialsResponse> authCredentials(AuthCredentialsRequest request) => _peer
-      .sendRequest(
-    HandlerHash(hash: [0xA6, 0x7, 0x86, 0xA0]),
-    request,
-  )
-      .then(AuthCredentialsResponse.fromBytes);
+  Future<AuthCredentialsResponse> authCredentials(AuthCredentialsRequest request) =>
+      _peer.sendRequest(HandlerHash(hash: [0xA6, 0x7, 0x86, 0xA0]), request).then(AuthCredentialsResponse.fromBytes);
 
-  Future<SendMessagePMResponse> sendMessagePM(SendMessagePMRequest request) => _peer
-      .sendRequest(
-    HandlerHash(hash: [0x92, 0x4E, 0xFD, 0x10]),
-    request,
-  )
-      .then(SendMessagePMResponse.fromBytes);
+  Future<SendMessagePMResponse> sendMessagePM(SendMessagePMRequest request) =>
+      _peer.sendRequest(HandlerHash(hash: [0x92, 0x4E, 0xFD, 0x10]), request).then(SendMessagePMResponse.fromBytes);
 
-  Future<SendInitMessagePMResponse> sendInitMessagePM(SendInitMessagePMRequest request) => _peer
-      .sendRequest(
-    HandlerHash(hash: [0x86, 0xC2, 0xB4, 0x1A]),
-    request,
-  )
-      .then(SendInitMessagePMResponse.fromBytes);
+  Future<SendInitMessagePMResponse> sendInitMessagePM(SendInitMessagePMRequest request) =>
+      _peer.sendRequest(HandlerHash(hash: [0x86, 0xC2, 0xB4, 0x1A]), request).then(SendInitMessagePMResponse.fromBytes);
 
-  Future<ReverseStringResponse> reverseString(ReverseStringReq request) => _peer
-      .sendRequest(
-    HandlerHash(hash: [0x86, 0xC, 0xAA, 0x80]),
-    request,
-  )
-      .then(ReverseStringResponse.fromBytes);
+  Stream<PresentEvent> listenUpdates(ListenUpdatesReq request) =>
+      _peer.sendStreamRequest(HandlerHash(hash: [0x28, 0xDC, 0x9C, 0xE9]), request).map(PresentEvent.fromBytes);
 
-  Future<UpdateFcmTokenResp> updateNotificationId(UpdateFcmTokenReq request) => _peer
-      .sendRequest(
-    HandlerHash(hash: [0x79, 0xA4, 0x14, 0xEF]),
-    request,
-  )
-      .then(UpdateFcmTokenResp.fromBytes);
+  Future<ReverseStringResponse> reverseString(ReverseStringReq request) =>
+      _peer.sendRequest(HandlerHash(hash: [0x86, 0xC, 0xAA, 0x80]), request).then(ReverseStringResponse.fromBytes);
 
-  Future<CreateGroupResponse> createGroup(CreateGroupReq request) => _peer
-      .sendRequest(
-    HandlerHash(hash: [0x7C, 0x8, 0x95, 0xB1]),
-    request,
-  )
-      .then(CreateGroupResponse.fromBytes);
+  Future<UpdateFcmTokenResp> updateNotificationId(UpdateFcmTokenReq request) =>
+      _peer.sendRequest(HandlerHash(hash: [0x79, 0xA4, 0x14, 0xEF]), request).then(UpdateFcmTokenResp.fromBytes);
 
-  Future<SendMessageGroupResp> sendMessageGroup(SendMessageGroupReq request) => _peer
-      .sendRequest(
-    HandlerHash(hash: [0xDB, 0xE4, 0x60, 0x89]),
-    request,
-  )
-      .then(SendMessageGroupResp.fromBytes);
+  Future<UpdateLTPKResponse> updateLTPK(UpdateLTPKRequest request) =>
+      _peer.sendRequest(HandlerHash(hash: [0xAC, 0x95, 0x39, 0x68]), request).then(UpdateLTPKResponse.fromBytes);
 
-  Stream<PresentEvent> listenUpdates(ListenUpdatesReq request) => _peer
-      .sendStreamRequest(
-    HandlerHash(hash: [0x28, 0xDC, 0x9C, 0xE9]),
-    request,
-  )
-      .map(PresentEvent.fromBytes);
+  Future<CreateGroupResponse> createGroup(CreateGroupReq request) =>
+      _peer.sendRequest(HandlerHash(hash: [0x7C, 0x8, 0x95, 0xB1]), request).then(CreateGroupResponse.fromBytes);
+
+  Future<SendMessageGroupResp> sendMessageGroup(SendMessageGroupReq request) =>
+      _peer.sendRequest(HandlerHash(hash: [0xDB, 0xE4, 0x60, 0x89]), request).then(SendMessageGroupResp.fromBytes);
 }
 
-class UpdateFcmTokenReq implements Message {
-  List<int> SessionToken;
-  String FcmToken;
+class UpdateLTPKResponse implements Message {
+  UpdateLTPKResponse();
 
-  UpdateFcmTokenReq({
+  UpdateLTPKResponse Copy() => UpdateLTPKResponse();
+
+  static UpdateLTPKResponse fromBytes(Uint8List bytes) => UpdateLTPKResponse()..Unmarshal(BinaryIterator(bytes));
+
+  Uint8List Marshal() {
+    List<int> b = [];
+
+    List<int> size = ConvertSizeToBytes(0);
+    b.addAll(size);
+    size = ConvertSizeToBytes(b.length - size.length);
+    for (int i = 0; i < size.length; i++) {
+      b[i] = size[i];
+    }
+
+    return Uint8List.fromList(b);
+  }
+
+  void Unmarshal(BinaryIterator b) {
+    BinaryCtx binaryCtx = BinaryCtx();
+  }
+}
+
+class UpdateLTPKRequest implements Message {
+  List<int>? SessionToken;
+
+  List<int>? LTPK;
+
+  List<int>? LTPKSignature;
+
+  UpdateLTPKRequest({
     required this.SessionToken,
-    required this.FcmToken,
+    required this.LTPK,
+    required this.LTPKSignature,
   });
 
-  static UpdateFcmTokenReq fromBytes(Uint8List bytes) => UpdateFcmTokenReq(
-    SessionToken: List.filled(0, 0xff, growable: true),
-    FcmToken: "",
-  )..Unmarshal(BinaryIterator(bytes));
+  UpdateLTPKRequest Copy() => UpdateLTPKRequest(
+      SessionToken: List.filled(0, 0xff, growable: true),
+      LTPK: List.filled(0, 0xff, growable: true),
+      LTPKSignature: List.filled(0, 0xff, growable: true));
+
+  static UpdateLTPKRequest fromBytes(Uint8List bytes) => UpdateLTPKRequest(
+      SessionToken: List.filled(0, 0xff, growable: true),
+      LTPK: List.filled(0, 0xff, growable: true),
+      LTPKSignature: List.filled(0, 0xff, growable: true))
+    ..Unmarshal(BinaryIterator(bytes));
 
   Uint8List Marshal() {
     List<int> b = [];
@@ -222,7 +196,124 @@ class UpdateFcmTokenReq implements Message {
     List<int> size = ConvertSizeToBytes(0);
     b.addAll(size);
     List<int> arrBufSessionToken = [];
-    for (var elSessionToken in SessionToken) {
+    for (var elSessionToken in SessionToken!) {
+      arrBufSessionToken.addAll(ConvertByteToBytes(elSessionToken));
+    }
+    b.addAll(ConvertSizeToBytes(arrBufSessionToken.length));
+    b.addAll(arrBufSessionToken);
+    List<int> arrBufLTPK = [];
+    for (var elLTPK in LTPK!) {
+      arrBufLTPK.addAll(ConvertByteToBytes(elLTPK));
+    }
+    b.addAll(ConvertSizeToBytes(arrBufLTPK.length));
+    b.addAll(arrBufLTPK);
+    List<int> arrBufLTPKSignature = [];
+    for (var elLTPKSignature in LTPKSignature!) {
+      arrBufLTPKSignature.addAll(ConvertByteToBytes(elLTPKSignature));
+    }
+    b.addAll(ConvertSizeToBytes(arrBufLTPKSignature.length));
+    b.addAll(arrBufLTPKSignature);
+    size = ConvertSizeToBytes(b.length - size.length);
+    for (int i = 0; i < size.length; i++) {
+      b[i] = size[i];
+    }
+
+    return Uint8List.fromList(b);
+  }
+
+  void Unmarshal(BinaryIterator b) {
+    BinaryCtx binaryCtx = BinaryCtx();
+    binaryCtx.size = b.nextSize();
+
+    binaryCtx.arrBuf = b.slice(binaryCtx.size);
+    binaryCtx.pos = 0;
+
+    bool isEmptySessionToken = true;
+
+    while (binaryCtx.arrBuf.hasNext()) {
+      isEmptySessionToken = false;
+
+      int elSessionToken;
+
+      binaryCtx.buf = binaryCtx.arrBuf.slice(1);
+      elSessionToken = ConvertBytesToByte(binaryCtx.buf);
+
+      SessionToken!.add(elSessionToken);
+    }
+
+    if (isEmptySessionToken) {
+      SessionToken = null;
+    }
+
+    binaryCtx.size = b.nextSize();
+
+    binaryCtx.arrBuf = b.slice(binaryCtx.size);
+    binaryCtx.pos = 0;
+
+    bool isEmptyLTPK = true;
+
+    while (binaryCtx.arrBuf.hasNext()) {
+      isEmptyLTPK = false;
+
+      int elLTPK;
+
+      binaryCtx.buf = binaryCtx.arrBuf.slice(1);
+      elLTPK = ConvertBytesToByte(binaryCtx.buf);
+
+      LTPK!.add(elLTPK);
+    }
+
+    if (isEmptyLTPK) {
+      LTPK = null;
+    }
+
+    binaryCtx.size = b.nextSize();
+
+    binaryCtx.arrBuf = b.slice(binaryCtx.size);
+    binaryCtx.pos = 0;
+
+    bool isEmptyLTPKSignature = true;
+
+    while (binaryCtx.arrBuf.hasNext()) {
+      isEmptyLTPKSignature = false;
+
+      int elLTPKSignature;
+
+      binaryCtx.buf = binaryCtx.arrBuf.slice(1);
+      elLTPKSignature = ConvertBytesToByte(binaryCtx.buf);
+
+      LTPKSignature!.add(elLTPKSignature);
+    }
+
+    if (isEmptyLTPKSignature) {
+      LTPKSignature = null;
+    }
+  }
+}
+
+class UpdateFcmTokenReq implements Message {
+  List<int>? SessionToken;
+
+  String FcmToken;
+
+  UpdateFcmTokenReq({
+    required this.SessionToken,
+    required this.FcmToken,
+  });
+
+  UpdateFcmTokenReq Copy() => UpdateFcmTokenReq(SessionToken: List.filled(0, 0xff, growable: true), FcmToken: "");
+
+  static UpdateFcmTokenReq fromBytes(Uint8List bytes) =>
+      UpdateFcmTokenReq(SessionToken: List.filled(0, 0xff, growable: true), FcmToken: "")
+        ..Unmarshal(BinaryIterator(bytes));
+
+  Uint8List Marshal() {
+    List<int> b = [];
+
+    List<int> size = ConvertSizeToBytes(0);
+    b.addAll(size);
+    List<int> arrBufSessionToken = [];
+    for (var elSessionToken in SessionToken!) {
       arrBufSessionToken.addAll(ConvertByteToBytes(elSessionToken));
     }
     b.addAll(ConvertSizeToBytes(arrBufSessionToken.length));
@@ -244,15 +335,21 @@ class UpdateFcmTokenReq implements Message {
     binaryCtx.arrBuf = b.slice(binaryCtx.size);
     binaryCtx.pos = 0;
 
-    SessionToken.extend(binaryCtx.size, 0xff);
+    bool isEmptySessionToken = true;
+
     while (binaryCtx.arrBuf.hasNext()) {
+      isEmptySessionToken = false;
+
       int elSessionToken;
 
       binaryCtx.buf = binaryCtx.arrBuf.slice(1);
       elSessionToken = ConvertBytesToByte(binaryCtx.buf);
 
-      SessionToken[binaryCtx.pos] = elSessionToken;
-      binaryCtx.pos++;
+      SessionToken!.add(elSessionToken);
+    }
+
+    if (isEmptySessionToken) {
+      SessionToken = null;
     }
 
     binaryCtx.size = b.nextSize();
@@ -263,6 +360,8 @@ class UpdateFcmTokenReq implements Message {
 
 class UpdateFcmTokenResp implements Message {
   UpdateFcmTokenResp();
+
+  UpdateFcmTokenResp Copy() => UpdateFcmTokenResp();
 
   static UpdateFcmTokenResp fromBytes(Uint8List bytes) => UpdateFcmTokenResp()..Unmarshal(BinaryIterator(bytes));
 
@@ -279,14 +378,20 @@ class UpdateFcmTokenResp implements Message {
     return Uint8List.fromList(b);
   }
 
-  void Unmarshal(BinaryIterator b) {}
+  void Unmarshal(BinaryIterator b) {
+    BinaryCtx binaryCtx = BinaryCtx();
+  }
 }
 
 class GroupMessage implements Message {
-  List<int> GroupIK;
+  List<int>? GroupIK;
+
   int MessageID;
+
   String MessageType;
+
   List<int> Content;
+
   List<Attachment> Attachments;
 
   GroupMessage({
@@ -297,19 +402,20 @@ class GroupMessage implements Message {
     required this.Attachments,
   });
 
+  GroupMessage Copy() => GroupMessage(
+      GroupIK: List.filled(0, 0xff, growable: true),
+      MessageID: 0,
+      MessageType: "",
+      Content: List.filled(0, 0xff, growable: true),
+      Attachments: List.filled(0, Attachment(Type: "", Payload: List.filled(0, 0xff, growable: true)), growable: true));
+
   static GroupMessage fromBytes(Uint8List bytes) => GroupMessage(
-    GroupIK: List.filled(0, 0xff, growable: true),
-    MessageID: 0,
-    MessageType: "",
-    Content: List.filled(0, 0xff, growable: true),
-    Attachments: List.filled(
-        0,
-        Attachment(
-          Type: "",
-          Payload: List.filled(0, 0xff, growable: true),
-        ),
-        growable: true),
-  )..Unmarshal(BinaryIterator(bytes));
+      GroupIK: List.filled(0, 0xff, growable: true),
+      MessageID: 0,
+      MessageType: "",
+      Content: List.filled(0, 0xff, growable: true),
+      Attachments: List.filled(0, Attachment(Type: "", Payload: List.filled(0, 0xff, growable: true)), growable: true))
+    ..Unmarshal(BinaryIterator(bytes));
 
   Uint8List Marshal() {
     List<int> b = [];
@@ -317,7 +423,7 @@ class GroupMessage implements Message {
     List<int> size = ConvertSizeToBytes(0);
     b.addAll(size);
     List<int> arrBufGroupIK = [];
-    for (var elGroupIK in GroupIK) {
+    for (var elGroupIK in GroupIK!) {
       arrBufGroupIK.addAll(ConvertByteToBytes(elGroupIK));
     }
     b.addAll(ConvertSizeToBytes(arrBufGroupIK.length));
@@ -352,15 +458,21 @@ class GroupMessage implements Message {
     binaryCtx.arrBuf = b.slice(binaryCtx.size);
     binaryCtx.pos = 0;
 
-    GroupIK.extend(binaryCtx.size, 0xff);
+    bool isEmptyGroupIK = true;
+
     while (binaryCtx.arrBuf.hasNext()) {
+      isEmptyGroupIK = false;
+
       int elGroupIK;
 
       binaryCtx.buf = binaryCtx.arrBuf.slice(1);
       elGroupIK = ConvertBytesToByte(binaryCtx.buf);
 
-      GroupIK[binaryCtx.pos] = elGroupIK;
-      binaryCtx.pos++;
+      GroupIK!.add(elGroupIK);
+    }
+
+    if (isEmptyGroupIK) {
+      GroupIK = null;
     }
 
     binaryCtx.buf = b.slice(4);
@@ -375,22 +487,20 @@ class GroupMessage implements Message {
     binaryCtx.arrBuf = b.slice(binaryCtx.size);
     binaryCtx.pos = 0;
 
-    Content.extend(binaryCtx.size, 0xff);
     while (binaryCtx.arrBuf.hasNext()) {
       int elContent;
 
       binaryCtx.buf = binaryCtx.arrBuf.slice(1);
       elContent = ConvertBytesToByte(binaryCtx.buf);
 
-      Content[binaryCtx.pos] = elContent;
-      binaryCtx.pos++;
+      Content.add(elContent);
     }
+
     binaryCtx.size = b.nextSize();
 
     binaryCtx.arrBuf = b.slice(binaryCtx.size);
     binaryCtx.pos = 0;
 
-    Attachments.extend(binaryCtx.size, Attachment(Type: "", Payload: List.filled(0, 0xff, growable: true)));
     while (binaryCtx.arrBuf.hasNext()) {
       Attachment elAttachments = Attachment(Type: "", Payload: List.filled(0, 0xff, growable: true));
 
@@ -398,18 +508,21 @@ class GroupMessage implements Message {
       binaryCtx.buf = binaryCtx.arrBuf.slice(binaryCtx.size);
       elAttachments.Unmarshal(binaryCtx.buf);
 
-      Attachments[binaryCtx.pos] = elAttachments;
-      binaryCtx.pos++;
+      Attachments.add(elAttachments);
     }
   }
 }
 
 class SendMessageGroupReq implements Message {
   String MessageType;
-  List<int> GroupIK;
+
+  List<int>? GroupIK;
+
   List<int> Content;
+
   List<Attachment> Attachments;
-  List<int> SessionToken;
+
+  List<int>? SessionToken;
 
   SendMessageGroupReq({
     required this.MessageType,
@@ -419,14 +532,20 @@ class SendMessageGroupReq implements Message {
     required this.SessionToken,
   });
 
+  SendMessageGroupReq Copy() => SendMessageGroupReq(
+      MessageType: "",
+      GroupIK: List.filled(0, 0xff, growable: true),
+      Content: List.filled(0, 0xff, growable: true),
+      Attachments: List.filled(0, Attachment(Type: "", Payload: List.filled(0, 0xff, growable: true)), growable: true),
+      SessionToken: List.filled(0, 0xff, growable: true));
+
   static SendMessageGroupReq fromBytes(Uint8List bytes) => SendMessageGroupReq(
-    MessageType: "",
-    GroupIK: List.filled(0, 0xff, growable: true),
-    Content: List.filled(0, 0xff, growable: true),
-    Attachments:
-    List.filled(0, Attachment(Type: "", Payload: List.filled(0, 0xff, growable: true)), growable: true),
-    SessionToken: List.filled(0, 0xff, growable: true),
-  )..Unmarshal(BinaryIterator(bytes));
+      MessageType: "",
+      GroupIK: List.filled(0, 0xff, growable: true),
+      Content: List.filled(0, 0xff, growable: true),
+      Attachments: List.filled(0, Attachment(Type: "", Payload: List.filled(0, 0xff, growable: true)), growable: true),
+      SessionToken: List.filled(0, 0xff, growable: true))
+    ..Unmarshal(BinaryIterator(bytes));
 
   Uint8List Marshal() {
     List<int> b = [];
@@ -436,7 +555,7 @@ class SendMessageGroupReq implements Message {
     b.addAll(ConvertSizeToBytes(MessageType.codeUnits.length));
     b.addAll(ConvertStringToBytes(MessageType));
     List<int> arrBufGroupIK = [];
-    for (var elGroupIK in GroupIK) {
+    for (var elGroupIK in GroupIK!) {
       arrBufGroupIK.addAll(ConvertByteToBytes(elGroupIK));
     }
     b.addAll(ConvertSizeToBytes(arrBufGroupIK.length));
@@ -454,7 +573,7 @@ class SendMessageGroupReq implements Message {
     b.addAll(ConvertSizeToBytes(arrBufAttachments.length));
     b.addAll(arrBufAttachments);
     List<int> arrBufSessionToken = [];
-    for (var elSessionToken in SessionToken) {
+    for (var elSessionToken in SessionToken!) {
       arrBufSessionToken.addAll(ConvertByteToBytes(elSessionToken));
     }
     b.addAll(ConvertSizeToBytes(arrBufSessionToken.length));
@@ -479,37 +598,42 @@ class SendMessageGroupReq implements Message {
     binaryCtx.arrBuf = b.slice(binaryCtx.size);
     binaryCtx.pos = 0;
 
-    GroupIK.extend(binaryCtx.size, 0xff);
+    bool isEmptyGroupIK = true;
+
     while (binaryCtx.arrBuf.hasNext()) {
+      isEmptyGroupIK = false;
+
       int elGroupIK;
 
       binaryCtx.buf = binaryCtx.arrBuf.slice(1);
       elGroupIK = ConvertBytesToByte(binaryCtx.buf);
 
-      GroupIK[binaryCtx.pos] = elGroupIK;
-      binaryCtx.pos++;
+      GroupIK!.add(elGroupIK);
     }
+
+    if (isEmptyGroupIK) {
+      GroupIK = null;
+    }
+
     binaryCtx.size = b.nextSize();
 
     binaryCtx.arrBuf = b.slice(binaryCtx.size);
     binaryCtx.pos = 0;
 
-    Content.extend(binaryCtx.size, 0xff);
     while (binaryCtx.arrBuf.hasNext()) {
       int elContent;
 
       binaryCtx.buf = binaryCtx.arrBuf.slice(1);
       elContent = ConvertBytesToByte(binaryCtx.buf);
 
-      Content[binaryCtx.pos] = elContent;
-      binaryCtx.pos++;
+      Content.add(elContent);
     }
+
     binaryCtx.size = b.nextSize();
 
     binaryCtx.arrBuf = b.slice(binaryCtx.size);
     binaryCtx.pos = 0;
 
-    Attachments.extend(binaryCtx.size, Attachment(Type: "", Payload: List.filled(0, 0xff, growable: true)));
     while (binaryCtx.arrBuf.hasNext()) {
       Attachment elAttachments = Attachment(Type: "", Payload: List.filled(0, 0xff, growable: true));
 
@@ -517,29 +641,37 @@ class SendMessageGroupReq implements Message {
       binaryCtx.buf = binaryCtx.arrBuf.slice(binaryCtx.size);
       elAttachments.Unmarshal(binaryCtx.buf);
 
-      Attachments[binaryCtx.pos] = elAttachments;
-      binaryCtx.pos++;
+      Attachments.add(elAttachments);
     }
+
     binaryCtx.size = b.nextSize();
 
     binaryCtx.arrBuf = b.slice(binaryCtx.size);
     binaryCtx.pos = 0;
 
-    SessionToken.extend(binaryCtx.size, 0xff);
+    bool isEmptySessionToken = true;
+
     while (binaryCtx.arrBuf.hasNext()) {
+      isEmptySessionToken = false;
+
       int elSessionToken;
 
       binaryCtx.buf = binaryCtx.arrBuf.slice(1);
       elSessionToken = ConvertBytesToByte(binaryCtx.buf);
 
-      SessionToken[binaryCtx.pos] = elSessionToken;
-      binaryCtx.pos++;
+      SessionToken!.add(elSessionToken);
+    }
+
+    if (isEmptySessionToken) {
+      SessionToken = null;
     }
   }
 }
 
 class SendMessageGroupResp implements Message {
   SendMessageGroupResp();
+
+  SendMessageGroupResp Copy() => SendMessageGroupResp();
 
   static SendMessageGroupResp fromBytes(Uint8List bytes) => SendMessageGroupResp()..Unmarshal(BinaryIterator(bytes));
 
@@ -556,14 +688,20 @@ class SendMessageGroupResp implements Message {
     return Uint8List.fromList(b);
   }
 
-  void Unmarshal(BinaryIterator b) {}
+  void Unmarshal(BinaryIterator b) {
+    BinaryCtx binaryCtx = BinaryCtx();
+  }
 }
 
 class CreateGroupReq implements Message {
-  List<int> SessionToken;
-  List<int> IdentityKey;
+  List<int>? SessionToken;
+
+  List<int>? IdentityKey;
+
   String Name;
+
   String Status;
+
   String PictureID;
 
   CreateGroupReq({
@@ -574,13 +712,20 @@ class CreateGroupReq implements Message {
     required this.PictureID,
   });
 
+  CreateGroupReq Copy() => CreateGroupReq(
+      SessionToken: List.filled(0, 0xff, growable: true),
+      IdentityKey: List.filled(0, 0xff, growable: true),
+      Name: "",
+      Status: "",
+      PictureID: "");
+
   static CreateGroupReq fromBytes(Uint8List bytes) => CreateGroupReq(
-    SessionToken: List.filled(0, 0xff, growable: true),
-    IdentityKey: List.filled(0, 0xff, growable: true),
-    Name: "",
-    Status: "",
-    PictureID: "",
-  )..Unmarshal(BinaryIterator(bytes));
+      SessionToken: List.filled(0, 0xff, growable: true),
+      IdentityKey: List.filled(0, 0xff, growable: true),
+      Name: "",
+      Status: "",
+      PictureID: "")
+    ..Unmarshal(BinaryIterator(bytes));
 
   Uint8List Marshal() {
     List<int> b = [];
@@ -588,13 +733,13 @@ class CreateGroupReq implements Message {
     List<int> size = ConvertSizeToBytes(0);
     b.addAll(size);
     List<int> arrBufSessionToken = [];
-    for (var elSessionToken in SessionToken) {
+    for (var elSessionToken in SessionToken!) {
       arrBufSessionToken.addAll(ConvertByteToBytes(elSessionToken));
     }
     b.addAll(ConvertSizeToBytes(arrBufSessionToken.length));
     b.addAll(arrBufSessionToken);
     List<int> arrBufIdentityKey = [];
-    for (var elIdentityKey in IdentityKey) {
+    for (var elIdentityKey in IdentityKey!) {
       arrBufIdentityKey.addAll(ConvertByteToBytes(elIdentityKey));
     }
     b.addAll(ConvertSizeToBytes(arrBufIdentityKey.length));
@@ -620,30 +765,43 @@ class CreateGroupReq implements Message {
     binaryCtx.arrBuf = b.slice(binaryCtx.size);
     binaryCtx.pos = 0;
 
-    SessionToken.extend(binaryCtx.size, 0xff);
+    bool isEmptySessionToken = true;
+
     while (binaryCtx.arrBuf.hasNext()) {
+      isEmptySessionToken = false;
+
       int elSessionToken;
 
       binaryCtx.buf = binaryCtx.arrBuf.slice(1);
       elSessionToken = ConvertBytesToByte(binaryCtx.buf);
 
-      SessionToken[binaryCtx.pos] = elSessionToken;
-      binaryCtx.pos++;
+      SessionToken!.add(elSessionToken);
     }
+
+    if (isEmptySessionToken) {
+      SessionToken = null;
+    }
+
     binaryCtx.size = b.nextSize();
 
     binaryCtx.arrBuf = b.slice(binaryCtx.size);
     binaryCtx.pos = 0;
 
-    IdentityKey.extend(binaryCtx.size, 0xff);
+    bool isEmptyIdentityKey = true;
+
     while (binaryCtx.arrBuf.hasNext()) {
+      isEmptyIdentityKey = false;
+
       int elIdentityKey;
 
       binaryCtx.buf = binaryCtx.arrBuf.slice(1);
       elIdentityKey = ConvertBytesToByte(binaryCtx.buf);
 
-      IdentityKey[binaryCtx.pos] = elIdentityKey;
-      binaryCtx.pos++;
+      IdentityKey!.add(elIdentityKey);
+    }
+
+    if (isEmptyIdentityKey) {
+      IdentityKey = null;
     }
 
     binaryCtx.size = b.nextSize();
@@ -663,6 +821,8 @@ class CreateGroupReq implements Message {
 class CreateGroupResponse implements Message {
   CreateGroupResponse();
 
+  CreateGroupResponse Copy() => CreateGroupResponse();
+
   static CreateGroupResponse fromBytes(Uint8List bytes) => CreateGroupResponse()..Unmarshal(BinaryIterator(bytes));
 
   Uint8List Marshal() {
@@ -678,7 +838,9 @@ class CreateGroupResponse implements Message {
     return Uint8List.fromList(b);
   }
 
-  void Unmarshal(BinaryIterator b) {}
+  void Unmarshal(BinaryIterator b) {
+    BinaryCtx binaryCtx = BinaryCtx();
+  }
 }
 
 class ReverseStringReq implements Message {
@@ -687,6 +849,8 @@ class ReverseStringReq implements Message {
   ReverseStringReq({
     required this.Str,
   });
+
+  ReverseStringReq Copy() => ReverseStringReq(Str: "");
 
   static ReverseStringReq fromBytes(Uint8List bytes) => ReverseStringReq(Str: "")..Unmarshal(BinaryIterator(bytes));
 
@@ -720,6 +884,8 @@ class ReverseStringResponse implements Message {
   ReverseStringResponse({
     required this.Res,
   });
+
+  ReverseStringResponse Copy() => ReverseStringResponse(Res: "");
 
   static ReverseStringResponse fromBytes(Uint8List bytes) =>
       ReverseStringResponse(Res: "")..Unmarshal(BinaryIterator(bytes));
@@ -755,6 +921,8 @@ class SendCodeRequest implements Message {
     required this.Phone,
   });
 
+  SendCodeRequest Copy() => SendCodeRequest(Phone: "");
+
   static SendCodeRequest fromBytes(Uint8List bytes) => SendCodeRequest(Phone: "")..Unmarshal(BinaryIterator(bytes));
 
   Uint8List Marshal() {
@@ -784,6 +952,8 @@ class SendCodeRequest implements Message {
 class SendCodeResponse implements Message {
   SendCodeResponse();
 
+  SendCodeResponse Copy() => SendCodeResponse();
+
   static SendCodeResponse fromBytes(Uint8List bytes) => SendCodeResponse()..Unmarshal(BinaryIterator(bytes));
 
   Uint8List Marshal() {
@@ -799,11 +969,14 @@ class SendCodeResponse implements Message {
     return Uint8List.fromList(b);
   }
 
-  void Unmarshal(BinaryIterator b) {}
+  void Unmarshal(BinaryIterator b) {
+    BinaryCtx binaryCtx = BinaryCtx();
+  }
 }
 
 class HandleCodeRequest implements Message {
   String Phone;
+
   int Code;
 
   HandleCodeRequest({
@@ -811,10 +984,10 @@ class HandleCodeRequest implements Message {
     required this.Code,
   });
 
-  static HandleCodeRequest fromBytes(Uint8List bytes) => HandleCodeRequest(
-    Phone: "",
-    Code: 0,
-  )..Unmarshal(BinaryIterator(bytes));
+  HandleCodeRequest Copy() => HandleCodeRequest(Phone: "", Code: 0);
+
+  static HandleCodeRequest fromBytes(Uint8List bytes) =>
+      HandleCodeRequest(Phone: "", Code: 0)..Unmarshal(BinaryIterator(bytes));
 
   Uint8List Marshal() {
     List<int> b = [];
@@ -844,6 +1017,8 @@ class HandleCodeRequest implements Message {
 class HandleCodeResponse implements Message {
   HandleCodeResponse();
 
+  HandleCodeResponse Copy() => HandleCodeResponse();
+
   static HandleCodeResponse fromBytes(Uint8List bytes) => HandleCodeResponse()..Unmarshal(BinaryIterator(bytes));
 
   Uint8List Marshal() {
@@ -859,19 +1034,22 @@ class HandleCodeResponse implements Message {
     return Uint8List.fromList(b);
   }
 
-  void Unmarshal(BinaryIterator b) {}
+  void Unmarshal(BinaryIterator b) {
+    BinaryCtx binaryCtx = BinaryCtx();
+  }
 }
 
 class RequiredOPKRequest implements Message {
-  List<int> SessionToken;
+  List<int>? SessionToken;
 
   RequiredOPKRequest({
     required this.SessionToken,
   });
 
-  static RequiredOPKRequest fromBytes(Uint8List bytes) => RequiredOPKRequest(
-    SessionToken: List.filled(0, 0xff, growable: true),
-  )..Unmarshal(BinaryIterator(bytes));
+  RequiredOPKRequest Copy() => RequiredOPKRequest(SessionToken: List.filled(0, 0xff, growable: true));
+
+  static RequiredOPKRequest fromBytes(Uint8List bytes) =>
+      RequiredOPKRequest(SessionToken: List.filled(0, 0xff, growable: true))..Unmarshal(BinaryIterator(bytes));
 
   Uint8List Marshal() {
     List<int> b = [];
@@ -879,7 +1057,7 @@ class RequiredOPKRequest implements Message {
     List<int> size = ConvertSizeToBytes(0);
     b.addAll(size);
     List<int> arrBufSessionToken = [];
-    for (var elSessionToken in SessionToken) {
+    for (var elSessionToken in SessionToken!) {
       arrBufSessionToken.addAll(ConvertByteToBytes(elSessionToken));
     }
     b.addAll(ConvertSizeToBytes(arrBufSessionToken.length));
@@ -899,15 +1077,21 @@ class RequiredOPKRequest implements Message {
     binaryCtx.arrBuf = b.slice(binaryCtx.size);
     binaryCtx.pos = 0;
 
-    SessionToken.extend(binaryCtx.size, 0xff);
+    bool isEmptySessionToken = true;
+
     while (binaryCtx.arrBuf.hasNext()) {
+      isEmptySessionToken = false;
+
       int elSessionToken;
 
       binaryCtx.buf = binaryCtx.arrBuf.slice(1);
       elSessionToken = ConvertBytesToByte(binaryCtx.buf);
 
-      SessionToken[binaryCtx.pos] = elSessionToken;
-      binaryCtx.pos++;
+      SessionToken!.add(elSessionToken);
+    }
+
+    if (isEmptySessionToken) {
+      SessionToken = null;
     }
   }
 }
@@ -918,6 +1102,8 @@ class RequiredOPKResponse implements Message {
   RequiredOPKResponse({
     required this.Count,
   });
+
+  RequiredOPKResponse Copy() => RequiredOPKResponse(Count: 0);
 
   static RequiredOPKResponse fromBytes(Uint8List bytes) =>
       RequiredOPKResponse(Count: 0)..Unmarshal(BinaryIterator(bytes));
@@ -945,7 +1131,8 @@ class RequiredOPKResponse implements Message {
 }
 
 class LoadOPKRequest implements Message {
-  List<int> SessionToken;
+  List<int>? SessionToken;
+
   List<OPKPair> OPK;
 
   LoadOPKRequest({
@@ -953,16 +1140,14 @@ class LoadOPKRequest implements Message {
     required this.OPK,
   });
 
+  LoadOPKRequest Copy() => LoadOPKRequest(
+      SessionToken: List.filled(0, 0xff, growable: true),
+      OPK: List.filled(0, OPKPair(OPKId: 0, OPK: List.filled(0, 0xff, growable: true)), growable: true));
+
   static LoadOPKRequest fromBytes(Uint8List bytes) => LoadOPKRequest(
-    SessionToken: List.filled(0, 0xff, growable: true),
-    OPK: List.filled(
-        0,
-        OPKPair(
-          OPKId: 0,
-          OPK: List.filled(0, 0xff, growable: true),
-        ),
-        growable: true),
-  )..Unmarshal(BinaryIterator(bytes));
+      SessionToken: List.filled(0, 0xff, growable: true),
+      OPK: List.filled(0, OPKPair(OPKId: 0, OPK: List.filled(0, 0xff, growable: true)), growable: true))
+    ..Unmarshal(BinaryIterator(bytes));
 
   Uint8List Marshal() {
     List<int> b = [];
@@ -970,7 +1155,7 @@ class LoadOPKRequest implements Message {
     List<int> size = ConvertSizeToBytes(0);
     b.addAll(size);
     List<int> arrBufSessionToken = [];
-    for (var elSessionToken in SessionToken) {
+    for (var elSessionToken in SessionToken!) {
       arrBufSessionToken.addAll(ConvertByteToBytes(elSessionToken));
     }
     b.addAll(ConvertSizeToBytes(arrBufSessionToken.length));
@@ -996,22 +1181,28 @@ class LoadOPKRequest implements Message {
     binaryCtx.arrBuf = b.slice(binaryCtx.size);
     binaryCtx.pos = 0;
 
-    SessionToken.extend(binaryCtx.size, 0xff);
+    bool isEmptySessionToken = true;
+
     while (binaryCtx.arrBuf.hasNext()) {
+      isEmptySessionToken = false;
+
       int elSessionToken;
 
       binaryCtx.buf = binaryCtx.arrBuf.slice(1);
       elSessionToken = ConvertBytesToByte(binaryCtx.buf);
 
-      SessionToken[binaryCtx.pos] = elSessionToken;
-      binaryCtx.pos++;
+      SessionToken!.add(elSessionToken);
     }
+
+    if (isEmptySessionToken) {
+      SessionToken = null;
+    }
+
     binaryCtx.size = b.nextSize();
 
     binaryCtx.arrBuf = b.slice(binaryCtx.size);
     binaryCtx.pos = 0;
 
-    OPK.extend(binaryCtx.size, OPKPair(OPKId: 0, OPK: List.filled(0, 0xff, growable: true)));
     while (binaryCtx.arrBuf.hasNext()) {
       OPKPair elOPK = OPKPair(OPKId: 0, OPK: List.filled(0, 0xff, growable: true));
 
@@ -1019,25 +1210,25 @@ class LoadOPKRequest implements Message {
       binaryCtx.buf = binaryCtx.arrBuf.slice(binaryCtx.size);
       elOPK.Unmarshal(binaryCtx.buf);
 
-      OPK[binaryCtx.pos] = elOPK;
-      binaryCtx.pos++;
+      OPK.add(elOPK);
     }
   }
 }
 
 class OPKPair implements Message {
   int OPKId;
-  List<int> OPK;
+
+  List<int>? OPK;
 
   OPKPair({
     required this.OPKId,
     required this.OPK,
   });
 
-  static OPKPair fromBytes(Uint8List bytes) => OPKPair(
-    OPKId: 0,
-    OPK: List.filled(0, 0xff, growable: true),
-  )..Unmarshal(BinaryIterator(bytes));
+  OPKPair Copy() => OPKPair(OPKId: 0, OPK: List.filled(0, 0xff, growable: true));
+
+  static OPKPair fromBytes(Uint8List bytes) =>
+      OPKPair(OPKId: 0, OPK: List.filled(0, 0xff, growable: true))..Unmarshal(BinaryIterator(bytes));
 
   Uint8List Marshal() {
     List<int> b = [];
@@ -1046,7 +1237,7 @@ class OPKPair implements Message {
     b.addAll(size);
     b.addAll(ConvertUint32ToBytes(OPKId));
     List<int> arrBufOPK = [];
-    for (var elOPK in OPK) {
+    for (var elOPK in OPK!) {
       arrBufOPK.addAll(ConvertByteToBytes(elOPK));
     }
     b.addAll(ConvertSizeToBytes(arrBufOPK.length));
@@ -1070,21 +1261,29 @@ class OPKPair implements Message {
     binaryCtx.arrBuf = b.slice(binaryCtx.size);
     binaryCtx.pos = 0;
 
-    OPK.extend(binaryCtx.size, 0xff);
+    bool isEmptyOPK = true;
+
     while (binaryCtx.arrBuf.hasNext()) {
+      isEmptyOPK = false;
+
       int elOPK;
 
       binaryCtx.buf = binaryCtx.arrBuf.slice(1);
       elOPK = ConvertBytesToByte(binaryCtx.buf);
 
-      OPK[binaryCtx.pos] = elOPK;
-      binaryCtx.pos++;
+      OPK!.add(elOPK);
+    }
+
+    if (isEmptyOPK) {
+      OPK = null;
     }
   }
 }
 
 class LoadOPKResponse implements Message {
   LoadOPKResponse();
+
+  LoadOPKResponse Copy() => LoadOPKResponse();
 
   static LoadOPKResponse fromBytes(Uint8List bytes) => LoadOPKResponse()..Unmarshal(BinaryIterator(bytes));
 
@@ -1101,11 +1300,14 @@ class LoadOPKResponse implements Message {
     return Uint8List.fromList(b);
   }
 
-  void Unmarshal(BinaryIterator b) {}
+  void Unmarshal(BinaryIterator b) {
+    BinaryCtx binaryCtx = BinaryCtx();
+  }
 }
 
 class FindUsersByPartNicknameRequest implements Message {
-  List<int> SessionToken;
+  List<int>? SessionToken;
+
   String PartNickname;
 
   FindUsersByPartNicknameRequest({
@@ -1113,10 +1315,12 @@ class FindUsersByPartNicknameRequest implements Message {
     required this.PartNickname,
   });
 
-  static FindUsersByPartNicknameRequest fromBytes(Uint8List bytes) => FindUsersByPartNicknameRequest(
-    SessionToken: List.filled(0, 0xff, growable: true),
-    PartNickname: "",
-  )..Unmarshal(BinaryIterator(bytes));
+  FindUsersByPartNicknameRequest Copy() =>
+      FindUsersByPartNicknameRequest(SessionToken: List.filled(0, 0xff, growable: true), PartNickname: "");
+
+  static FindUsersByPartNicknameRequest fromBytes(Uint8List bytes) =>
+      FindUsersByPartNicknameRequest(SessionToken: List.filled(0, 0xff, growable: true), PartNickname: "")
+        ..Unmarshal(BinaryIterator(bytes));
 
   Uint8List Marshal() {
     List<int> b = [];
@@ -1124,7 +1328,7 @@ class FindUsersByPartNicknameRequest implements Message {
     List<int> size = ConvertSizeToBytes(0);
     b.addAll(size);
     List<int> arrBufSessionToken = [];
-    for (var elSessionToken in SessionToken) {
+    for (var elSessionToken in SessionToken!) {
       arrBufSessionToken.addAll(ConvertByteToBytes(elSessionToken));
     }
     b.addAll(ConvertSizeToBytes(arrBufSessionToken.length));
@@ -1146,15 +1350,21 @@ class FindUsersByPartNicknameRequest implements Message {
     binaryCtx.arrBuf = b.slice(binaryCtx.size);
     binaryCtx.pos = 0;
 
-    SessionToken.extend(binaryCtx.size, 0xff);
+    bool isEmptySessionToken = true;
+
     while (binaryCtx.arrBuf.hasNext()) {
+      isEmptySessionToken = false;
+
       int elSessionToken;
 
       binaryCtx.buf = binaryCtx.arrBuf.slice(1);
       elSessionToken = ConvertBytesToByte(binaryCtx.buf);
 
-      SessionToken[binaryCtx.pos] = elSessionToken;
-      binaryCtx.pos++;
+      SessionToken!.add(elSessionToken);
+    }
+
+    if (isEmptySessionToken) {
+      SessionToken = null;
     }
 
     binaryCtx.size = b.nextSize();
@@ -1170,17 +1380,16 @@ class FindUsersByPartNicknameResponse implements Message {
     required this.Users,
   });
 
+  FindUsersByPartNicknameResponse Copy() => FindUsersByPartNicknameResponse(
+      Users: List.filled(
+          0, PresentUser(IdentityKey: List.filled(0, 0xff, growable: true), Nickname: "", PictureID: "", Status: ""),
+          growable: true));
+
   static FindUsersByPartNicknameResponse fromBytes(Uint8List bytes) => FindUsersByPartNicknameResponse(
-    Users: List.filled(
-        0,
-        PresentUser(
-          IdentityKey: List.filled(0, 0xff, growable: true),
-          Nickname: "",
-          PictureID: "",
-          Status: "",
-        ),
-        growable: true),
-  )..Unmarshal(BinaryIterator(bytes));
+      Users: List.filled(
+          0, PresentUser(IdentityKey: List.filled(0, 0xff, growable: true), Nickname: "", PictureID: "", Status: ""),
+          growable: true))
+    ..Unmarshal(BinaryIterator(bytes));
 
   Uint8List Marshal() {
     List<int> b = [];
@@ -1208,8 +1417,6 @@ class FindUsersByPartNicknameResponse implements Message {
     binaryCtx.arrBuf = b.slice(binaryCtx.size);
     binaryCtx.pos = 0;
 
-    Users.extend(binaryCtx.size,
-        PresentUser(IdentityKey: List.filled(0, 0xff, growable: true), Nickname: "", PictureID: "", Status: ""));
     while (binaryCtx.arrBuf.hasNext()) {
       PresentUser elUsers =
       PresentUser(IdentityKey: List.filled(0, 0xff, growable: true), Nickname: "", PictureID: "", Status: "");
@@ -1218,16 +1425,18 @@ class FindUsersByPartNicknameResponse implements Message {
       binaryCtx.buf = binaryCtx.arrBuf.slice(binaryCtx.size);
       elUsers.Unmarshal(binaryCtx.buf);
 
-      Users[binaryCtx.pos] = elUsers;
-      binaryCtx.pos++;
+      Users.add(elUsers);
     }
   }
 }
 
 class PresentUser implements Message {
-  List<int> IdentityKey;
+  List<int>? IdentityKey;
+
   String Nickname;
+
   String PictureID;
+
   String Status;
 
   PresentUser({
@@ -1237,12 +1446,12 @@ class PresentUser implements Message {
     required this.Status,
   });
 
-  static PresentUser fromBytes(Uint8List bytes) => PresentUser(
-    IdentityKey: List.filled(0, 0xff, growable: true),
-    Nickname: "",
-    PictureID: "",
-    Status: "",
-  )..Unmarshal(BinaryIterator(bytes));
+  PresentUser Copy() =>
+      PresentUser(IdentityKey: List.filled(0, 0xff, growable: true), Nickname: "", PictureID: "", Status: "");
+
+  static PresentUser fromBytes(Uint8List bytes) =>
+      PresentUser(IdentityKey: List.filled(0, 0xff, growable: true), Nickname: "", PictureID: "", Status: "")
+        ..Unmarshal(BinaryIterator(bytes));
 
   Uint8List Marshal() {
     List<int> b = [];
@@ -1250,7 +1459,7 @@ class PresentUser implements Message {
     List<int> size = ConvertSizeToBytes(0);
     b.addAll(size);
     List<int> arrBufIdentityKey = [];
-    for (var elIdentityKey in IdentityKey) {
+    for (var elIdentityKey in IdentityKey!) {
       arrBufIdentityKey.addAll(ConvertByteToBytes(elIdentityKey));
     }
     b.addAll(ConvertSizeToBytes(arrBufIdentityKey.length));
@@ -1276,15 +1485,21 @@ class PresentUser implements Message {
     binaryCtx.arrBuf = b.slice(binaryCtx.size);
     binaryCtx.pos = 0;
 
-    IdentityKey.extend(binaryCtx.size, 0xff);
+    bool isEmptyIdentityKey = true;
+
     while (binaryCtx.arrBuf.hasNext()) {
+      isEmptyIdentityKey = false;
+
       int elIdentityKey;
 
       binaryCtx.buf = binaryCtx.arrBuf.slice(1);
       elIdentityKey = ConvertBytesToByte(binaryCtx.buf);
 
-      IdentityKey[binaryCtx.pos] = elIdentityKey;
-      binaryCtx.pos++;
+      IdentityKey!.add(elIdentityKey);
+    }
+
+    if (isEmptyIdentityKey) {
+      IdentityKey = null;
     }
 
     binaryCtx.size = b.nextSize();
@@ -1302,18 +1517,21 @@ class PresentUser implements Message {
 }
 
 class GetInitMsgKeysRequest implements Message {
-  List<int> SessionToken;
-  List<int> IdentityKey;
+  List<int>? SessionToken;
+
+  List<int>? IdentityKey;
 
   GetInitMsgKeysRequest({
     required this.SessionToken,
     required this.IdentityKey,
   });
 
+  GetInitMsgKeysRequest Copy() => GetInitMsgKeysRequest(
+      SessionToken: List.filled(0, 0xff, growable: true), IdentityKey: List.filled(0, 0xff, growable: true));
+
   static GetInitMsgKeysRequest fromBytes(Uint8List bytes) => GetInitMsgKeysRequest(
-    SessionToken: List.filled(0, 0xff, growable: true),
-    IdentityKey: List.filled(0, 0xff, growable: true),
-  )..Unmarshal(BinaryIterator(bytes));
+      SessionToken: List.filled(0, 0xff, growable: true), IdentityKey: List.filled(0, 0xff, growable: true))
+    ..Unmarshal(BinaryIterator(bytes));
 
   Uint8List Marshal() {
     List<int> b = [];
@@ -1321,13 +1539,13 @@ class GetInitMsgKeysRequest implements Message {
     List<int> size = ConvertSizeToBytes(0);
     b.addAll(size);
     List<int> arrBufSessionToken = [];
-    for (var elSessionToken in SessionToken) {
+    for (var elSessionToken in SessionToken!) {
       arrBufSessionToken.addAll(ConvertByteToBytes(elSessionToken));
     }
     b.addAll(ConvertSizeToBytes(arrBufSessionToken.length));
     b.addAll(arrBufSessionToken);
     List<int> arrBufIdentityKey = [];
-    for (var elIdentityKey in IdentityKey) {
+    for (var elIdentityKey in IdentityKey!) {
       arrBufIdentityKey.addAll(ConvertByteToBytes(elIdentityKey));
     }
     b.addAll(ConvertSizeToBytes(arrBufIdentityKey.length));
@@ -1347,39 +1565,55 @@ class GetInitMsgKeysRequest implements Message {
     binaryCtx.arrBuf = b.slice(binaryCtx.size);
     binaryCtx.pos = 0;
 
-    SessionToken.extend(binaryCtx.size, 0xff);
+    bool isEmptySessionToken = true;
+
     while (binaryCtx.arrBuf.hasNext()) {
+      isEmptySessionToken = false;
+
       int elSessionToken;
 
       binaryCtx.buf = binaryCtx.arrBuf.slice(1);
       elSessionToken = ConvertBytesToByte(binaryCtx.buf);
 
-      SessionToken[binaryCtx.pos] = elSessionToken;
-      binaryCtx.pos++;
+      SessionToken!.add(elSessionToken);
     }
+
+    if (isEmptySessionToken) {
+      SessionToken = null;
+    }
+
     binaryCtx.size = b.nextSize();
 
     binaryCtx.arrBuf = b.slice(binaryCtx.size);
     binaryCtx.pos = 0;
 
-    IdentityKey.extend(binaryCtx.size, 0xff);
+    bool isEmptyIdentityKey = true;
+
     while (binaryCtx.arrBuf.hasNext()) {
+      isEmptyIdentityKey = false;
+
       int elIdentityKey;
 
       binaryCtx.buf = binaryCtx.arrBuf.slice(1);
       elIdentityKey = ConvertBytesToByte(binaryCtx.buf);
 
-      IdentityKey[binaryCtx.pos] = elIdentityKey;
-      binaryCtx.pos++;
+      IdentityKey!.add(elIdentityKey);
+    }
+
+    if (isEmptyIdentityKey) {
+      IdentityKey = null;
     }
   }
 }
 
 class GetInitMsgKeysResponse implements Message {
   int OPKId;
-  List<int> OPK;
-  List<int> SignedLTPK;
-  List<int> Signature;
+
+  List<int>? OPK;
+
+  List<int>? SignedLTPK;
+
+  List<int>? Signature;
 
   GetInitMsgKeysResponse({
     required this.OPKId,
@@ -1388,12 +1622,18 @@ class GetInitMsgKeysResponse implements Message {
     required this.Signature,
   });
 
+  GetInitMsgKeysResponse Copy() => GetInitMsgKeysResponse(
+      OPKId: 0,
+      OPK: List.filled(0, 0xff, growable: true),
+      SignedLTPK: List.filled(0, 0xff, growable: true),
+      Signature: List.filled(0, 0xff, growable: true));
+
   static GetInitMsgKeysResponse fromBytes(Uint8List bytes) => GetInitMsgKeysResponse(
-    OPKId: 0,
-    OPK: List.filled(0, 0xff, growable: true),
-    SignedLTPK: List.filled(0, 0xff, growable: true),
-    Signature: List.filled(0, 0xff, growable: true),
-  )..Unmarshal(BinaryIterator(bytes));
+      OPKId: 0,
+      OPK: List.filled(0, 0xff, growable: true),
+      SignedLTPK: List.filled(0, 0xff, growable: true),
+      Signature: List.filled(0, 0xff, growable: true))
+    ..Unmarshal(BinaryIterator(bytes));
 
   Uint8List Marshal() {
     List<int> b = [];
@@ -1402,19 +1642,19 @@ class GetInitMsgKeysResponse implements Message {
     b.addAll(size);
     b.addAll(ConvertUint32ToBytes(OPKId));
     List<int> arrBufOPK = [];
-    for (var elOPK in OPK) {
+    for (var elOPK in OPK!) {
       arrBufOPK.addAll(ConvertByteToBytes(elOPK));
     }
     b.addAll(ConvertSizeToBytes(arrBufOPK.length));
     b.addAll(arrBufOPK);
     List<int> arrBufSignedLTPK = [];
-    for (var elSignedLTPK in SignedLTPK) {
+    for (var elSignedLTPK in SignedLTPK!) {
       arrBufSignedLTPK.addAll(ConvertByteToBytes(elSignedLTPK));
     }
     b.addAll(ConvertSizeToBytes(arrBufSignedLTPK.length));
     b.addAll(arrBufSignedLTPK);
     List<int> arrBufSignature = [];
-    for (var elSignature in Signature) {
+    for (var elSignature in Signature!) {
       arrBufSignature.addAll(ConvertByteToBytes(elSignature));
     }
     b.addAll(ConvertSizeToBytes(arrBufSignature.length));
@@ -1438,60 +1678,89 @@ class GetInitMsgKeysResponse implements Message {
     binaryCtx.arrBuf = b.slice(binaryCtx.size);
     binaryCtx.pos = 0;
 
-    OPK.extend(binaryCtx.size, 0xff);
+    bool isEmptyOPK = true;
+
     while (binaryCtx.arrBuf.hasNext()) {
+      isEmptyOPK = false;
+
       int elOPK;
 
       binaryCtx.buf = binaryCtx.arrBuf.slice(1);
       elOPK = ConvertBytesToByte(binaryCtx.buf);
 
-      OPK[binaryCtx.pos] = elOPK;
-      binaryCtx.pos++;
+      OPK!.add(elOPK);
     }
+
+    if (isEmptyOPK) {
+      OPK = null;
+    }
+
     binaryCtx.size = b.nextSize();
 
     binaryCtx.arrBuf = b.slice(binaryCtx.size);
     binaryCtx.pos = 0;
 
-    SignedLTPK.extend(binaryCtx.size, 0xff);
+    bool isEmptySignedLTPK = true;
+
     while (binaryCtx.arrBuf.hasNext()) {
+      isEmptySignedLTPK = false;
+
       int elSignedLTPK;
 
       binaryCtx.buf = binaryCtx.arrBuf.slice(1);
       elSignedLTPK = ConvertBytesToByte(binaryCtx.buf);
 
-      SignedLTPK[binaryCtx.pos] = elSignedLTPK;
-      binaryCtx.pos++;
+      SignedLTPK!.add(elSignedLTPK);
     }
+
+    if (isEmptySignedLTPK) {
+      SignedLTPK = null;
+    }
+
     binaryCtx.size = b.nextSize();
 
     binaryCtx.arrBuf = b.slice(binaryCtx.size);
     binaryCtx.pos = 0;
 
-    Signature.extend(binaryCtx.size, 0xff);
+    bool isEmptySignature = true;
+
     while (binaryCtx.arrBuf.hasNext()) {
+      isEmptySignature = false;
+
       int elSignature;
 
       binaryCtx.buf = binaryCtx.arrBuf.slice(1);
       elSignature = ConvertBytesToByte(binaryCtx.buf);
 
-      Signature[binaryCtx.pos] = elSignature;
-      binaryCtx.pos++;
+      Signature!.add(elSignature);
+    }
+
+    if (isEmptySignature) {
+      Signature = null;
     }
   }
 }
 
 class RegisterRequest implements Message {
   String Phone;
+
   int Code;
+
   String Nickname;
-  List<int> PassHash;
+
+  List<int>? PassHash;
+
   String DeviceID;
+
   String DeviceName;
+
   String FcmToken;
-  List<int> LTPK;
-  List<int> LTPKSignature;
-  List<int> IdentityKey;
+
+  List<int>? LTPK;
+
+  List<int>? LTPKSignature;
+
+  List<int>? IdentityKey;
 
   RegisterRequest({
     required this.Phone,
@@ -1506,18 +1775,30 @@ class RegisterRequest implements Message {
     required this.IdentityKey,
   });
 
+  RegisterRequest Copy() => RegisterRequest(
+      Phone: "",
+      Code: 0,
+      Nickname: "",
+      PassHash: List.filled(0, 0xff, growable: true),
+      DeviceID: "",
+      DeviceName: "",
+      FcmToken: "",
+      LTPK: List.filled(0, 0xff, growable: true),
+      LTPKSignature: List.filled(0, 0xff, growable: true),
+      IdentityKey: List.filled(0, 0xff, growable: true));
+
   static RegisterRequest fromBytes(Uint8List bytes) => RegisterRequest(
-    Phone: "",
-    Code: 0,
-    Nickname: "",
-    PassHash: List.filled(0, 0xff, growable: true),
-    DeviceID: "",
-    DeviceName: "",
-    FcmToken: "",
-    LTPK: List.filled(0, 0xff, growable: true),
-    LTPKSignature: List.filled(0, 0xff, growable: true),
-    IdentityKey: List.filled(0, 0xff, growable: true),
-  )..Unmarshal(BinaryIterator(bytes));
+      Phone: "",
+      Code: 0,
+      Nickname: "",
+      PassHash: List.filled(0, 0xff, growable: true),
+      DeviceID: "",
+      DeviceName: "",
+      FcmToken: "",
+      LTPK: List.filled(0, 0xff, growable: true),
+      LTPKSignature: List.filled(0, 0xff, growable: true),
+      IdentityKey: List.filled(0, 0xff, growable: true))
+    ..Unmarshal(BinaryIterator(bytes));
 
   Uint8List Marshal() {
     List<int> b = [];
@@ -1530,7 +1811,7 @@ class RegisterRequest implements Message {
     b.addAll(ConvertSizeToBytes(Nickname.codeUnits.length));
     b.addAll(ConvertStringToBytes(Nickname));
     List<int> arrBufPassHash = [];
-    for (var elPassHash in PassHash) {
+    for (var elPassHash in PassHash!) {
       arrBufPassHash.addAll(ConvertByteToBytes(elPassHash));
     }
     b.addAll(ConvertSizeToBytes(arrBufPassHash.length));
@@ -1542,19 +1823,19 @@ class RegisterRequest implements Message {
     b.addAll(ConvertSizeToBytes(FcmToken.codeUnits.length));
     b.addAll(ConvertStringToBytes(FcmToken));
     List<int> arrBufLTPK = [];
-    for (var elLTPK in LTPK) {
+    for (var elLTPK in LTPK!) {
       arrBufLTPK.addAll(ConvertByteToBytes(elLTPK));
     }
     b.addAll(ConvertSizeToBytes(arrBufLTPK.length));
     b.addAll(arrBufLTPK);
     List<int> arrBufLTPKSignature = [];
-    for (var elLTPKSignature in LTPKSignature) {
+    for (var elLTPKSignature in LTPKSignature!) {
       arrBufLTPKSignature.addAll(ConvertByteToBytes(elLTPKSignature));
     }
     b.addAll(ConvertSizeToBytes(arrBufLTPKSignature.length));
     b.addAll(arrBufLTPKSignature);
     List<int> arrBufIdentityKey = [];
-    for (var elIdentityKey in IdentityKey) {
+    for (var elIdentityKey in IdentityKey!) {
       arrBufIdentityKey.addAll(ConvertByteToBytes(elIdentityKey));
     }
     b.addAll(ConvertSizeToBytes(arrBufIdentityKey.length));
@@ -1583,15 +1864,21 @@ class RegisterRequest implements Message {
     binaryCtx.arrBuf = b.slice(binaryCtx.size);
     binaryCtx.pos = 0;
 
-    PassHash.extend(binaryCtx.size, 0xff);
+    bool isEmptyPassHash = true;
+
     while (binaryCtx.arrBuf.hasNext()) {
+      isEmptyPassHash = false;
+
       int elPassHash;
 
       binaryCtx.buf = binaryCtx.arrBuf.slice(1);
       elPassHash = ConvertBytesToByte(binaryCtx.buf);
 
-      PassHash[binaryCtx.pos] = elPassHash;
-      binaryCtx.pos++;
+      PassHash!.add(elPassHash);
+    }
+
+    if (isEmptyPassHash) {
+      PassHash = null;
     }
 
     binaryCtx.size = b.nextSize();
@@ -1611,59 +1898,80 @@ class RegisterRequest implements Message {
     binaryCtx.arrBuf = b.slice(binaryCtx.size);
     binaryCtx.pos = 0;
 
-    LTPK.extend(binaryCtx.size, 0xff);
+    bool isEmptyLTPK = true;
+
     while (binaryCtx.arrBuf.hasNext()) {
+      isEmptyLTPK = false;
+
       int elLTPK;
 
       binaryCtx.buf = binaryCtx.arrBuf.slice(1);
       elLTPK = ConvertBytesToByte(binaryCtx.buf);
 
-      LTPK[binaryCtx.pos] = elLTPK;
-      binaryCtx.pos++;
+      LTPK!.add(elLTPK);
     }
+
+    if (isEmptyLTPK) {
+      LTPK = null;
+    }
+
     binaryCtx.size = b.nextSize();
 
     binaryCtx.arrBuf = b.slice(binaryCtx.size);
     binaryCtx.pos = 0;
 
-    LTPKSignature.extend(binaryCtx.size, 0xff);
+    bool isEmptyLTPKSignature = true;
+
     while (binaryCtx.arrBuf.hasNext()) {
+      isEmptyLTPKSignature = false;
+
       int elLTPKSignature;
 
       binaryCtx.buf = binaryCtx.arrBuf.slice(1);
       elLTPKSignature = ConvertBytesToByte(binaryCtx.buf);
 
-      LTPKSignature[binaryCtx.pos] = elLTPKSignature;
-      binaryCtx.pos++;
+      LTPKSignature!.add(elLTPKSignature);
     }
+
+    if (isEmptyLTPKSignature) {
+      LTPKSignature = null;
+    }
+
     binaryCtx.size = b.nextSize();
 
     binaryCtx.arrBuf = b.slice(binaryCtx.size);
     binaryCtx.pos = 0;
 
-    IdentityKey.extend(binaryCtx.size, 0xff);
+    bool isEmptyIdentityKey = true;
+
     while (binaryCtx.arrBuf.hasNext()) {
+      isEmptyIdentityKey = false;
+
       int elIdentityKey;
 
       binaryCtx.buf = binaryCtx.arrBuf.slice(1);
       elIdentityKey = ConvertBytesToByte(binaryCtx.buf);
 
-      IdentityKey[binaryCtx.pos] = elIdentityKey;
-      binaryCtx.pos++;
+      IdentityKey!.add(elIdentityKey);
+    }
+
+    if (isEmptyIdentityKey) {
+      IdentityKey = null;
     }
   }
 }
 
 class RegisterResponse implements Message {
-  List<int> SessionToken;
+  List<int>? SessionToken;
 
   RegisterResponse({
     required this.SessionToken,
   });
 
-  static RegisterResponse fromBytes(Uint8List bytes) => RegisterResponse(
-    SessionToken: List.filled(0, 0xff, growable: true),
-  )..Unmarshal(BinaryIterator(bytes));
+  RegisterResponse Copy() => RegisterResponse(SessionToken: List.filled(0, 0xff, growable: true));
+
+  static RegisterResponse fromBytes(Uint8List bytes) =>
+      RegisterResponse(SessionToken: List.filled(0, 0xff, growable: true))..Unmarshal(BinaryIterator(bytes));
 
   Uint8List Marshal() {
     List<int> b = [];
@@ -1671,7 +1979,7 @@ class RegisterResponse implements Message {
     List<int> size = ConvertSizeToBytes(0);
     b.addAll(size);
     List<int> arrBufSessionToken = [];
-    for (var elSessionToken in SessionToken) {
+    for (var elSessionToken in SessionToken!) {
       arrBufSessionToken.addAll(ConvertByteToBytes(elSessionToken));
     }
     b.addAll(ConvertSizeToBytes(arrBufSessionToken.length));
@@ -1691,29 +1999,36 @@ class RegisterResponse implements Message {
     binaryCtx.arrBuf = b.slice(binaryCtx.size);
     binaryCtx.pos = 0;
 
-    SessionToken.extend(binaryCtx.size, 0xff);
+    bool isEmptySessionToken = true;
+
     while (binaryCtx.arrBuf.hasNext()) {
+      isEmptySessionToken = false;
+
       int elSessionToken;
 
       binaryCtx.buf = binaryCtx.arrBuf.slice(1);
       elSessionToken = ConvertBytesToByte(binaryCtx.buf);
 
-      SessionToken[binaryCtx.pos] = elSessionToken;
-      binaryCtx.pos++;
+      SessionToken!.add(elSessionToken);
+    }
+
+    if (isEmptySessionToken) {
+      SessionToken = null;
     }
   }
 }
 
 class AuthTokenRequest implements Message {
-  List<int> SessionToken;
+  List<int>? SessionToken;
 
   AuthTokenRequest({
     required this.SessionToken,
   });
 
-  static AuthTokenRequest fromBytes(Uint8List bytes) => AuthTokenRequest(
-    SessionToken: List.filled(0, 0xff, growable: true),
-  )..Unmarshal(BinaryIterator(bytes));
+  AuthTokenRequest Copy() => AuthTokenRequest(SessionToken: List.filled(0, 0xff, growable: true));
+
+  static AuthTokenRequest fromBytes(Uint8List bytes) =>
+      AuthTokenRequest(SessionToken: List.filled(0, 0xff, growable: true))..Unmarshal(BinaryIterator(bytes));
 
   Uint8List Marshal() {
     List<int> b = [];
@@ -1721,7 +2036,7 @@ class AuthTokenRequest implements Message {
     List<int> size = ConvertSizeToBytes(0);
     b.addAll(size);
     List<int> arrBufSessionToken = [];
-    for (var elSessionToken in SessionToken) {
+    for (var elSessionToken in SessionToken!) {
       arrBufSessionToken.addAll(ConvertByteToBytes(elSessionToken));
     }
     b.addAll(ConvertSizeToBytes(arrBufSessionToken.length));
@@ -1741,29 +2056,36 @@ class AuthTokenRequest implements Message {
     binaryCtx.arrBuf = b.slice(binaryCtx.size);
     binaryCtx.pos = 0;
 
-    SessionToken.extend(binaryCtx.size, 0xff);
+    bool isEmptySessionToken = true;
+
     while (binaryCtx.arrBuf.hasNext()) {
+      isEmptySessionToken = false;
+
       int elSessionToken;
 
       binaryCtx.buf = binaryCtx.arrBuf.slice(1);
       elSessionToken = ConvertBytesToByte(binaryCtx.buf);
 
-      SessionToken[binaryCtx.pos] = elSessionToken;
-      binaryCtx.pos++;
+      SessionToken!.add(elSessionToken);
+    }
+
+    if (isEmptySessionToken) {
+      SessionToken = null;
     }
   }
 }
 
 class AuthTokenResponse implements Message {
-  List<int> SessionToken;
+  List<int>? SessionToken;
 
   AuthTokenResponse({
     required this.SessionToken,
   });
 
-  static AuthTokenResponse fromBytes(Uint8List bytes) => AuthTokenResponse(
-    SessionToken: List.filled(0, 0xff, growable: true),
-  )..Unmarshal(BinaryIterator(bytes));
+  AuthTokenResponse Copy() => AuthTokenResponse(SessionToken: List.filled(0, 0xff, growable: true));
+
+  static AuthTokenResponse fromBytes(Uint8List bytes) =>
+      AuthTokenResponse(SessionToken: List.filled(0, 0xff, growable: true))..Unmarshal(BinaryIterator(bytes));
 
   Uint8List Marshal() {
     List<int> b = [];
@@ -1771,7 +2093,7 @@ class AuthTokenResponse implements Message {
     List<int> size = ConvertSizeToBytes(0);
     b.addAll(size);
     List<int> arrBufSessionToken = [];
-    for (var elSessionToken in SessionToken) {
+    for (var elSessionToken in SessionToken!) {
       arrBufSessionToken.addAll(ConvertByteToBytes(elSessionToken));
     }
     b.addAll(ConvertSizeToBytes(arrBufSessionToken.length));
@@ -1791,23 +2113,32 @@ class AuthTokenResponse implements Message {
     binaryCtx.arrBuf = b.slice(binaryCtx.size);
     binaryCtx.pos = 0;
 
-    SessionToken.extend(binaryCtx.size, 0xff);
+    bool isEmptySessionToken = true;
+
     while (binaryCtx.arrBuf.hasNext()) {
+      isEmptySessionToken = false;
+
       int elSessionToken;
 
       binaryCtx.buf = binaryCtx.arrBuf.slice(1);
       elSessionToken = ConvertBytesToByte(binaryCtx.buf);
 
-      SessionToken[binaryCtx.pos] = elSessionToken;
-      binaryCtx.pos++;
+      SessionToken!.add(elSessionToken);
+    }
+
+    if (isEmptySessionToken) {
+      SessionToken = null;
     }
   }
 }
 
 class AuthCredentialsRequest implements Message {
   String Phone;
-  String PassHash;
+
+  List<int>? PassHash;
+
   String DeviceID;
+
   String DeviceName;
 
   AuthCredentialsRequest({
@@ -1817,12 +2148,12 @@ class AuthCredentialsRequest implements Message {
     required this.DeviceName,
   });
 
-  static AuthCredentialsRequest fromBytes(Uint8List bytes) => AuthCredentialsRequest(
-    Phone: "",
-    PassHash: "",
-    DeviceID: "",
-    DeviceName: "",
-  )..Unmarshal(BinaryIterator(bytes));
+  AuthCredentialsRequest Copy() =>
+      AuthCredentialsRequest(Phone: "", PassHash: List.filled(0, 0xff, growable: true), DeviceID: "", DeviceName: "");
+
+  static AuthCredentialsRequest fromBytes(Uint8List bytes) =>
+      AuthCredentialsRequest(Phone: "", PassHash: List.filled(0, 0xff, growable: true), DeviceID: "", DeviceName: "")
+        ..Unmarshal(BinaryIterator(bytes));
 
   Uint8List Marshal() {
     List<int> b = [];
@@ -1831,8 +2162,12 @@ class AuthCredentialsRequest implements Message {
     b.addAll(size);
     b.addAll(ConvertSizeToBytes(Phone.codeUnits.length));
     b.addAll(ConvertStringToBytes(Phone));
-    b.addAll(ConvertSizeToBytes(PassHash.codeUnits.length));
-    b.addAll(ConvertStringToBytes(PassHash));
+    List<int> arrBufPassHash = [];
+    for (var elPassHash in PassHash!) {
+      arrBufPassHash.addAll(ConvertByteToBytes(elPassHash));
+    }
+    b.addAll(ConvertSizeToBytes(arrBufPassHash.length));
+    b.addAll(arrBufPassHash);
     b.addAll(ConvertSizeToBytes(DeviceID.codeUnits.length));
     b.addAll(ConvertStringToBytes(DeviceID));
     b.addAll(ConvertSizeToBytes(DeviceName.codeUnits.length));
@@ -1853,8 +2188,26 @@ class AuthCredentialsRequest implements Message {
     Phone = ConvertBytesToString(binaryCtx.buf);
 
     binaryCtx.size = b.nextSize();
-    binaryCtx.buf = b.slice(binaryCtx.size);
-    PassHash = ConvertBytesToString(binaryCtx.buf);
+
+    binaryCtx.arrBuf = b.slice(binaryCtx.size);
+    binaryCtx.pos = 0;
+
+    bool isEmptyPassHash = true;
+
+    while (binaryCtx.arrBuf.hasNext()) {
+      isEmptyPassHash = false;
+
+      int elPassHash;
+
+      binaryCtx.buf = binaryCtx.arrBuf.slice(1);
+      elPassHash = ConvertBytesToByte(binaryCtx.buf);
+
+      PassHash!.add(elPassHash);
+    }
+
+    if (isEmptyPassHash) {
+      PassHash = null;
+    }
 
     binaryCtx.size = b.nextSize();
     binaryCtx.buf = b.slice(binaryCtx.size);
@@ -1867,15 +2220,16 @@ class AuthCredentialsRequest implements Message {
 }
 
 class AuthCredentialsResponse implements Message {
-  List<int> SessionToken;
+  List<int>? SessionToken;
 
   AuthCredentialsResponse({
     required this.SessionToken,
   });
 
-  static AuthCredentialsResponse fromBytes(Uint8List bytes) => AuthCredentialsResponse(
-    SessionToken: List.filled(0, 0xff, growable: true),
-  )..Unmarshal(BinaryIterator(bytes));
+  AuthCredentialsResponse Copy() => AuthCredentialsResponse(SessionToken: List.filled(0, 0xff, growable: true));
+
+  static AuthCredentialsResponse fromBytes(Uint8List bytes) =>
+      AuthCredentialsResponse(SessionToken: List.filled(0, 0xff, growable: true))..Unmarshal(BinaryIterator(bytes));
 
   Uint8List Marshal() {
     List<int> b = [];
@@ -1883,7 +2237,7 @@ class AuthCredentialsResponse implements Message {
     List<int> size = ConvertSizeToBytes(0);
     b.addAll(size);
     List<int> arrBufSessionToken = [];
-    for (var elSessionToken in SessionToken) {
+    for (var elSessionToken in SessionToken!) {
       arrBufSessionToken.addAll(ConvertByteToBytes(elSessionToken));
     }
     b.addAll(ConvertSizeToBytes(arrBufSessionToken.length));
@@ -1903,21 +2257,28 @@ class AuthCredentialsResponse implements Message {
     binaryCtx.arrBuf = b.slice(binaryCtx.size);
     binaryCtx.pos = 0;
 
-    SessionToken.extend(binaryCtx.size, 0xff);
+    bool isEmptySessionToken = true;
+
     while (binaryCtx.arrBuf.hasNext()) {
+      isEmptySessionToken = false;
+
       int elSessionToken;
 
       binaryCtx.buf = binaryCtx.arrBuf.slice(1);
       elSessionToken = ConvertBytesToByte(binaryCtx.buf);
 
-      SessionToken[binaryCtx.pos] = elSessionToken;
-      binaryCtx.pos++;
+      SessionToken!.add(elSessionToken);
+    }
+
+    if (isEmptySessionToken) {
+      SessionToken = null;
     }
   }
 }
 
 class Attachment implements Message {
   String Type;
+
   List<int> Payload;
 
   Attachment({
@@ -1925,10 +2286,10 @@ class Attachment implements Message {
     required this.Payload,
   });
 
-  static Attachment fromBytes(Uint8List bytes) => Attachment(
-    Type: "",
-    Payload: List.filled(0, 0xff, growable: true),
-  )..Unmarshal(BinaryIterator(bytes));
+  Attachment Copy() => Attachment(Type: "", Payload: List.filled(0, 0xff, growable: true));
+
+  static Attachment fromBytes(Uint8List bytes) =>
+      Attachment(Type: "", Payload: List.filled(0, 0xff, growable: true))..Unmarshal(BinaryIterator(bytes));
 
   Uint8List Marshal() {
     List<int> b = [];
@@ -1963,26 +2324,29 @@ class Attachment implements Message {
     binaryCtx.arrBuf = b.slice(binaryCtx.size);
     binaryCtx.pos = 0;
 
-    Payload.extend(binaryCtx.size, 0xff);
     while (binaryCtx.arrBuf.hasNext()) {
       int elPayload;
 
       binaryCtx.buf = binaryCtx.arrBuf.slice(1);
       elPayload = ConvertBytesToByte(binaryCtx.buf);
 
-      Payload[binaryCtx.pos] = elPayload;
-      binaryCtx.pos++;
+      Payload.add(elPayload);
     }
   }
 }
 
 class SendMessagePMRequest implements Message {
   String MessageType;
-  List<int> ReceiverIK;
-  List<int> RSPK;
+
+  List<int>? ReceiverIK;
+
+  List<int>? RSPK;
+
   List<int> Content;
+
   List<Attachment> Attachments;
-  List<int> SessionToken;
+
+  List<int>? SessionToken;
 
   SendMessagePMRequest({
     required this.MessageType,
@@ -1993,20 +2357,22 @@ class SendMessagePMRequest implements Message {
     required this.SessionToken,
   });
 
+  SendMessagePMRequest Copy() => SendMessagePMRequest(
+      MessageType: "",
+      ReceiverIK: List.filled(0, 0xff, growable: true),
+      RSPK: List.filled(0, 0xff, growable: true),
+      Content: List.filled(0, 0xff, growable: true),
+      Attachments: List.filled(0, Attachment(Type: "", Payload: List.filled(0, 0xff, growable: true)), growable: true),
+      SessionToken: List.filled(0, 0xff, growable: true));
+
   static SendMessagePMRequest fromBytes(Uint8List bytes) => SendMessagePMRequest(
-    MessageType: "",
-    ReceiverIK: List.filled(0, 0xff, growable: true),
-    RSPK: List.filled(0, 0xff, growable: true),
-    Content: List.filled(0, 0xff, growable: true),
-    Attachments: List.filled(
-        0,
-        Attachment(
-          Type: "",
-          Payload: List.filled(0, 0xff, growable: true),
-        ),
-        growable: true),
-    SessionToken: List.filled(0, 0xff, growable: true),
-  )..Unmarshal(BinaryIterator(bytes));
+      MessageType: "",
+      ReceiverIK: List.filled(0, 0xff, growable: true),
+      RSPK: List.filled(0, 0xff, growable: true),
+      Content: List.filled(0, 0xff, growable: true),
+      Attachments: List.filled(0, Attachment(Type: "", Payload: List.filled(0, 0xff, growable: true)), growable: true),
+      SessionToken: List.filled(0, 0xff, growable: true))
+    ..Unmarshal(BinaryIterator(bytes));
 
   Uint8List Marshal() {
     List<int> b = [];
@@ -2016,13 +2382,13 @@ class SendMessagePMRequest implements Message {
     b.addAll(ConvertSizeToBytes(MessageType.codeUnits.length));
     b.addAll(ConvertStringToBytes(MessageType));
     List<int> arrBufReceiverIK = [];
-    for (var elReceiverIK in ReceiverIK) {
+    for (var elReceiverIK in ReceiverIK!) {
       arrBufReceiverIK.addAll(ConvertByteToBytes(elReceiverIK));
     }
     b.addAll(ConvertSizeToBytes(arrBufReceiverIK.length));
     b.addAll(arrBufReceiverIK);
     List<int> arrBufRSPK = [];
-    for (var elRSPK in RSPK) {
+    for (var elRSPK in RSPK!) {
       arrBufRSPK.addAll(ConvertByteToBytes(elRSPK));
     }
     b.addAll(ConvertSizeToBytes(arrBufRSPK.length));
@@ -2040,7 +2406,7 @@ class SendMessagePMRequest implements Message {
     b.addAll(ConvertSizeToBytes(arrBufAttachments.length));
     b.addAll(arrBufAttachments);
     List<int> arrBufSessionToken = [];
-    for (var elSessionToken in SessionToken) {
+    for (var elSessionToken in SessionToken!) {
       arrBufSessionToken.addAll(ConvertByteToBytes(elSessionToken));
     }
     b.addAll(ConvertSizeToBytes(arrBufSessionToken.length));
@@ -2065,52 +2431,64 @@ class SendMessagePMRequest implements Message {
     binaryCtx.arrBuf = b.slice(binaryCtx.size);
     binaryCtx.pos = 0;
 
-    ReceiverIK.extend(binaryCtx.size, 0xff);
+    bool isEmptyReceiverIK = true;
+
     while (binaryCtx.arrBuf.hasNext()) {
+      isEmptyReceiverIK = false;
+
       int elReceiverIK;
 
       binaryCtx.buf = binaryCtx.arrBuf.slice(1);
       elReceiverIK = ConvertBytesToByte(binaryCtx.buf);
 
-      ReceiverIK[binaryCtx.pos] = elReceiverIK;
-      binaryCtx.pos++;
+      ReceiverIK!.add(elReceiverIK);
     }
+
+    if (isEmptyReceiverIK) {
+      ReceiverIK = null;
+    }
+
     binaryCtx.size = b.nextSize();
 
     binaryCtx.arrBuf = b.slice(binaryCtx.size);
     binaryCtx.pos = 0;
 
-    RSPK.extend(binaryCtx.size, 0xff);
+    bool isEmptyRSPK = true;
+
     while (binaryCtx.arrBuf.hasNext()) {
+      isEmptyRSPK = false;
+
       int elRSPK;
 
       binaryCtx.buf = binaryCtx.arrBuf.slice(1);
       elRSPK = ConvertBytesToByte(binaryCtx.buf);
 
-      RSPK[binaryCtx.pos] = elRSPK;
-      binaryCtx.pos++;
+      RSPK!.add(elRSPK);
     }
+
+    if (isEmptyRSPK) {
+      RSPK = null;
+    }
+
     binaryCtx.size = b.nextSize();
 
     binaryCtx.arrBuf = b.slice(binaryCtx.size);
     binaryCtx.pos = 0;
 
-    Content.extend(binaryCtx.size, 0xff);
     while (binaryCtx.arrBuf.hasNext()) {
       int elContent;
 
       binaryCtx.buf = binaryCtx.arrBuf.slice(1);
       elContent = ConvertBytesToByte(binaryCtx.buf);
 
-      Content[binaryCtx.pos] = elContent;
-      binaryCtx.pos++;
+      Content.add(elContent);
     }
+
     binaryCtx.size = b.nextSize();
 
     binaryCtx.arrBuf = b.slice(binaryCtx.size);
     binaryCtx.pos = 0;
 
-    Attachments.extend(binaryCtx.size, Attachment(Type: "", Payload: List.filled(0, 0xff, growable: true)));
     while (binaryCtx.arrBuf.hasNext()) {
       Attachment elAttachments = Attachment(Type: "", Payload: List.filled(0, 0xff, growable: true));
 
@@ -2118,23 +2496,29 @@ class SendMessagePMRequest implements Message {
       binaryCtx.buf = binaryCtx.arrBuf.slice(binaryCtx.size);
       elAttachments.Unmarshal(binaryCtx.buf);
 
-      Attachments[binaryCtx.pos] = elAttachments;
-      binaryCtx.pos++;
+      Attachments.add(elAttachments);
     }
+
     binaryCtx.size = b.nextSize();
 
     binaryCtx.arrBuf = b.slice(binaryCtx.size);
     binaryCtx.pos = 0;
 
-    SessionToken.extend(binaryCtx.size, 0xff);
+    bool isEmptySessionToken = true;
+
     while (binaryCtx.arrBuf.hasNext()) {
+      isEmptySessionToken = false;
+
       int elSessionToken;
 
       binaryCtx.buf = binaryCtx.arrBuf.slice(1);
       elSessionToken = ConvertBytesToByte(binaryCtx.buf);
 
-      SessionToken[binaryCtx.pos] = elSessionToken;
-      binaryCtx.pos++;
+      SessionToken!.add(elSessionToken);
+    }
+
+    if (isEmptySessionToken) {
+      SessionToken = null;
     }
   }
 }
@@ -2145,6 +2529,8 @@ class SendMessagePMResponse implements Message {
   SendMessagePMResponse({
     required this.MessageID,
   });
+
+  SendMessagePMResponse Copy() => SendMessagePMResponse(MessageID: 0);
 
   static SendMessagePMResponse fromBytes(Uint8List bytes) =>
       SendMessagePMResponse(MessageID: 0)..Unmarshal(BinaryIterator(bytes));
@@ -2173,8 +2559,11 @@ class SendMessagePMResponse implements Message {
 
 class PresentEvent implements Message {
   int MonotonicEventID;
+
   String Type;
+
   List<int> Payload;
+
   int CreatedAt;
 
   PresentEvent({
@@ -2184,12 +2573,12 @@ class PresentEvent implements Message {
     required this.CreatedAt,
   });
 
-  static PresentEvent fromBytes(Uint8List bytes) => PresentEvent(
-    MonotonicEventID: 0,
-    Type: "",
-    Payload: List.filled(0, 0xff, growable: true),
-    CreatedAt: 0,
-  )..Unmarshal(BinaryIterator(bytes));
+  PresentEvent Copy() =>
+      PresentEvent(MonotonicEventID: 0, Type: "", Payload: List.filled(0, 0xff, growable: true), CreatedAt: 0);
+
+  static PresentEvent fromBytes(Uint8List bytes) =>
+      PresentEvent(MonotonicEventID: 0, Type: "", Payload: List.filled(0, 0xff, growable: true), CreatedAt: 0)
+        ..Unmarshal(BinaryIterator(bytes));
 
   Uint8List Marshal() {
     List<int> b = [];
@@ -2229,15 +2618,13 @@ class PresentEvent implements Message {
     binaryCtx.arrBuf = b.slice(binaryCtx.size);
     binaryCtx.pos = 0;
 
-    Payload.extend(binaryCtx.size, 0xff);
     while (binaryCtx.arrBuf.hasNext()) {
       int elPayload;
 
       binaryCtx.buf = binaryCtx.arrBuf.slice(1);
       elPayload = ConvertBytesToByte(binaryCtx.buf);
 
-      Payload[binaryCtx.pos] = elPayload;
-      binaryCtx.pos++;
+      Payload.add(elPayload);
     }
 
     binaryCtx.buf = b.slice(8);
@@ -2246,11 +2633,16 @@ class PresentEvent implements Message {
 }
 
 class PmMessage implements Message {
-  List<int> RemoteIK;
-  List<int> RSPK;
+  List<int>? RemoteIK;
+
+  List<int>? RSPK;
+
   int MessageID;
+
   String MessageType;
+
   List<int> Content;
+
   List<Attachment> Attachments;
 
   PmMessage({
@@ -2262,20 +2654,22 @@ class PmMessage implements Message {
     required this.Attachments,
   });
 
+  PmMessage Copy() => PmMessage(
+      RemoteIK: List.filled(0, 0xff, growable: true),
+      RSPK: List.filled(0, 0xff, growable: true),
+      MessageID: 0,
+      MessageType: "",
+      Content: List.filled(0, 0xff, growable: true),
+      Attachments: List.filled(0, Attachment(Type: "", Payload: List.filled(0, 0xff, growable: true)), growable: true));
+
   static PmMessage fromBytes(Uint8List bytes) => PmMessage(
-    RemoteIK: List.filled(0, 0xff, growable: true),
-    RSPK: List.filled(0, 0xff, growable: true),
-    MessageID: 0,
-    MessageType: "",
-    Content: List.filled(0, 0xff, growable: true),
-    Attachments: List.filled(
-        0,
-        Attachment(
-          Type: "",
-          Payload: List.filled(0, 0xff, growable: true),
-        ),
-        growable: true),
-  )..Unmarshal(BinaryIterator(bytes));
+      RemoteIK: List.filled(0, 0xff, growable: true),
+      RSPK: List.filled(0, 0xff, growable: true),
+      MessageID: 0,
+      MessageType: "",
+      Content: List.filled(0, 0xff, growable: true),
+      Attachments: List.filled(0, Attachment(Type: "", Payload: List.filled(0, 0xff, growable: true)), growable: true))
+    ..Unmarshal(BinaryIterator(bytes));
 
   Uint8List Marshal() {
     List<int> b = [];
@@ -2283,13 +2677,13 @@ class PmMessage implements Message {
     List<int> size = ConvertSizeToBytes(0);
     b.addAll(size);
     List<int> arrBufRemoteIK = [];
-    for (var elRemoteIK in RemoteIK) {
+    for (var elRemoteIK in RemoteIK!) {
       arrBufRemoteIK.addAll(ConvertByteToBytes(elRemoteIK));
     }
     b.addAll(ConvertSizeToBytes(arrBufRemoteIK.length));
     b.addAll(arrBufRemoteIK);
     List<int> arrBufRSPK = [];
-    for (var elRSPK in RSPK) {
+    for (var elRSPK in RSPK!) {
       arrBufRSPK.addAll(ConvertByteToBytes(elRSPK));
     }
     b.addAll(ConvertSizeToBytes(arrBufRSPK.length));
@@ -2324,30 +2718,43 @@ class PmMessage implements Message {
     binaryCtx.arrBuf = b.slice(binaryCtx.size);
     binaryCtx.pos = 0;
 
-    RemoteIK.extend(binaryCtx.size, 0xff);
+    bool isEmptyRemoteIK = true;
+
     while (binaryCtx.arrBuf.hasNext()) {
+      isEmptyRemoteIK = false;
+
       int elRemoteIK;
 
       binaryCtx.buf = binaryCtx.arrBuf.slice(1);
       elRemoteIK = ConvertBytesToByte(binaryCtx.buf);
 
-      RemoteIK[binaryCtx.pos] = elRemoteIK;
-      binaryCtx.pos++;
+      RemoteIK!.add(elRemoteIK);
     }
+
+    if (isEmptyRemoteIK) {
+      RemoteIK = null;
+    }
+
     binaryCtx.size = b.nextSize();
 
     binaryCtx.arrBuf = b.slice(binaryCtx.size);
     binaryCtx.pos = 0;
 
-    RSPK.extend(binaryCtx.size, 0xff);
+    bool isEmptyRSPK = true;
+
     while (binaryCtx.arrBuf.hasNext()) {
+      isEmptyRSPK = false;
+
       int elRSPK;
 
       binaryCtx.buf = binaryCtx.arrBuf.slice(1);
       elRSPK = ConvertBytesToByte(binaryCtx.buf);
 
-      RSPK[binaryCtx.pos] = elRSPK;
-      binaryCtx.pos++;
+      RSPK!.add(elRSPK);
+    }
+
+    if (isEmptyRSPK) {
+      RSPK = null;
     }
 
     binaryCtx.buf = b.slice(4);
@@ -2362,22 +2769,20 @@ class PmMessage implements Message {
     binaryCtx.arrBuf = b.slice(binaryCtx.size);
     binaryCtx.pos = 0;
 
-    Content.extend(binaryCtx.size, 0xff);
     while (binaryCtx.arrBuf.hasNext()) {
       int elContent;
 
       binaryCtx.buf = binaryCtx.arrBuf.slice(1);
       elContent = ConvertBytesToByte(binaryCtx.buf);
 
-      Content[binaryCtx.pos] = elContent;
-      binaryCtx.pos++;
+      Content.add(elContent);
     }
+
     binaryCtx.size = b.nextSize();
 
     binaryCtx.arrBuf = b.slice(binaryCtx.size);
     binaryCtx.pos = 0;
 
-    Attachments.extend(binaryCtx.size, Attachment(Type: "", Payload: List.filled(0, 0xff, growable: true)));
     while (binaryCtx.arrBuf.hasNext()) {
       Attachment elAttachments = Attachment(Type: "", Payload: List.filled(0, 0xff, growable: true));
 
@@ -2385,15 +2790,16 @@ class PmMessage implements Message {
       binaryCtx.buf = binaryCtx.arrBuf.slice(binaryCtx.size);
       elAttachments.Unmarshal(binaryCtx.buf);
 
-      Attachments[binaryCtx.pos] = elAttachments;
-      binaryCtx.pos++;
+      Attachments.add(elAttachments);
     }
   }
 }
 
 class PmInitMessage implements Message {
-  List<int> RemoteIK;
-  List<int> RemoteEK;
+  List<int>? RemoteIK;
+
+  List<int>? RemoteEK;
+
   int UsedOPKMarkID;
 
   PmInitMessage({
@@ -2402,11 +2808,12 @@ class PmInitMessage implements Message {
     required this.UsedOPKMarkID,
   });
 
+  PmInitMessage Copy() => PmInitMessage(
+      RemoteIK: List.filled(0, 0xff, growable: true), RemoteEK: List.filled(0, 0xff, growable: true), UsedOPKMarkID: 0);
+
   static PmInitMessage fromBytes(Uint8List bytes) => PmInitMessage(
-    RemoteIK: List.filled(0, 0xff, growable: true),
-    RemoteEK: List.filled(0, 0xff, growable: true),
-    UsedOPKMarkID: 0,
-  )..Unmarshal(BinaryIterator(bytes));
+      RemoteIK: List.filled(0, 0xff, growable: true), RemoteEK: List.filled(0, 0xff, growable: true), UsedOPKMarkID: 0)
+    ..Unmarshal(BinaryIterator(bytes));
 
   Uint8List Marshal() {
     List<int> b = [];
@@ -2414,13 +2821,13 @@ class PmInitMessage implements Message {
     List<int> size = ConvertSizeToBytes(0);
     b.addAll(size);
     List<int> arrBufRemoteIK = [];
-    for (var elRemoteIK in RemoteIK) {
+    for (var elRemoteIK in RemoteIK!) {
       arrBufRemoteIK.addAll(ConvertByteToBytes(elRemoteIK));
     }
     b.addAll(ConvertSizeToBytes(arrBufRemoteIK.length));
     b.addAll(arrBufRemoteIK);
     List<int> arrBufRemoteEK = [];
-    for (var elRemoteEK in RemoteEK) {
+    for (var elRemoteEK in RemoteEK!) {
       arrBufRemoteEK.addAll(ConvertByteToBytes(elRemoteEK));
     }
     b.addAll(ConvertSizeToBytes(arrBufRemoteEK.length));
@@ -2441,38 +2848,54 @@ class PmInitMessage implements Message {
     binaryCtx.arrBuf = b.slice(binaryCtx.size);
     binaryCtx.pos = 0;
 
-    RemoteIK.extend(binaryCtx.size, 0xff);
+    bool isEmptyRemoteIK = true;
+
     while (binaryCtx.arrBuf.hasNext()) {
+      isEmptyRemoteIK = false;
+
       int elRemoteIK;
 
       binaryCtx.buf = binaryCtx.arrBuf.slice(1);
       elRemoteIK = ConvertBytesToByte(binaryCtx.buf);
 
-      RemoteIK[binaryCtx.pos] = elRemoteIK;
-      binaryCtx.pos++;
+      RemoteIK!.add(elRemoteIK);
     }
+
+    if (isEmptyRemoteIK) {
+      RemoteIK = null;
+    }
+
     binaryCtx.size = b.nextSize();
 
     binaryCtx.arrBuf = b.slice(binaryCtx.size);
     binaryCtx.pos = 0;
 
-    RemoteEK.extend(binaryCtx.size, 0xff);
+    bool isEmptyRemoteEK = true;
+
     while (binaryCtx.arrBuf.hasNext()) {
+      isEmptyRemoteEK = false;
+
       int elRemoteEK;
 
       binaryCtx.buf = binaryCtx.arrBuf.slice(1);
       elRemoteEK = ConvertBytesToByte(binaryCtx.buf);
 
-      RemoteEK[binaryCtx.pos] = elRemoteEK;
-      binaryCtx.pos++;
+      RemoteEK!.add(elRemoteEK);
+    }
+
+    if (isEmptyRemoteEK) {
+      RemoteEK = null;
     }
   }
 }
 
 class SendInitMessagePMRequest implements Message {
-  List<int> SessionToken;
-  List<int> ReceiverIK;
-  List<int> SelfEK;
+  List<int>? SessionToken;
+
+  List<int>? ReceiverIK;
+
+  List<int>? SelfEK;
+
   int UsedOPKMarkID;
 
   SendInitMessagePMRequest({
@@ -2482,12 +2905,18 @@ class SendInitMessagePMRequest implements Message {
     required this.UsedOPKMarkID,
   });
 
+  SendInitMessagePMRequest Copy() => SendInitMessagePMRequest(
+      SessionToken: List.filled(0, 0xff, growable: true),
+      ReceiverIK: List.filled(0, 0xff, growable: true),
+      SelfEK: List.filled(0, 0xff, growable: true),
+      UsedOPKMarkID: 0);
+
   static SendInitMessagePMRequest fromBytes(Uint8List bytes) => SendInitMessagePMRequest(
-    SessionToken: List.filled(0, 0xff, growable: true),
-    ReceiverIK: List.filled(0, 0xff, growable: true),
-    SelfEK: List.filled(0, 0xff, growable: true),
-    UsedOPKMarkID: 0,
-  )..Unmarshal(BinaryIterator(bytes));
+      SessionToken: List.filled(0, 0xff, growable: true),
+      ReceiverIK: List.filled(0, 0xff, growable: true),
+      SelfEK: List.filled(0, 0xff, growable: true),
+      UsedOPKMarkID: 0)
+    ..Unmarshal(BinaryIterator(bytes));
 
   Uint8List Marshal() {
     List<int> b = [];
@@ -2495,19 +2924,19 @@ class SendInitMessagePMRequest implements Message {
     List<int> size = ConvertSizeToBytes(0);
     b.addAll(size);
     List<int> arrBufSessionToken = [];
-    for (var elSessionToken in SessionToken) {
+    for (var elSessionToken in SessionToken!) {
       arrBufSessionToken.addAll(ConvertByteToBytes(elSessionToken));
     }
     b.addAll(ConvertSizeToBytes(arrBufSessionToken.length));
     b.addAll(arrBufSessionToken);
     List<int> arrBufReceiverIK = [];
-    for (var elReceiverIK in ReceiverIK) {
+    for (var elReceiverIK in ReceiverIK!) {
       arrBufReceiverIK.addAll(ConvertByteToBytes(elReceiverIK));
     }
     b.addAll(ConvertSizeToBytes(arrBufReceiverIK.length));
     b.addAll(arrBufReceiverIK);
     List<int> arrBufSelfEK = [];
-    for (var elSelfEK in SelfEK) {
+    for (var elSelfEK in SelfEK!) {
       arrBufSelfEK.addAll(ConvertByteToBytes(elSelfEK));
     }
     b.addAll(ConvertSizeToBytes(arrBufSelfEK.length));
@@ -2528,51 +2957,73 @@ class SendInitMessagePMRequest implements Message {
     binaryCtx.arrBuf = b.slice(binaryCtx.size);
     binaryCtx.pos = 0;
 
-    SessionToken.extend(binaryCtx.size, 0xff);
+    bool isEmptySessionToken = true;
+
     while (binaryCtx.arrBuf.hasNext()) {
+      isEmptySessionToken = false;
+
       int elSessionToken;
 
       binaryCtx.buf = binaryCtx.arrBuf.slice(1);
       elSessionToken = ConvertBytesToByte(binaryCtx.buf);
 
-      SessionToken[binaryCtx.pos] = elSessionToken;
-      binaryCtx.pos++;
+      SessionToken!.add(elSessionToken);
     }
+
+    if (isEmptySessionToken) {
+      SessionToken = null;
+    }
+
     binaryCtx.size = b.nextSize();
 
     binaryCtx.arrBuf = b.slice(binaryCtx.size);
     binaryCtx.pos = 0;
 
-    ReceiverIK.extend(binaryCtx.size, 0xff);
+    bool isEmptyReceiverIK = true;
+
     while (binaryCtx.arrBuf.hasNext()) {
+      isEmptyReceiverIK = false;
+
       int elReceiverIK;
 
       binaryCtx.buf = binaryCtx.arrBuf.slice(1);
       elReceiverIK = ConvertBytesToByte(binaryCtx.buf);
 
-      ReceiverIK[binaryCtx.pos] = elReceiverIK;
-      binaryCtx.pos++;
+      ReceiverIK!.add(elReceiverIK);
     }
+
+    if (isEmptyReceiverIK) {
+      ReceiverIK = null;
+    }
+
     binaryCtx.size = b.nextSize();
 
     binaryCtx.arrBuf = b.slice(binaryCtx.size);
     binaryCtx.pos = 0;
 
-    SelfEK.extend(binaryCtx.size, 0xff);
+    bool isEmptySelfEK = true;
+
     while (binaryCtx.arrBuf.hasNext()) {
+      isEmptySelfEK = false;
+
       int elSelfEK;
 
       binaryCtx.buf = binaryCtx.arrBuf.slice(1);
       elSelfEK = ConvertBytesToByte(binaryCtx.buf);
 
-      SelfEK[binaryCtx.pos] = elSelfEK;
-      binaryCtx.pos++;
+      SelfEK!.add(elSelfEK);
+    }
+
+    if (isEmptySelfEK) {
+      SelfEK = null;
     }
   }
 }
 
 class SendInitMessagePMResponse implements Message {
   SendInitMessagePMResponse();
+
+  SendInitMessagePMResponse Copy() => SendInitMessagePMResponse();
 
   static SendInitMessagePMResponse fromBytes(Uint8List bytes) =>
       SendInitMessagePMResponse()..Unmarshal(BinaryIterator(bytes));
@@ -2590,11 +3041,14 @@ class SendInitMessagePMResponse implements Message {
     return Uint8List.fromList(b);
   }
 
-  void Unmarshal(BinaryIterator b) {}
+  void Unmarshal(BinaryIterator b) {
+    BinaryCtx binaryCtx = BinaryCtx();
+  }
 }
 
 class ListenUpdatesReq implements Message {
-  List<int> SessionToken;
+  List<int>? SessionToken;
+
   int MonotonicIdOffset;
 
   ListenUpdatesReq({
@@ -2602,10 +3056,11 @@ class ListenUpdatesReq implements Message {
     required this.MonotonicIdOffset,
   });
 
-  static ListenUpdatesReq fromBytes(Uint8List bytes) => ListenUpdatesReq(
-    SessionToken: List.filled(0, 0xff, growable: true),
-    MonotonicIdOffset: 0,
-  )..Unmarshal(BinaryIterator(bytes));
+  ListenUpdatesReq Copy() => ListenUpdatesReq(SessionToken: List.filled(0, 0xff, growable: true), MonotonicIdOffset: 0);
+
+  static ListenUpdatesReq fromBytes(Uint8List bytes) =>
+      ListenUpdatesReq(SessionToken: List.filled(0, 0xff, growable: true), MonotonicIdOffset: 0)
+        ..Unmarshal(BinaryIterator(bytes));
 
   Uint8List Marshal() {
     List<int> b = [];
@@ -2613,7 +3068,7 @@ class ListenUpdatesReq implements Message {
     List<int> size = ConvertSizeToBytes(0);
     b.addAll(size);
     List<int> arrBufSessionToken = [];
-    for (var elSessionToken in SessionToken) {
+    for (var elSessionToken in SessionToken!) {
       arrBufSessionToken.addAll(ConvertByteToBytes(elSessionToken));
     }
     b.addAll(ConvertSizeToBytes(arrBufSessionToken.length));
@@ -2634,36 +3089,21 @@ class ListenUpdatesReq implements Message {
     binaryCtx.arrBuf = b.slice(binaryCtx.size);
     binaryCtx.pos = 0;
 
-    SessionToken.extend(binaryCtx.size, 0xff);
+    bool isEmptySessionToken = true;
+
     while (binaryCtx.arrBuf.hasNext()) {
+      isEmptySessionToken = false;
+
       int elSessionToken;
 
       binaryCtx.buf = binaryCtx.arrBuf.slice(1);
       elSessionToken = ConvertBytesToByte(binaryCtx.buf);
 
-      SessionToken[binaryCtx.pos] = elSessionToken;
-      binaryCtx.pos++;
-    }
-  }
-}
-
-class ListenUpdatesResponse implements Message {
-  ListenUpdatesResponse();
-
-  static ListenUpdatesResponse fromBytes(Uint8List bytes) => ListenUpdatesResponse()..Unmarshal(BinaryIterator(bytes));
-
-  Uint8List Marshal() {
-    List<int> b = [];
-
-    List<int> size = ConvertSizeToBytes(0);
-    b.addAll(size);
-    size = ConvertSizeToBytes(b.length - size.length);
-    for (int i = 0; i < size.length; i++) {
-      b[i] = size[i];
+      SessionToken!.add(elSessionToken);
     }
 
-    return Uint8List.fromList(b);
+    if (isEmptySessionToken) {
+      SessionToken = null;
+    }
   }
-
-  void Unmarshal(BinaryIterator b) {}
 }

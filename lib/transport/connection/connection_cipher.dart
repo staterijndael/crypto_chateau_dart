@@ -2,12 +2,9 @@ import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:crypto_chateau_dart/extensions.dart';
-import 'package:crypto_chateau_dart/transport/connection/connection_pipe.dart';
-import 'package:crypto_chateau_dart/transport/connection/encryption.dart';
-import 'package:crypto_chateau_dart/transport/connection/error.dart';
+import 'package:crypto_chateau_dart/transport/connection/connection.dart';
 import 'package:crypto_chateau_dart/transport/utils.dart';
 import 'package:x25519/x25519.dart';
-import 'package:crypto_chateau_dart/transport/connection/connection_base.dart';
 import 'bytes_writer.dart';
 import 'bytes_reader.dart';
 
@@ -15,20 +12,46 @@ class ConnectionCipher extends ConnectionBase {
   final Encryption _encryption;
   late _State _state;
 
-  ConnectionCipher(super._connection, this._encryption) {
+  ConnectionCipher(Connection connection, this._encryption) : super(connection) {
     _state = _encryption.key.when(
       isNull: () => _StateNone(this),
       isNotNull: (_) => _StateIdle(this),
     );
+    final subscription = connection.connectionState.listen(_handleConnectionState);
+    subscription.onDone(subscription.cancel);
   }
 
   @override
-  Stream<BytesReader> get read => super.read.asyncExpand((buffer) => _state.read(buffer));
+  Stream<BytesReader> get read => super.read.asyncExpand(_read);
 
   @override
   void write(BytesWriter buffer) => _state.write(buffer);
 
+  Stream<BytesReader> _read(BytesReader buffer) => _state.read(buffer);
+
   void Function(BytesWriter buffer) get _write => super.write;
+
+  void _handleConnectionState(ConnectionState connectionState) {
+    switch (connectionState) {
+      case ConnectionState.connected:
+        break;
+      case ConnectionState.disconnected:
+        _setStateNone();
+        break;
+    }
+  }
+
+  void _setStateNone() {
+    _state = _StateNone(this);
+    _encryption.key = null;
+  }
+
+  void _setStateInit() => _state = _StateInit(this);
+
+  void _setStateIdle(Uint8List encryptionKey) {
+    _encryption.key = encryptionKey;
+    _state = _StateIdle(this);
+  }
 }
 
 abstract class _State {
@@ -48,7 +71,10 @@ class _StateNone implements _State {
   Stream<BytesReader> read(BytesReader event) => Stream.empty();
 
   @override
-  void write(BytesWriter buffer) => _context._state = _StateInit(_context)..write(buffer);
+  void write(BytesWriter buffer) {
+    _context._setStateInit();
+    _context._state.write(buffer);
+  }
 }
 
 /// Оборачивает шаги рукапожатия в Pipe
@@ -77,12 +103,17 @@ class _StateInit implements _State {
     _context._write(buffer);
   }
 
-  void _toIdle(Uint8List encryptionKey) {
-    _context._encryption.key = encryptionKey;
-    final newState = _context._state = _StateIdle(_context);
-    _buffer.forEach(newState.write);
+  void _setStateIdle(Uint8List encryptionKey) {
+    _context._setStateIdle(encryptionKey);
+    _buffer.forEach(_context._state.write);
     _buffer.clear();
   }
+
+  void _setStateInitStateSecondRequest(
+    Uint8List privateKey,
+    Uint8List publicKey,
+  ) =>
+      _state = _StateInitStateSecondRequest(this, privateKey, publicKey);
 }
 
 class _StateIdle implements _State {
@@ -125,9 +156,7 @@ class _StateInitStateFirstRequest implements _StateInitState {
 
   @override
   Stream<BytesReader> read(BytesReader buffer) async* {
-    final publicKey = buffer.bytes;
-    final privateKey = _createPrivateKey();
-    _context._state = _StateInitStateSecondRequest(_context, privateKey, publicKey);
+    _context._setStateInitStateSecondRequest(_createPrivateKey(), buffer.bytes);
   }
 
   Uint8List _createPrivateKey() {
@@ -164,6 +193,6 @@ class _StateInitStateSecondRequest implements _StateInitState {
     }
 
     final encryptionKey = Uint8List.fromList(getSha256FromBytes(X25519(_privateKey, _publicKey)));
-    _context._toIdle(encryptionKey);
+    _context._setStateIdle(encryptionKey);
   }
 }

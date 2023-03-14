@@ -13,9 +13,9 @@ class ConnectionHandshakeError implements ConnectionErrorFatal {
   String toString() => '$runtimeType: expected success handshake message from server, bytes: $bytes';
 }
 
-class ConnectionRootError implements ConnectionErrorFatal {
-  const ConnectionRootError();
+class SocketDoneException {
+  const SocketDoneException();
 
   @override
-  String toString() => '$runtimeType: can not connect to server';
+  String toString() => '$runtimeType: socket is done';
 }

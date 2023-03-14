@@ -1,6 +1,7 @@
 library connection;
 
 import 'dart:async';
+
 import 'bytes_writer.dart';
 import 'bytes_reader.dart';
 import 'connection_root.dart';
@@ -27,6 +28,8 @@ abstract class Connection {
   factory Connection.pipe(Connection connection) = ConnectionPipe;
 
   factory Connection.logger(Connection connection, [String? name]) = ConnectionLogger;
+
+  Stream<ConnectionState> get connectionState;
 
   Stream<BytesReader> get read;
 

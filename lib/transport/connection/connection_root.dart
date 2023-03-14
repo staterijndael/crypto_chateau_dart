@@ -17,12 +17,20 @@ class ConnectParams {
   });
 }
 
+enum ConnectionState {
+  connected,
+  disconnected,
+}
+
 class ConnectionRoot implements Connection {
   final ConnectParams _connectParams;
-  final _readController = StreamController<BytesReader>.broadcast(sync: true);
+  final StreamController<ConnectionState> _stateController;
+  final StreamController<BytesReader> _readController;
   late _State _state = _StateNone(this);
 
-  ConnectionRoot(this._connectParams);
+  ConnectionRoot(this._connectParams)
+      : _stateController = StreamController<ConnectionState>.broadcast(sync: true),
+        _readController = StreamController<BytesReader>.broadcast(sync: true);
 
   Future<void> close() async {
     await _state.close();
@@ -30,10 +38,27 @@ class ConnectionRoot implements Connection {
   }
 
   @override
+  Stream<ConnectionState> get connectionState => _stateController.stream;
+
+  @override
   Stream<BytesReader> get read => _readController.stream;
 
   @override
   void write(BytesWriter buffer) => _state.write(buffer);
+
+  void _addError(Object error, StackTrace? stackTrace) => _readController.addError(error, stackTrace);
+
+  void _setStateNone() {
+    _state = _StateNone(this);
+    _stateController.add(ConnectionState.disconnected);
+  }
+
+  void _setStateInit() => _state = _StateInit(this);
+
+  void _setStateIdle(Socket socket) {
+    _state = _StateIdle(this, socket);
+    _stateController.add(ConnectionState.connected);
+  }
 }
 
 abstract class _State {
@@ -50,9 +75,10 @@ class _StateNone implements _State {
   Future<void> close() => Future.value();
 
   @override
-  void write(BytesWriter buffer) =>
-      _context._state = _StateInit(_context)
-        ..write(buffer);
+  void write(BytesWriter buffer) {
+    _context._setStateInit();
+    _context._state.write(buffer);
+  }
 }
 
 class _StateInit implements _State {
@@ -64,19 +90,19 @@ class _StateInit implements _State {
       _connectParams.host,
       _connectParams.port,
     ).then(
-          (socket) {
-        final state = _context._state = _StateIdle(_context, socket);
-        _buffer.forEach(state.write);
+      (socket) {
+        _context._setStateIdle(socket);
+        _buffer.forEach(_context._state.write);
+        _buffer.clear();
       },
       onError: (Object e, StackTrace st) {
-        _context._readController.addError(e, st);
-
-        /// TODO: ретраи, фатальные ошибки
+        _context._addError(e, st);
+        _context._setStateNone();
       },
     );
   }
 
-  ConnectParams get _connectParams => _context._connectParams;
+  get _connectParams => _context._connectParams;
 
   Future<void> close() => Future.value();
 
@@ -105,7 +131,16 @@ class _StateIdle implements _State {
     if (_readSubscription != null) return;
 
     _readSubscription = _socket.listen(
-          (bytes) => _readController.add(BytesReader(bytes)),
+      (bytes) => _readController.add(BytesReader(bytes)),
+      onError: (e, st) {
+        _context._addError(e, st);
+        _context._setStateNone();
+        close().ignore();
+      },
+      onDone: () {
+        _context._setStateNone();
+        close().ignore();
+      },
     );
   }
 
