@@ -28,7 +28,7 @@ class Pipe {
   Stream<BytesReader> read(BytesReader buffer) async* {
     var current = _reserved ?? _BytesReaderWithLength(buffer.readLength());
 
-    while(true) {
+    while (true) {
       final lengthNeed = current.length - current.builder.length;
 
       if (buffer.length > lengthNeed) {
@@ -44,6 +44,10 @@ class Pipe {
       if (current.builder.length == current.length) {
         final bytes = current.builder.takeBytes();
         yield BytesReader(bytes);
+        break;
+      }
+
+      if (buffer.length == 0) {
         break;
       }
     }
