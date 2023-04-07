@@ -6,36 +6,18 @@ import 'package:crypto_chateau_dart/transport/meta.dart';
 import 'bytes_writer.dart';
 
 class Peer {
-  final _Peer _loop;
+  static const int errByte = 0x2F;
+  final MultiplexConnection _connection;
 
-  Peer(MultiplexConnection connection) : _loop = _Peer(connection);
+  const Peer(this._connection);
 
   Future<Uint8List> sendRequest(HandlerHash hash, Message request) async {
     final builder = BytesBuilder(copy: false);
     builder.addByte(newProtocolByte());
     builder.add(hash.hash);
     builder.add(request.Marshal());
+    final bytes = builder.toBytes();
 
-    return _loop.sendRequest(builder.toBytes());
-  }
-
-  Stream<Uint8List> sendStreamRequest(HandlerHash hash, Message request) {
-    final builder = BytesBuilder(copy: false);
-    builder.addByte(newProtocolByte());
-    builder.add(hash.hash);
-    builder.add(request.Marshal());
-
-    return _loop.sendStreamRequest(builder.toBytes());
-  }
-}
-
-class _Peer {
-  static const int errByte = 0x2F;
-  final MultiplexConnection _connection;
-
-  const _Peer(this._connection);
-
-  Future<Uint8List> sendRequest(Uint8List bytes) async {
     final connection = _createConnection();
     connection.write(BytesWriter()..writeData(bytes));
     final response = await connection.read.first;
@@ -56,7 +38,13 @@ class _Peer {
     return response.read();
   }
 
-  Stream<Uint8List> sendStreamRequest(Uint8List bytes) async* {
+  Stream<Uint8List> sendStreamRequest(HandlerHash hash, Message request) async* {
+    final builder = BytesBuilder(copy: false);
+    builder.addByte(newProtocolByte());
+    builder.add(hash.hash);
+    builder.add(request.Marshal());
+    final bytes = builder.toBytes();
+
     final connection = _createConnection();
     connection.write(BytesWriter()..writeData(bytes));
 

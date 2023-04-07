@@ -35,6 +35,7 @@ class ConnectionRoot implements Connection {
   Future<void> close() async {
     await _state.close();
     await _readController.close();
+    await _stateController.close();
   }
 
   @override
@@ -133,11 +134,13 @@ class _StateIdle implements _State {
     _readSubscription = _socket.listen(
       (bytes) => _readController.add(BytesReader(bytes)),
       onError: (e, st) {
+        print('DONE');
         _context._addError(e, st);
         _context._setStateNone();
         close().ignore();
       },
       onDone: () {
+        print('DONE');
         _context._setStateNone();
         close().ignore();
       },
@@ -148,6 +151,7 @@ class _StateIdle implements _State {
     await _writeController?.close();
     await _writeSubscription?.cancel();
     await _readSubscription?.cancel();
+    _socket.destroy();
   }
 
   @override

@@ -13,6 +13,7 @@ var handlerHashMap = {
     "RequiredOPK": [0xE6, 0xF3, 0x96, 0x42],
     "LoadOPK": [0x3, 0xB, 0x41, 0x2E],
     "FindUsersByPartNickname": [0x50, 0x85, 0x5D, 0xE],
+    "FindUserByIK": [0x80, 0x3A, 0x30, 0xB4],
     "GetInitMsgKeys": [0x12, 0x90, 0xA7, 0xFE],
     "Register": [0x7D, 0xCB, 0xAD, 0xA0],
     "AuthToken": [0x98, 0xF1, 0xCE, 0x10],
@@ -20,9 +21,12 @@ var handlerHashMap = {
     "SendMessagePM": [0x92, 0x4E, 0xFD, 0x10],
     "SendInitMessagePM": [0x86, 0xC2, 0xB4, 0x1A],
     "ListenUpdates": [0x28, 0xDC, 0x9C, 0xE9],
+    "ListenNotifies": [0x70, 0xC0, 0xC3, 0x19],
     "ReverseString": [0x86, 0xC, 0xAA, 0x80],
     "UpdateNotificationId": [0x79, 0xA4, 0x14, 0xEF],
     "UpdateLTPK": [0xAC, 0x95, 0x39, 0x68],
+    "UploadStatic": [0xB9, 0xAD, 0x1C, 0xEF],
+    "MessageWasRead": [0x58, 0x2A, 0x29, 0xC8],
   },
   "GroupEndpoint": {
     "CreateGroup": [0x7C, 0x8, 0x95, 0xB1],
@@ -64,27 +68,33 @@ extension ExtendList<T> on List<T> {
 class Client {
   final ConnectParams connectParams;
   final Peer _peer;
+  final ConnectionRoot _root;
 
   const Client._({
     required this.connectParams,
     required Peer peer,
-  }) : _peer = peer;
+    required ConnectionRoot root,
+  })  : _peer = peer,
+        _root = root;
 
   factory Client({
     required ConnectParams connectParams,
   }) {
     final encryption = Encryption();
-    final connection = Connection.root(connectParams).pipe().cipher(encryption);
+    final root = Connection.root(connectParams);
 
     return Client._(
       connectParams: connectParams,
+      root: root,
       peer: Peer(
         MultiplexConnection(
-          connection,
+          root.pipe().cipher(encryption),
         ),
       ),
     );
   }
+
+  Future<void> close() => _root.close();
 
 // handlers
 
@@ -103,6 +113,9 @@ class Client {
   Future<FindUsersByPartNicknameResponse> findUsersByPartNickname(FindUsersByPartNicknameRequest request) => _peer
       .sendRequest(HandlerHash(hash: [0x50, 0x85, 0x5D, 0xE]), request)
       .then(FindUsersByPartNicknameResponse.fromBytes);
+
+  Future<FindUserByIKResponse> findUserByIK(FindUserByIKRequest request) =>
+      _peer.sendRequest(HandlerHash(hash: [0x80, 0x3A, 0x30, 0xB4]), request).then(FindUserByIKResponse.fromBytes);
 
   Future<GetInitMsgKeysResponse> getInitMsgKeys(GetInitMsgKeysRequest request) =>
       _peer.sendRequest(HandlerHash(hash: [0x12, 0x90, 0xA7, 0xFE]), request).then(GetInitMsgKeysResponse.fromBytes);
@@ -125,6 +138,9 @@ class Client {
   Stream<PresentEvent> listenUpdates(ListenUpdatesReq request) =>
       _peer.sendStreamRequest(HandlerHash(hash: [0x28, 0xDC, 0x9C, 0xE9]), request).map(PresentEvent.fromBytes);
 
+  Stream<PresentNotify> listenNotifies(ListenNotifiesReq request) =>
+      _peer.sendStreamRequest(HandlerHash(hash: [0x70, 0xC0, 0xC3, 0x19]), request).map(PresentNotify.fromBytes);
+
   Future<ReverseStringResponse> reverseString(ReverseStringReq request) =>
       _peer.sendRequest(HandlerHash(hash: [0x86, 0xC, 0xAA, 0x80]), request).then(ReverseStringResponse.fromBytes);
 
@@ -134,11 +150,471 @@ class Client {
   Future<UpdateLTPKResponse> updateLTPK(UpdateLTPKRequest request) =>
       _peer.sendRequest(HandlerHash(hash: [0xAC, 0x95, 0x39, 0x68]), request).then(UpdateLTPKResponse.fromBytes);
 
+  Stream<UploadStaticResponse> uploadStatic(UploadStaticRequest request) =>
+      _peer.sendStreamRequest(HandlerHash(hash: [0xB9, 0xAD, 0x1C, 0xEF]), request).map(UploadStaticResponse.fromBytes);
+
+  Future<MessageWasReadResponse> messageWasRead(MessageWasReadReq request) =>
+      _peer.sendRequest(HandlerHash(hash: [0x58, 0x2A, 0x29, 0xC8]), request).then(MessageWasReadResponse.fromBytes);
+
   Future<CreateGroupResponse> createGroup(CreateGroupReq request) =>
       _peer.sendRequest(HandlerHash(hash: [0x7C, 0x8, 0x95, 0xB1]), request).then(CreateGroupResponse.fromBytes);
 
   Future<SendMessageGroupResp> sendMessageGroup(SendMessageGroupReq request) =>
       _peer.sendRequest(HandlerHash(hash: [0xDB, 0xE4, 0x60, 0x89]), request).then(SendMessageGroupResp.fromBytes);
+}
+
+class MessageWasReadReq implements Message {
+  List<int>? SessionToken;
+
+  List<int>? UserIK;
+
+  int MessageID;
+
+  MessageWasReadReq({
+    required this.SessionToken,
+    required this.UserIK,
+    required this.MessageID,
+  });
+
+  MessageWasReadReq Copy() => MessageWasReadReq(
+      SessionToken: List.filled(0, 0xff, growable: true), UserIK: List.filled(0, 0xff, growable: true), MessageID: 0);
+
+  static MessageWasReadReq fromBytes(Uint8List bytes) => MessageWasReadReq(
+      SessionToken: List.filled(0, 0xff, growable: true), UserIK: List.filled(0, 0xff, growable: true), MessageID: 0)
+    ..Unmarshal(BinaryIterator(bytes));
+
+  Uint8List Marshal() {
+    List<int> b = [];
+
+    List<int> size = ConvertSizeToBytes(0);
+    b.addAll(size);
+    List<int> arrBufSessionToken = [];
+    for (var elSessionToken in SessionToken!) {
+      arrBufSessionToken.addAll(ConvertByteToBytes(elSessionToken));
+    }
+    b.addAll(ConvertSizeToBytes(arrBufSessionToken.length));
+    b.addAll(arrBufSessionToken);
+    List<int> arrBufUserIK = [];
+    for (var elUserIK in UserIK!) {
+      arrBufUserIK.addAll(ConvertByteToBytes(elUserIK));
+    }
+    b.addAll(ConvertSizeToBytes(arrBufUserIK.length));
+    b.addAll(arrBufUserIK);
+    b.addAll(ConvertUint32ToBytes(MessageID));
+    size = ConvertSizeToBytes(b.length - size.length);
+    for (int i = 0; i < size.length; i++) {
+      b[i] = size[i];
+    }
+
+    return Uint8List.fromList(b);
+  }
+
+  void Unmarshal(BinaryIterator b) {
+    BinaryCtx binaryCtx = BinaryCtx();
+    binaryCtx.size = b.nextSize();
+
+    binaryCtx.arrBuf = b.slice(binaryCtx.size);
+    binaryCtx.pos = 0;
+
+    bool isEmptySessionToken = true;
+
+    while (binaryCtx.arrBuf.hasNext()) {
+      isEmptySessionToken = false;
+
+      int elSessionToken;
+
+      binaryCtx.buf = binaryCtx.arrBuf.slice(1);
+      elSessionToken = ConvertBytesToByte(binaryCtx.buf);
+
+      SessionToken!.add(elSessionToken);
+    }
+
+    if (isEmptySessionToken) {
+      SessionToken = null;
+    }
+
+    binaryCtx.size = b.nextSize();
+
+    binaryCtx.arrBuf = b.slice(binaryCtx.size);
+    binaryCtx.pos = 0;
+
+    bool isEmptyUserIK = true;
+
+    while (binaryCtx.arrBuf.hasNext()) {
+      isEmptyUserIK = false;
+
+      int elUserIK;
+
+      binaryCtx.buf = binaryCtx.arrBuf.slice(1);
+      elUserIK = ConvertBytesToByte(binaryCtx.buf);
+
+      UserIK!.add(elUserIK);
+    }
+
+    if (isEmptyUserIK) {
+      UserIK = null;
+    }
+
+    binaryCtx.buf = b.slice(4);
+    MessageID = ConvertBytesToUint32(binaryCtx.buf);
+  }
+}
+
+class MessageWasReadResponse implements Message {
+  MessageWasReadResponse();
+
+  MessageWasReadResponse Copy() => MessageWasReadResponse();
+
+  static MessageWasReadResponse fromBytes(Uint8List bytes) =>
+      MessageWasReadResponse()..Unmarshal(BinaryIterator(bytes));
+
+  Uint8List Marshal() {
+    List<int> b = [];
+
+    List<int> size = ConvertSizeToBytes(0);
+    b.addAll(size);
+    size = ConvertSizeToBytes(b.length - size.length);
+    for (int i = 0; i < size.length; i++) {
+      b[i] = size[i];
+    }
+
+    return Uint8List.fromList(b);
+  }
+
+  void Unmarshal(BinaryIterator b) {
+    BinaryCtx binaryCtx = BinaryCtx();
+  }
+}
+
+class FindUserByIKRequest implements Message {
+  List<int>? SessionToken;
+
+  List<int>? UserIK;
+
+  FindUserByIKRequest({
+    required this.SessionToken,
+    required this.UserIK,
+  });
+
+  FindUserByIKRequest Copy() => FindUserByIKRequest(
+      SessionToken: List.filled(0, 0xff, growable: true), UserIK: List.filled(0, 0xff, growable: true));
+
+  static FindUserByIKRequest fromBytes(Uint8List bytes) => FindUserByIKRequest(
+      SessionToken: List.filled(0, 0xff, growable: true), UserIK: List.filled(0, 0xff, growable: true))
+    ..Unmarshal(BinaryIterator(bytes));
+
+  Uint8List Marshal() {
+    List<int> b = [];
+
+    List<int> size = ConvertSizeToBytes(0);
+    b.addAll(size);
+    List<int> arrBufSessionToken = [];
+    for (var elSessionToken in SessionToken!) {
+      arrBufSessionToken.addAll(ConvertByteToBytes(elSessionToken));
+    }
+    b.addAll(ConvertSizeToBytes(arrBufSessionToken.length));
+    b.addAll(arrBufSessionToken);
+    List<int> arrBufUserIK = [];
+    for (var elUserIK in UserIK!) {
+      arrBufUserIK.addAll(ConvertByteToBytes(elUserIK));
+    }
+    b.addAll(ConvertSizeToBytes(arrBufUserIK.length));
+    b.addAll(arrBufUserIK);
+    size = ConvertSizeToBytes(b.length - size.length);
+    for (int i = 0; i < size.length; i++) {
+      b[i] = size[i];
+    }
+
+    return Uint8List.fromList(b);
+  }
+
+  void Unmarshal(BinaryIterator b) {
+    BinaryCtx binaryCtx = BinaryCtx();
+    binaryCtx.size = b.nextSize();
+
+    binaryCtx.arrBuf = b.slice(binaryCtx.size);
+    binaryCtx.pos = 0;
+
+    bool isEmptySessionToken = true;
+
+    while (binaryCtx.arrBuf.hasNext()) {
+      isEmptySessionToken = false;
+
+      int elSessionToken;
+
+      binaryCtx.buf = binaryCtx.arrBuf.slice(1);
+      elSessionToken = ConvertBytesToByte(binaryCtx.buf);
+
+      SessionToken!.add(elSessionToken);
+    }
+
+    if (isEmptySessionToken) {
+      SessionToken = null;
+    }
+
+    binaryCtx.size = b.nextSize();
+
+    binaryCtx.arrBuf = b.slice(binaryCtx.size);
+    binaryCtx.pos = 0;
+
+    bool isEmptyUserIK = true;
+
+    while (binaryCtx.arrBuf.hasNext()) {
+      isEmptyUserIK = false;
+
+      int elUserIK;
+
+      binaryCtx.buf = binaryCtx.arrBuf.slice(1);
+      elUserIK = ConvertBytesToByte(binaryCtx.buf);
+
+      UserIK!.add(elUserIK);
+    }
+
+    if (isEmptyUserIK) {
+      UserIK = null;
+    }
+  }
+}
+
+class FindUserByIKResponse implements Message {
+  PresentUser User;
+
+  FindUserByIKResponse({
+    required this.User,
+  });
+
+  FindUserByIKResponse Copy() => FindUserByIKResponse(
+      User: PresentUser(
+          IdentityKey: List.filled(0, 0xff, growable: true), Nickname: "", Tag: "", PictureID: "", Status: ""));
+
+  static FindUserByIKResponse fromBytes(Uint8List bytes) => FindUserByIKResponse(
+      User: PresentUser(
+          IdentityKey: List.filled(0, 0xff, growable: true), Nickname: "", Tag: "", PictureID: "", Status: ""))
+    ..Unmarshal(BinaryIterator(bytes));
+
+  Uint8List Marshal() {
+    List<int> b = [];
+
+    List<int> size = ConvertSizeToBytes(0);
+    b.addAll(size);
+    b.addAll(User.Marshal());
+    size = ConvertSizeToBytes(b.length - size.length);
+    for (int i = 0; i < size.length; i++) {
+      b[i] = size[i];
+    }
+
+    return Uint8List.fromList(b);
+  }
+
+  void Unmarshal(BinaryIterator b) {
+    BinaryCtx binaryCtx = BinaryCtx();
+
+    binaryCtx.size = b.nextSize();
+    binaryCtx.buf = b.slice(binaryCtx.size);
+    User.Unmarshal(binaryCtx.buf);
+  }
+}
+
+class UploadStaticRequest implements Message {
+  List<int>? SessionToken;
+
+  String Type;
+
+  String StaticName;
+
+  int TotalSegmentsCount;
+
+  UploadStaticRequest({
+    required this.SessionToken,
+    required this.Type,
+    required this.StaticName,
+    required this.TotalSegmentsCount,
+  });
+
+  UploadStaticRequest Copy() => UploadStaticRequest(
+      SessionToken: List.filled(0, 0xff, growable: true), Type: "", StaticName: "", TotalSegmentsCount: 0);
+
+  static UploadStaticRequest fromBytes(Uint8List bytes) => UploadStaticRequest(
+      SessionToken: List.filled(0, 0xff, growable: true), Type: "", StaticName: "", TotalSegmentsCount: 0)
+    ..Unmarshal(BinaryIterator(bytes));
+
+  Uint8List Marshal() {
+    List<int> b = [];
+
+    List<int> size = ConvertSizeToBytes(0);
+    b.addAll(size);
+    List<int> arrBufSessionToken = [];
+    for (var elSessionToken in SessionToken!) {
+      arrBufSessionToken.addAll(ConvertByteToBytes(elSessionToken));
+    }
+    b.addAll(ConvertSizeToBytes(arrBufSessionToken.length));
+    b.addAll(arrBufSessionToken);
+    b.addAll(ConvertSizeToBytes(Type.codeUnits.length));
+    b.addAll(ConvertStringToBytes(Type));
+    b.addAll(ConvertSizeToBytes(StaticName.codeUnits.length));
+    b.addAll(ConvertStringToBytes(StaticName));
+    b.addAll(ConvertUint32ToBytes(TotalSegmentsCount));
+    size = ConvertSizeToBytes(b.length - size.length);
+    for (int i = 0; i < size.length; i++) {
+      b[i] = size[i];
+    }
+
+    return Uint8List.fromList(b);
+  }
+
+  void Unmarshal(BinaryIterator b) {
+    BinaryCtx binaryCtx = BinaryCtx();
+    binaryCtx.size = b.nextSize();
+
+    binaryCtx.arrBuf = b.slice(binaryCtx.size);
+    binaryCtx.pos = 0;
+
+    bool isEmptySessionToken = true;
+
+    while (binaryCtx.arrBuf.hasNext()) {
+      isEmptySessionToken = false;
+
+      int elSessionToken;
+
+      binaryCtx.buf = binaryCtx.arrBuf.slice(1);
+      elSessionToken = ConvertBytesToByte(binaryCtx.buf);
+
+      SessionToken!.add(elSessionToken);
+    }
+
+    if (isEmptySessionToken) {
+      SessionToken = null;
+    }
+
+    binaryCtx.size = b.nextSize();
+    binaryCtx.buf = b.slice(binaryCtx.size);
+    Type = ConvertBytesToString(binaryCtx.buf);
+
+    binaryCtx.size = b.nextSize();
+    binaryCtx.buf = b.slice(binaryCtx.size);
+    StaticName = ConvertBytesToString(binaryCtx.buf);
+
+    binaryCtx.buf = b.slice(4);
+    TotalSegmentsCount = ConvertBytesToUint32(binaryCtx.buf);
+  }
+}
+
+class UploadStaticResponse implements Message {
+  UploadStaticResponse();
+
+  UploadStaticResponse Copy() => UploadStaticResponse();
+
+  static UploadStaticResponse fromBytes(Uint8List bytes) => UploadStaticResponse()..Unmarshal(BinaryIterator(bytes));
+
+  Uint8List Marshal() {
+    List<int> b = [];
+
+    List<int> size = ConvertSizeToBytes(0);
+    b.addAll(size);
+    size = ConvertSizeToBytes(b.length - size.length);
+    for (int i = 0; i < size.length; i++) {
+      b[i] = size[i];
+    }
+
+    return Uint8List.fromList(b);
+  }
+
+  void Unmarshal(BinaryIterator b) {
+    BinaryCtx binaryCtx = BinaryCtx();
+  }
+}
+
+class UploadStaticSegment implements Message {
+  int SegmentSeqID;
+
+  List<int> Payload;
+
+  UploadStaticSegment({
+    required this.SegmentSeqID,
+    required this.Payload,
+  });
+
+  UploadStaticSegment Copy() => UploadStaticSegment(SegmentSeqID: 0, Payload: List.filled(0, 0xff, growable: true));
+
+  static UploadStaticSegment fromBytes(Uint8List bytes) =>
+      UploadStaticSegment(SegmentSeqID: 0, Payload: List.filled(0, 0xff, growable: true))
+        ..Unmarshal(BinaryIterator(bytes));
+
+  Uint8List Marshal() {
+    List<int> b = [];
+
+    List<int> size = ConvertSizeToBytes(0);
+    b.addAll(size);
+    b.addAll(ConvertUint32ToBytes(SegmentSeqID));
+    List<int> arrBufPayload = [];
+    for (var elPayload in Payload) {
+      arrBufPayload.addAll(ConvertByteToBytes(elPayload));
+    }
+    b.addAll(ConvertSizeToBytes(arrBufPayload.length));
+    b.addAll(arrBufPayload);
+    size = ConvertSizeToBytes(b.length - size.length);
+    for (int i = 0; i < size.length; i++) {
+      b[i] = size[i];
+    }
+
+    return Uint8List.fromList(b);
+  }
+
+  void Unmarshal(BinaryIterator b) {
+    BinaryCtx binaryCtx = BinaryCtx();
+
+    binaryCtx.buf = b.slice(4);
+    SegmentSeqID = ConvertBytesToUint32(binaryCtx.buf);
+
+    binaryCtx.size = b.nextSize();
+
+    binaryCtx.arrBuf = b.slice(binaryCtx.size);
+    binaryCtx.pos = 0;
+
+    while (binaryCtx.arrBuf.hasNext()) {
+      int elPayload;
+
+      binaryCtx.buf = binaryCtx.arrBuf.slice(1);
+      elPayload = ConvertBytesToByte(binaryCtx.buf);
+
+      Payload.add(elPayload);
+    }
+  }
+}
+
+class UploadStaticDone implements Message {
+  String MediaID;
+
+  UploadStaticDone({
+    required this.MediaID,
+  });
+
+  UploadStaticDone Copy() => UploadStaticDone(MediaID: "");
+
+  static UploadStaticDone fromBytes(Uint8List bytes) => UploadStaticDone(MediaID: "")..Unmarshal(BinaryIterator(bytes));
+
+  Uint8List Marshal() {
+    List<int> b = [];
+
+    List<int> size = ConvertSizeToBytes(0);
+    b.addAll(size);
+    b.addAll(ConvertSizeToBytes(MediaID.codeUnits.length));
+    b.addAll(ConvertStringToBytes(MediaID));
+    size = ConvertSizeToBytes(b.length - size.length);
+    for (int i = 0; i < size.length; i++) {
+      b[i] = size[i];
+    }
+
+    return Uint8List.fromList(b);
+  }
+
+  void Unmarshal(BinaryIterator b) {
+    BinaryCtx binaryCtx = BinaryCtx();
+
+    binaryCtx.size = b.nextSize();
+    binaryCtx.buf = b.slice(binaryCtx.size);
+    MediaID = ConvertBytesToString(binaryCtx.buf);
+  }
 }
 
 class UpdateLTPKResponse implements Message {
@@ -1382,12 +1858,16 @@ class FindUsersByPartNicknameResponse implements Message {
 
   FindUsersByPartNicknameResponse Copy() => FindUsersByPartNicknameResponse(
       Users: List.filled(
-          0, PresentUser(IdentityKey: List.filled(0, 0xff, growable: true), Nickname: "", PictureID: "", Status: ""),
+          0,
+          PresentUser(
+              IdentityKey: List.filled(0, 0xff, growable: true), Nickname: "", Tag: "", PictureID: "", Status: ""),
           growable: true));
 
   static FindUsersByPartNicknameResponse fromBytes(Uint8List bytes) => FindUsersByPartNicknameResponse(
       Users: List.filled(
-          0, PresentUser(IdentityKey: List.filled(0, 0xff, growable: true), Nickname: "", PictureID: "", Status: ""),
+          0,
+          PresentUser(
+              IdentityKey: List.filled(0, 0xff, growable: true), Nickname: "", Tag: "", PictureID: "", Status: ""),
           growable: true))
     ..Unmarshal(BinaryIterator(bytes));
 
@@ -1418,8 +1898,8 @@ class FindUsersByPartNicknameResponse implements Message {
     binaryCtx.pos = 0;
 
     while (binaryCtx.arrBuf.hasNext()) {
-      PresentUser elUsers =
-      PresentUser(IdentityKey: List.filled(0, 0xff, growable: true), Nickname: "", PictureID: "", Status: "");
+      PresentUser elUsers = PresentUser(
+          IdentityKey: List.filled(0, 0xff, growable: true), Nickname: "", Tag: "", PictureID: "", Status: "");
 
       binaryCtx.size = binaryCtx.arrBuf.nextSize();
       binaryCtx.buf = binaryCtx.arrBuf.slice(binaryCtx.size);
@@ -1435,6 +1915,8 @@ class PresentUser implements Message {
 
   String Nickname;
 
+  String Tag;
+
   String PictureID;
 
   String Status;
@@ -1442,15 +1924,16 @@ class PresentUser implements Message {
   PresentUser({
     required this.IdentityKey,
     required this.Nickname,
+    required this.Tag,
     required this.PictureID,
     required this.Status,
   });
 
   PresentUser Copy() =>
-      PresentUser(IdentityKey: List.filled(0, 0xff, growable: true), Nickname: "", PictureID: "", Status: "");
+      PresentUser(IdentityKey: List.filled(0, 0xff, growable: true), Nickname: "", Tag: "", PictureID: "", Status: "");
 
   static PresentUser fromBytes(Uint8List bytes) =>
-      PresentUser(IdentityKey: List.filled(0, 0xff, growable: true), Nickname: "", PictureID: "", Status: "")
+      PresentUser(IdentityKey: List.filled(0, 0xff, growable: true), Nickname: "", Tag: "", PictureID: "", Status: "")
         ..Unmarshal(BinaryIterator(bytes));
 
   Uint8List Marshal() {
@@ -1466,6 +1949,8 @@ class PresentUser implements Message {
     b.addAll(arrBufIdentityKey);
     b.addAll(ConvertSizeToBytes(Nickname.codeUnits.length));
     b.addAll(ConvertStringToBytes(Nickname));
+    b.addAll(ConvertSizeToBytes(Tag.codeUnits.length));
+    b.addAll(ConvertStringToBytes(Tag));
     b.addAll(ConvertSizeToBytes(PictureID.codeUnits.length));
     b.addAll(ConvertStringToBytes(PictureID));
     b.addAll(ConvertSizeToBytes(Status.codeUnits.length));
@@ -1505,6 +1990,10 @@ class PresentUser implements Message {
     binaryCtx.size = b.nextSize();
     binaryCtx.buf = b.slice(binaryCtx.size);
     Nickname = ConvertBytesToString(binaryCtx.buf);
+
+    binaryCtx.size = b.nextSize();
+    binaryCtx.buf = b.slice(binaryCtx.size);
+    Tag = ConvertBytesToString(binaryCtx.buf);
 
     binaryCtx.size = b.nextSize();
     binaryCtx.buf = b.slice(binaryCtx.size);
@@ -2632,6 +3121,73 @@ class PresentEvent implements Message {
   }
 }
 
+class PresentNotify implements Message {
+  String Type;
+
+  List<int> Payload;
+
+  int CreatedAt;
+
+  PresentNotify({
+    required this.Type,
+    required this.Payload,
+    required this.CreatedAt,
+  });
+
+  PresentNotify Copy() => PresentNotify(Type: "", Payload: List.filled(0, 0xff, growable: true), CreatedAt: 0);
+
+  static PresentNotify fromBytes(Uint8List bytes) =>
+      PresentNotify(Type: "", Payload: List.filled(0, 0xff, growable: true), CreatedAt: 0)
+        ..Unmarshal(BinaryIterator(bytes));
+
+  Uint8List Marshal() {
+    List<int> b = [];
+
+    List<int> size = ConvertSizeToBytes(0);
+    b.addAll(size);
+    b.addAll(ConvertSizeToBytes(Type.codeUnits.length));
+    b.addAll(ConvertStringToBytes(Type));
+    List<int> arrBufPayload = [];
+    for (var elPayload in Payload) {
+      arrBufPayload.addAll(ConvertByteToBytes(elPayload));
+    }
+    b.addAll(ConvertSizeToBytes(arrBufPayload.length));
+    b.addAll(arrBufPayload);
+    b.addAll(ConvertInt64ToBytes(CreatedAt));
+    size = ConvertSizeToBytes(b.length - size.length);
+    for (int i = 0; i < size.length; i++) {
+      b[i] = size[i];
+    }
+
+    return Uint8List.fromList(b);
+  }
+
+  void Unmarshal(BinaryIterator b) {
+    BinaryCtx binaryCtx = BinaryCtx();
+
+    binaryCtx.size = b.nextSize();
+    binaryCtx.buf = b.slice(binaryCtx.size);
+    Type = ConvertBytesToString(binaryCtx.buf);
+
+    binaryCtx.size = b.nextSize();
+
+    binaryCtx.arrBuf = b.slice(binaryCtx.size);
+    binaryCtx.pos = 0;
+
+    while (binaryCtx.arrBuf.hasNext()) {
+      int elPayload;
+
+      binaryCtx.buf = binaryCtx.arrBuf.slice(1);
+      elPayload = ConvertBytesToByte(binaryCtx.buf);
+
+      Payload.add(elPayload);
+    }
+
+    binaryCtx.buf = b.slice(8);
+    CreatedAt = ConvertBytesToInt64(binaryCtx.buf);
+  }
+}
+
 class PmMessage implements Message {
   List<int>? RemoteIK;
 
@@ -2792,6 +3348,137 @@ class PmMessage implements Message {
 
       Attachments.add(elAttachments);
     }
+  }
+}
+
+class UserOnlineStatusChanged implements Message {
+  List<int>? UserIK;
+
+  String Status;
+
+  UserOnlineStatusChanged({
+    required this.UserIK,
+    required this.Status,
+  });
+
+  UserOnlineStatusChanged Copy() => UserOnlineStatusChanged(UserIK: List.filled(0, 0xff, growable: true), Status: "");
+
+  static UserOnlineStatusChanged fromBytes(Uint8List bytes) =>
+      UserOnlineStatusChanged(UserIK: List.filled(0, 0xff, growable: true), Status: "")
+        ..Unmarshal(BinaryIterator(bytes));
+
+  Uint8List Marshal() {
+    List<int> b = [];
+
+    List<int> size = ConvertSizeToBytes(0);
+    b.addAll(size);
+    List<int> arrBufUserIK = [];
+    for (var elUserIK in UserIK!) {
+      arrBufUserIK.addAll(ConvertByteToBytes(elUserIK));
+    }
+    b.addAll(ConvertSizeToBytes(arrBufUserIK.length));
+    b.addAll(arrBufUserIK);
+    b.addAll(ConvertSizeToBytes(Status.codeUnits.length));
+    b.addAll(ConvertStringToBytes(Status));
+    size = ConvertSizeToBytes(b.length - size.length);
+    for (int i = 0; i < size.length; i++) {
+      b[i] = size[i];
+    }
+
+    return Uint8List.fromList(b);
+  }
+
+  void Unmarshal(BinaryIterator b) {
+    BinaryCtx binaryCtx = BinaryCtx();
+    binaryCtx.size = b.nextSize();
+
+    binaryCtx.arrBuf = b.slice(binaryCtx.size);
+    binaryCtx.pos = 0;
+
+    bool isEmptyUserIK = true;
+
+    while (binaryCtx.arrBuf.hasNext()) {
+      isEmptyUserIK = false;
+
+      int elUserIK;
+
+      binaryCtx.buf = binaryCtx.arrBuf.slice(1);
+      elUserIK = ConvertBytesToByte(binaryCtx.buf);
+
+      UserIK!.add(elUserIK);
+    }
+
+    if (isEmptyUserIK) {
+      UserIK = null;
+    }
+
+    binaryCtx.size = b.nextSize();
+    binaryCtx.buf = b.slice(binaryCtx.size);
+    Status = ConvertBytesToString(binaryCtx.buf);
+  }
+}
+
+class MessageWasRead implements Message {
+  List<int>? UserIK;
+
+  int MessageID;
+
+  MessageWasRead({
+    required this.UserIK,
+    required this.MessageID,
+  });
+
+  MessageWasRead Copy() => MessageWasRead(UserIK: List.filled(0, 0xff, growable: true), MessageID: 0);
+
+  static MessageWasRead fromBytes(Uint8List bytes) =>
+      MessageWasRead(UserIK: List.filled(0, 0xff, growable: true), MessageID: 0)..Unmarshal(BinaryIterator(bytes));
+
+  Uint8List Marshal() {
+    List<int> b = [];
+
+    List<int> size = ConvertSizeToBytes(0);
+    b.addAll(size);
+    List<int> arrBufUserIK = [];
+    for (var elUserIK in UserIK!) {
+      arrBufUserIK.addAll(ConvertByteToBytes(elUserIK));
+    }
+    b.addAll(ConvertSizeToBytes(arrBufUserIK.length));
+    b.addAll(arrBufUserIK);
+    b.addAll(ConvertUint32ToBytes(MessageID));
+    size = ConvertSizeToBytes(b.length - size.length);
+    for (int i = 0; i < size.length; i++) {
+      b[i] = size[i];
+    }
+
+    return Uint8List.fromList(b);
+  }
+
+  void Unmarshal(BinaryIterator b) {
+    BinaryCtx binaryCtx = BinaryCtx();
+    binaryCtx.size = b.nextSize();
+
+    binaryCtx.arrBuf = b.slice(binaryCtx.size);
+    binaryCtx.pos = 0;
+
+    bool isEmptyUserIK = true;
+
+    while (binaryCtx.arrBuf.hasNext()) {
+      isEmptyUserIK = false;
+
+      int elUserIK;
+
+      binaryCtx.buf = binaryCtx.arrBuf.slice(1);
+      elUserIK = ConvertBytesToByte(binaryCtx.buf);
+
+      UserIK!.add(elUserIK);
+    }
+
+    if (isEmptyUserIK) {
+      UserIK = null;
+    }
+
+    binaryCtx.buf = b.slice(4);
+    MessageID = ConvertBytesToUint32(binaryCtx.buf);
   }
 }
 
@@ -3074,6 +3761,63 @@ class ListenUpdatesReq implements Message {
     b.addAll(ConvertSizeToBytes(arrBufSessionToken.length));
     b.addAll(arrBufSessionToken);
     b.addAll(ConvertIntToBytes(MonotonicIdOffset));
+    size = ConvertSizeToBytes(b.length - size.length);
+    for (int i = 0; i < size.length; i++) {
+      b[i] = size[i];
+    }
+
+    return Uint8List.fromList(b);
+  }
+
+  void Unmarshal(BinaryIterator b) {
+    BinaryCtx binaryCtx = BinaryCtx();
+    binaryCtx.size = b.nextSize();
+
+    binaryCtx.arrBuf = b.slice(binaryCtx.size);
+    binaryCtx.pos = 0;
+
+    bool isEmptySessionToken = true;
+
+    while (binaryCtx.arrBuf.hasNext()) {
+      isEmptySessionToken = false;
+
+      int elSessionToken;
+
+      binaryCtx.buf = binaryCtx.arrBuf.slice(1);
+      elSessionToken = ConvertBytesToByte(binaryCtx.buf);
+
+      SessionToken!.add(elSessionToken);
+    }
+
+    if (isEmptySessionToken) {
+      SessionToken = null;
+    }
+  }
+}
+
+class ListenNotifiesReq implements Message {
+  List<int>? SessionToken;
+
+  ListenNotifiesReq({
+    required this.SessionToken,
+  });
+
+  ListenNotifiesReq Copy() => ListenNotifiesReq(SessionToken: List.filled(0, 0xff, growable: true));
+
+  static ListenNotifiesReq fromBytes(Uint8List bytes) =>
+      ListenNotifiesReq(SessionToken: List.filled(0, 0xff, growable: true))..Unmarshal(BinaryIterator(bytes));
+
+  Uint8List Marshal() {
+    List<int> b = [];
+
+    List<int> size = ConvertSizeToBytes(0);
+    b.addAll(size);
+    List<int> arrBufSessionToken = [];
+    for (var elSessionToken in SessionToken!) {
+      arrBufSessionToken.addAll(ConvertByteToBytes(elSessionToken));
+    }
+    b.addAll(ConvertSizeToBytes(arrBufSessionToken.length));
+    b.addAll(arrBufSessionToken);
     size = ConvertSizeToBytes(b.length - size.length);
     for (int i = 0; i < size.length; i++) {
       b[i] = size[i];
