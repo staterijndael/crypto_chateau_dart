@@ -68,7 +68,7 @@ class Peer {
     }
   }
 
-  Connection _createConnection() => Connection.pipe(_connection.createConnection());
+  Connection _createConnection() => Connection.pipe(_connection.createConnection()).logger('PIPE-PEER');
 }
 
 class MultiplexRequestLoopRPCError implements Exception {

@@ -88,7 +88,7 @@ class Client {
       root: root,
       peer: Peer(
         MultiplexConnection(
-          root.logger('ROOT').pipe().cipher(encryption),
+          root.pipe().cipher(encryption),
         ),
       ),
     );
