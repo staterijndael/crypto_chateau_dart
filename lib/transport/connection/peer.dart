@@ -21,6 +21,7 @@ class Peer {
     final connection = _createConnection();
     connection.write(BytesWriter()..writeData(bytes));
     final response = await connection.read.first;
+    print(request.runtimeType);
 
     final serverRespMetaInfo = getServerRespMetaInfo(bytes);
     final offset = serverRespMetaInfo.payloadOffset;
@@ -49,6 +50,7 @@ class Peer {
     connection.write(BytesWriter()..writeData(bytes));
 
     await for (var response in connection.read) {
+      print(request.runtimeType);
       final serverRespMetaInfo = getServerRespMetaInfo(bytes);
       final offset = serverRespMetaInfo.payloadOffset;
 
